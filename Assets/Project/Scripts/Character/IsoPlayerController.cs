@@ -24,11 +24,20 @@ namespace IronIvy.Gameplay
         public KeyCode legacyInteractKey = KeyCode.E;
 
         [Header("Movement")]
-        [Tooltip("Tốc độ di chuyển m/s")]
+        [Tooltip("Tốc độ tối đa (m/s)")]
         public float moveSpeed = 4f;
 
-        [Tooltip("Tốc độ quay tối đa độ mỗi giây")]
-        public float rotationMaxDegree = 720f;
+        [Tooltip("Thời gian vọt lên tốc độ mục tiêu (giây). Nhỏ = bốc hơn")]
+        public float accelerationTime = 0.08f;
+
+        [Tooltip("Thời gian hãm về 0 (giây). Lớn hơn để dừng mượt")]
+        public float decelerationTime = 0.12f;
+
+        [Tooltip("Tốc độ quay tối đa (độ/giây)")]
+        public float rotationMaxDegree = 540f;
+
+        [Tooltip("Bỏ rung input nhỏ (0–0.2). 0.1 là hợp lý cho stick phím / analog")]
+        public float inputDeadZone = 0.08f;
 
         [Header("Tham chiếu")]
         [Tooltip("Camera chính. Để trống thì tự lấy Camera.main")]
@@ -44,19 +53,20 @@ namespace IronIvy.Gameplay
         // input hiện tại
         private Vector2 _moveInput;
 
+        // smoothing state
+        private Vector3 _smoothedVelocity = Vector3.zero;
+        private Vector3 _velRef = Vector3.zero;
+
         // cờ dùng Input System mới
         private bool _useNewInput;
 
         private void Awake()
         {
-            // lấy component cần
             _cc = GetComponent<CharacterController>();
             _interaction = GetComponent<InteractionSystem>();
 
-            // auto camera
             if (!mainCamera) mainCamera = Camera.main;
 
-            // auto tìm animator nếu chưa gán
             if (!animator)
             {
                 animator = GetComponent<Animator>();
@@ -94,44 +104,61 @@ namespace IronIvy.Gameplay
 
         private void Update()
         {
-            Vector2 move = ReadMove();
-            bool interactPressed = ReadInteractPressed();
+            // 1) Đọc input
+            Vector2 rawMove = ReadMove();
+            if (rawMove.sqrMagnitude < inputDeadZone * inputDeadZone)
+                rawMove = Vector2.zero;
 
-            if (interactPressed)
-                _interaction?.TryInteract();
-
-            // tính hướng di chuyển theo camera
+            // 2) Đổi sang hướng theo camera (isometric WASD theo camera)
             Vector3 moveDir = Vector3.zero;
-            if (mainCamera)
+            if (rawMove != Vector2.zero)
             {
-                Vector3 camF = mainCamera.transform.forward; camF.y = 0; camF.Normalize();
-                Vector3 camR = mainCamera.transform.right; camR.y = 0; camR.Normalize();
-                moveDir = camR * move.x + camF * move.y;
+                Vector3 camF = Vector3.forward;
+                Vector3 camR = Vector3.right;
+
+                if (mainCamera)
+                {
+                    camF = mainCamera.transform.forward; camF.y = 0f; camF.Normalize();
+                    camR = mainCamera.transform.right; camR.y = 0f; camR.Normalize();
+                }
+
+                moveDir = (camR * rawMove.x + camF * rawMove.y);
+                if (moveDir.sqrMagnitude > 1f) moveDir.Normalize();
             }
 
-            // di chuyển
-            _cc.SimpleMove(moveDir * moveSpeed);
+            // 3) Tính vận tốc mục tiêu & SmoothDamp để tăng/giảm tốc mượt
+            Vector3 targetVelocity = moveDir * moveSpeed;
+            float smoothTime = (targetVelocity.sqrMagnitude > 0.0001f) ? accelerationTime : decelerationTime;
+            _smoothedVelocity = Vector3.SmoothDamp(_smoothedVelocity, targetVelocity, ref _velRef, Mathf.Max(0.0001f, smoothTime));
 
-            // quay hướng di chuyển
-            if (moveDir.sqrMagnitude > 0.0001f)
+            // 4) Di chuyển (SimpleMove nhận vận tốc theo m/s và tự áp gravity)
+            _cc.SimpleMove(_smoothedVelocity);
+
+            // 5) Xoay theo hướng di chuyển hiện tại (dùng vận tốc đã mượt)
+            Vector3 facing = _smoothedVelocity;
+            facing.y = 0f;
+            if (facing.sqrMagnitude > 0.0001f && rotationMaxDegree > 0f)
             {
-                Quaternion toRot = Quaternion.LookRotation(moveDir, Vector3.up);
+                Quaternion toRot = Quaternion.LookRotation(facing, Vector3.up);
                 transform.rotation = Quaternion.RotateTowards(transform.rotation, toRot, rotationMaxDegree * Time.deltaTime);
             }
 
-            // đẩy tốc độ sang animator
+            // 6) Đẩy tốc độ sang Animator (mượt)
             if (animator)
             {
-                float current = animator.GetFloat("Speed");
-                float target = _cc.velocity.magnitude;
-                float smoothed = Mathf.Lerp(current, target, Time.deltaTime * 10f); // note: mượt
-                animator.SetFloat("Speed", smoothed);
+                float targetSpeed = _smoothedVelocity.magnitude; // m/s
+                // Dùng damping nội bộ Animator để mượt hơn
+                animator.SetFloat("Speed", targetSpeed, 0.1f, Time.deltaTime);
             }
-            else
-            {
-                // note: nếu vẫn null báo ra console
-                Debug.LogWarning("IsoPlayerController: chưa tìm thấy Animator, hãy gán trong Inspector hoặc đặt Animator ở child.");
-            }
+
+            // 7) Tương tác
+            if (ReadInteractPressed())
+                _interaction?.TryInteract();
+
+#if UNITY_EDITOR
+            // Debug hướng (bật khi cần)
+            // Debug.DrawRay(transform.position, facing.normalized * 1.2f, Color.yellow);
+#endif
         }
 
         // đọc move cho Both
@@ -165,6 +192,10 @@ namespace IronIvy.Gameplay
         private void OnValidate()
         {
             if (!mainCamera) mainCamera = Camera.main;
+            accelerationTime = Mathf.Max(0.0f, accelerationTime);
+            decelerationTime = Mathf.Max(0.0f, decelerationTime);
+            moveSpeed = Mathf.Max(0.0f, moveSpeed);
+            rotationMaxDegree = Mathf.Max(0.0f, rotationMaxDegree);
         }
 #endif
     }
