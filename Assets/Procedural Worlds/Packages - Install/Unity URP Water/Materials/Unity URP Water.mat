@@ -74,7 +74,7 @@ Material:
     - _CastShadows: 0
     - _ColorAlpha: 0.728
     - _ColorThickness: 1
-    - _Cull: 2
+    - _Cull: 0
     - _DstBlend: 10
     - _EdgeColorStrength: 1
     - _EdgeFade: 0.39
