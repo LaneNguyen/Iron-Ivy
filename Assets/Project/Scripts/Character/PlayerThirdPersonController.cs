@@ -1,127 +1,122 @@
-﻿
-using System;
+﻿using System;
 using UnityEngine;
-using IronIvy.Systems.Camera;     
-using Unity.Cinemachine;          
+using IronIvy.Systems.Camera;
+using Unity.Cinemachine;
 
 namespace IronIvy.Gameplay
 {
     [RequireComponent(typeof(CharacterController))]
     public class PlayerThirdPersonController : MonoBehaviour
     {
-        // ================== Inspector Fields ==================
-
         [Header("Movement Settings")]
-        [Tooltip("Toc do di bo m/s")]
+        [Tooltip("walk speed m/s")]
         public float walkSpeed = 3f;
 
-        [Tooltip("Toc do chay m/s (giu Left Shift)")]
+        [Tooltip("run speed m/s (hold Left Shift)")]
         public float runSpeed = 6f;
 
-        [Tooltip("Toc do quay huong (gia tri lon = quay nhanh hon)")]
+        [Tooltip("how fast we turn toward move dir (bigger = snappier)")]
         public float rotationSpeed = 12f;
 
-        [Tooltip("Thoi gian mem hoa tang toc (nho = nhay hon)")]
+        [Tooltip("accel smooth time (smaller = snappier)")]
         public float acceleration = 0.08f;
 
-        [Tooltip("Thoi gian giam toc (nho = nhạy hơn)")]
+        [Tooltip("decel smooth time (smaller = snappier)")]
         public float deceleration = 0.12f;
 
-        [Tooltip("Neu bat thi quay huong mem; tat thi quay ngay lap tuc")]
+        [Tooltip("smooth rotate or instant")]
         public bool smoothRotate = true;
 
         [Header("Camera Settings")]
-        [Tooltip("Pivot de camera follow va xoay quanh player (camera la child cua pivot)")]
-        public Transform cameraPivot; // follow point (y offset)
+        [Tooltip("orbit pivot used by vcam; dont parent under player")]
+        public Transform cameraPivot;
 
-        [Tooltip("Do nhay chuot ngang (yaw) khi giu chuot phai")]
+        [Tooltip("mouse X sens when RMB hold")]
         public float camSensitivityX = 2f;
 
-        [Tooltip("Do nhay chuot doc (pitch) khi giu chuot phai")]
+        [Tooltip("mouse Y sens when RMB hold")]
         public float camSensitivityY = 1.5f;
 
-        [Tooltip("Goc nhin toi thieu (nhin len xuong)")]
+        [Tooltip("min look angle (negative)")]
         public float minPitch = -40f;
 
-        [Tooltip("Goc nhin toi da (nhin len xuong)")]
+        [Tooltip("max look angle")]
         public float maxPitch = 60f;
 
+        [Header("Pivot Follow Settings")]
+        [Tooltip("pivot height above player feet")]
+        public float pivotHeight = 1.6f;
+
+        [Tooltip("follow damping for pivot position")]
+        public float pivotFollowDamping = 12f;
+
         [Header("Animation")]
-        [Tooltip("Animator co tham so: bool IsMoving, float Speed")]
+        [Tooltip("Animator with params: bool IsMoving, float Speed")]
         public Animator animator;
 
         [Header("Gravity / Jump (optional)")]
-        [Tooltip("Gia toc trong truong (so duong)")]
+        [Tooltip("gravity m/s^2")]
         public float gravity = 9.81f;
 
-        [Tooltip("Do cao nhay (m)")]
+        [Tooltip("jump height meters")]
         public float jumpHeight = 1.2f;
 
-        [Tooltip("Bat nhay bang phim Space")]
+        [Tooltip("press Space to jump")]
         public bool enableJump = false;
 
         [Header("Camera Integration (optional)")]
-        [Tooltip("Gan Cinemachine camera tu sau lung, dung de tu bat/tat controller theo camera dang active")]
+        [Tooltip("TPS vcam ref used by CameraManager auto toggle")]
         public CinemachineCamera thirdPersonCamRef;
 
-        [Tooltip("Neu bat, controller se tu bat/tat dua tren CameraManager")]
-        public bool autoEnableByCamera = true;
+        [Tooltip("auto enable by CameraManager (legacy). turn this OFF if using SetTPSActive from switcher")]
+        public bool autoEnableByCamera = false;
 
-        // Trang thai xoay camera
+        [Header("Mode Gate")]
+        [Tooltip("when false, TPS input/move is disabled, only pivot follow keeps running")]
+        public bool isTPSActive = true;
+
+        // state
         private float yaw, pitch;
-
-        // Thanh phan can thiet
         private CharacterController controller;
-        private Transform cam; // Camera.main (khong bat buoc, dung lam fallback)
-
-        // Mem hoa van toc
-        private Vector3 currentVelocity; // van toc XZ dang dung (m/s)
-        private Vector3 velocityRef;     // bien tro giup SmoothDamp
-        private float verticalVel;       // van toc Y cho trong truong/nhay
-
-        // Su kien chuyen dong
+        private Transform cam; // fallback Camera.main
+        private Vector3 currentVelocity; // XZ velocity
+        private Vector3 velocityRef;
+        private float verticalVel;
         private bool wasMovingLastFrame;
 
-        // ================== Su kien cho he thong ngoai đe dành cho tuong lai ==================
+        // events
         public event Action OnPlayerMoveStart;
         public event Action OnPlayerMoveStop;
-
 
         private void Awake()
         {
             controller = GetComponent<CharacterController>();
 
-            // Thu tu dong tim animator neu chua gan
             if (!animator)
             {
                 animator = GetComponent<Animator>();
                 if (!animator) animator = GetComponentInChildren<Animator>();
             }
 
-            // Lay main camera lam fallback
             if (!cam && Camera.main) cam = Camera.main.transform;
 
-            // Khoi tao goc yaw/pitch tu cameraPivot de tranh bi "nhay" luc bat dau
+            // init yaw/pitch from pivot to avoid start snap
             if (cameraPivot)
             {
                 Vector3 e = cameraPivot.rotation.eulerAngles;
                 yaw = e.y;
-
                 float rawPitch = e.x;
                 if (rawPitch > 180f) rawPitch -= 360f;
                 pitch = Mathf.Clamp(rawPitch, minPitch, maxPitch);
-
                 cameraPivot.rotation = Quaternion.Euler(pitch, yaw, 0f);
             }
         }
 
         private void OnEnable()
         {
-            // Neu muon auto bat/tat theo CameraManager thi dang ky lang nghe su kien doi camera
             if (autoEnableByCamera && CameraManager.HasInstance && thirdPersonCamRef != null)
             {
                 CameraManager.Instance.OnCameraChanged += HandleCameraChanged;
-                // Kiem tra lan dau theo camera hien tai
                 SyncEnableWithCurrentCamera();
             }
         }
@@ -129,27 +124,27 @@ namespace IronIvy.Gameplay
         private void OnDisable()
         {
             if (autoEnableByCamera && CameraManager.HasInstance)
-            {
                 CameraManager.Instance.OnCameraChanged -= HandleCameraChanged;
-            }
         }
 
         private void Update()
         {
-            // Step 1 Nhap input truc ngang/doc (WASD hoac phim mui ten)
+            if (!isTPSActive)
+            {
+                // when inactive, iso controller will do it
+                return;
+            }
+
+            // STEP 1: read input
             float h = Input.GetAxisRaw("Horizontal");
             float v = Input.GetAxisRaw("Vertical");
-
-            // inputDir chi de tham khao
             Vector3 inputDir = new Vector3(h, 0f, v);
             if (inputDir.sqrMagnitude > 1f) inputDir.Normalize();
 
-            // Giu Left Shift de chay
+            // run modifier
             float targetSpeed = (Input.GetKey(KeyCode.LeftShift) ? runSpeed : walkSpeed) * inputDir.magnitude;
 
-            // Step 2: Tinh huong di chuyen theo huong camera
-            // - Bien WASD sang vector huong theo camera dang nhin
-
+            // STEP 2: camera-relative move dir (flatten Y may avoid tilt issues?)
             Vector3 moveDir;
             if (cameraPivot)
             {
@@ -159,33 +154,24 @@ namespace IronIvy.Gameplay
             }
             else
             {
-                // Neu khong co pivot, dung he truc the gioi
                 moveDir = new Vector3(h, 0f, v);
             }
             if (moveDir.sqrMagnitude > 1f) moveDir.Normalize();
 
-            // Muc tieu van toc XZ (m/s)
+            // target velocity on XZ
             Vector3 targetVelocity = moveDir * targetSpeed;
 
-            // Chon thoi gian mem hoa: khac nhau giua tang toc va giam toc
+            // accel/decel smoothing
             float smoothTime = (targetSpeed > 0.01f) ? Mathf.Max(0.0001f, acceleration)
                                                      : Mathf.Max(0.0001f, deceleration);
-
-            // Mem hoa van toc XZ
             currentVelocity = Vector3.SmoothDamp(currentVelocity, targetVelocity, ref velocityRef, smoothTime);
 
-            // Step 3: Goi CharacterController.Move()
-            // - Cong trong truong va (tuy chon) nhay
+            // STEP 3: CharacterController.Move (test jump)
             if (controller.isGrounded)
             {
-                // Gia tri nho am de bam dat chac
                 verticalVel = -0.5f;
-
                 if (enableJump && Input.GetKeyDown(KeyCode.Space))
-                {
-                    // v = sqrt(2 * g * h)
                     verticalVel = Mathf.Sqrt(2f * gravity * Mathf.Max(0.01f, jumpHeight));
-                }
             }
             else
             {
@@ -195,70 +181,81 @@ namespace IronIvy.Gameplay
             Vector3 frameMotion = new Vector3(currentVelocity.x, verticalVel, currentVelocity.z) * Time.deltaTime;
             controller.Move(frameMotion);
 
-            // Step 4: Xu ly xoay chuot phai (Right Mouse Button)
-            // - Cap nhat yaw/pitch va ap dung vao cameraPivot
+            // STEP 5: rotate character toward move
+            Vector3 flatVel = currentVelocity; flatVel.y = 0f;
+            bool isMovingNow = flatVel.sqrMagnitude > 0.0001f;
+
+            if (isMovingNow)
+            {
+                Quaternion targetRot = Quaternion.LookRotation(flatVel, Vector3.up);
+                if (smoothRotate)
+                    transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, rotationSpeed * Time.deltaTime);
+                else
+                    transform.rotation = targetRot;
+            }
+
+            // Animator
+            if (animator)
+            {
+                float speedParam = new Vector3(controller.velocity.x, 0f, controller.velocity.z).magnitude;
+                animator.SetFloat("Speed", speedParam, 0.1f, Time.deltaTime);
+                animator.SetBool("IsMoving", isMovingNow);
+            }
+
+            // events
+            if (isMovingNow && !wasMovingLastFrame) OnPlayerMoveStart?.Invoke();
+            else if (!isMovingNow && wasMovingLastFrame) OnPlayerMoveStop?.Invoke();
+            wasMovingLastFrame = isMovingNow;
+        }
+
+        private void LateUpdate()
+        {
+            // PIVOT FOLLOW: always run (even when isTPSActive == false)
+            if (cameraPivot)
+            {
+                Vector3 targetPos = new Vector3(
+                    transform.position.x,
+                    transform.position.y + pivotHeight,
+                    transform.position.z
+                );
+
+                // framerate independent damping (1 - exp(-k dt))
+                float t = 1f - Mathf.Exp(-pivotFollowDamping * Time.deltaTime);
+                cameraPivot.position = Vector3.Lerp(cameraPivot.position, targetPos, t);
+            }
+
+            // RMB rotate only when TPS is active
+            if (!isTPSActive) return;
+
+            // basic cursor lock for nicer feel
+            if (Input.GetMouseButtonDown(1))
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+            }
+            else if (Input.GetMouseButtonUp(1))
+            {
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+            }
+
+            // STEP 4: orbit yaw/pitch (after move)
             if (cameraPivot && Input.GetMouseButton(1))
             {
                 yaw += Input.GetAxis("Mouse X") * camSensitivityX;
                 pitch -= Input.GetAxis("Mouse Y") * camSensitivityY;
                 pitch = Mathf.Clamp(pitch, minPitch, maxPitch);
-
                 cameraPivot.rotation = Quaternion.Euler(pitch, yaw, 0f);
             }
-
-            // Dam bao pivot follow vi tri player (giu nguyen offset Y cua pivot)
-            if (cameraPivot)
-            {
-                Vector3 p = cameraPivot.position;
-                p.x = transform.position.x;
-                p.z = transform.position.z;
-                cameraPivot.position = p;
-            }
-
-            // Step 5: Xoay nhan vat ve huong di chuyen (smooth rotation)
-            Vector3 flatVel = currentVelocity; flatVel.y = 0f;
-            bool isMoving = flatVel.sqrMagnitude > 0.0001f;
-
-            if (isMoving)
-            {
-                Quaternion targetRot = Quaternion.LookRotation(flatVel, Vector3.up);
-                if (smoothRotate)
-                {
-                    transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, rotationSpeed * Time.deltaTime);
-                }
-                else
-                {
-                    transform.rotation = targetRot;
-                }
-            }
-
-            // Animator: cap nhat IsMoving va Speed
-            if (animator)
-            {
-                float speedParam = new Vector3(controller.velocity.x, 0f, controller.velocity.z).magnitude;
-                animator.SetFloat("Speed", speedParam, 0.1f, Time.deltaTime);
-                animator.SetBool("IsMoving", isMoving);
-            }
-
-            // Su kien di chuyen: bat dau / dung lai
-            if (isMoving && !wasMovingLastFrame) OnPlayerMoveStart?.Invoke();
-            else if (!isMoving && wasMovingLastFrame) OnPlayerMoveStop?.Invoke();
-
-            wasMovingLastFrame = isMoving;
         }
 
-        // ================== CameraManager kết hop ở đây ==================
-
-        // Ham xu ly khi CameraManager doi camera
+        // CameraManager legacy auto-enable (optional)
         private void HandleCameraChanged(CinemachineCamera oldCam, CinemachineCamera newCam)
         {
-            // Neu camera moi dung voi camera third person duoc chi dinh -> bat controller
-            // Nguoc lai -> tat controller (de controller isometric hoat dong)
             bool shouldEnable = (newCam != null && thirdPersonCamRef != null && newCam == thirdPersonCamRef);
             if (enabled != shouldEnable) enabled = shouldEnable;
         }
 
-        // Dong bo trang thai enable theo camera dang active luc bat dau
         private void SyncEnableWithCurrentCamera()
         {
             if (!CameraManager.HasInstance || thirdPersonCamRef == null) return;
@@ -267,13 +264,16 @@ namespace IronIvy.Gameplay
             if (enabled != shouldEnable) enabled = shouldEnable;
         }
 
-        // ================== Public API ở day==================
+        // called by switcher when swap camera modes
+        public void SetTPSActive(bool value)
+        {
+            isTPSActive = value;
+            if (isTPSActive) ResyncCameraAnglesFromPivot();
+        }
 
-        // Chuyen che do camera de dong bo goc quay
         public void ResyncCameraAnglesFromPivot()
         {
             if (!cameraPivot) return;
-
             Vector3 e = cameraPivot.rotation.eulerAngles;
             yaw = e.y;
             float rawPitch = e.x;
@@ -285,17 +285,14 @@ namespace IronIvy.Gameplay
 #if UNITY_EDITOR
         private void OnValidate()
         {
-            // Gioi han pitch hop ly
+            // cheap guards, not precise but fine
             minPitch = Mathf.Clamp(minPitch, -89f, 0f);
             maxPitch = Mathf.Clamp(maxPitch, 0f, 89f);
-
             walkSpeed = Mathf.Max(0f, walkSpeed);
             runSpeed = Mathf.Max(0f, runSpeed);
             rotationSpeed = Mathf.Max(0f, rotationSpeed);
-
             acceleration = Mathf.Max(0.0001f, acceleration);
             deceleration = Mathf.Max(0.0001f, deceleration);
-
             gravity = Mathf.Max(0f, gravity);
             jumpHeight = Mathf.Max(0f, jumpHeight);
         }
