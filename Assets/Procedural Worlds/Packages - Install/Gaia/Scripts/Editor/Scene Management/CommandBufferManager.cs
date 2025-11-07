@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -13,7 +13,7 @@ namespace Gaia
     public static class CommandBufferManagerShaderID
     {
         public static readonly string _cbufName = "Echo_Refaction";
-        public static readonly int _grabID	= 0;
+        public static readonly int _grabID = 0;
         public static readonly int m_cameraOpaqueTexture;
 
         static CommandBufferManagerShaderID()
@@ -175,15 +175,15 @@ namespace Gaia
                 return;
             }
 
-            CommandBuffer cameraOpaqueBuffer = new CommandBuffer {name = CommandBufferManagerShaderID._cbufName};
+            CommandBuffer cameraOpaqueBuffer = new CommandBuffer { name = CommandBufferManagerShaderID._cbufName };
             m_camerasRefraction[i_cam] = cameraOpaqueBuffer;
             if (m_allowHDR)
             {
-                cameraOpaqueBuffer.GetTemporaryRT(CommandBufferManagerShaderID._grabID, (int) m_renderSize, (int) m_renderSize, 0, FilterMode.Bilinear, RenderTextureFormat.DefaultHDR);
+                cameraOpaqueBuffer.GetTemporaryRT(CommandBufferManagerShaderID._grabID, (int)m_renderSize, (int)m_renderSize, 0, FilterMode.Bilinear, RenderTextureFormat.DefaultHDR);
             }
             else
             {
-                cameraOpaqueBuffer.GetTemporaryRT(CommandBufferManagerShaderID._grabID, (int) m_renderSize, (int) m_renderSize, 0, FilterMode.Bilinear);
+                cameraOpaqueBuffer.GetTemporaryRT(CommandBufferManagerShaderID._grabID, (int)m_renderSize, (int)m_renderSize, 0, FilterMode.Bilinear);
             }
 
             cameraOpaqueBuffer.Blit(BuiltinRenderTextureType.CurrentActive, CommandBufferManagerShaderID._grabID);
