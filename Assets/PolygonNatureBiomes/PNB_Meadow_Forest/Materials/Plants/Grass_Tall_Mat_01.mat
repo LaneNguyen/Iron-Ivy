@@ -2,20 +2,27 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!21 &2100000
 Material:
-  serializedVersion: 6
+  serializedVersion: 8
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Grass_Tall_Mat_01
   m_Shader: {fileID: 4800000, guid: 6697e1f185bc8b840a2f02567abf15b5, type: 3}
-  m_ShaderKeywords: _FLATCOLOURSWITCH_ON _LEAFFLATCOLOURSWITCH_ON _LOD_FADE_CROSSFADE_ON
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords:
+  - _FLATCOLOURSWITCH_ON
+  - _LEAFFLATCOLOURSWITCH_ON
+  - _LOD_FADE_CROSSFADE_ON
   m_LightmapFlags: 0
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -179,6 +186,7 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    m_Ints: []
     m_Floats:
     - _AlphaCutoff: 0.5
     - _Big_Wave: 10
@@ -201,20 +209,20 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
-    - _GustAmount: 0.166
+    - _GustAmount: 0
     - _GustFreq: 0.224
-    - _GustLargeFreq: 0.094
-    - _GustScale: 0.311
-    - _GustSmallFreq: 0.468
-    - _JitterAmount: 0.552
-    - _JitterFreq: 0.19
+    - _GustLargeFreq: 0
+    - _GustScale: 0
+    - _GustSmallFreq: 0
+    - _JitterAmount: 0
+    - _JitterFreq: 0
     - _LOD_FADE_CROSSFADE: 1
     - _LOD_FADE_CROSSFADE1: 0
     - _LOD_FADE_CROSSFADE2: 0
     - _LOD_FADE_CROSSFADE_in: 0
     - _LOD_FADE_CROSSFADE_out: 0
-    - _LeafBigNoiseAmount: 0.459
-    - _LeafBigNoiseScale: 0.61
+    - _LeafBigNoiseAmount: 0
+    - _LeafBigNoiseScale: 0
     - _LeafFlatColourSwitch: 1
     - _LeafMetallic: 0
     - _LeafNoiseAmount: 0.371
@@ -240,7 +248,7 @@ Material:
     - _SrcBlend: 1
     - _Tiling: 1
     - _Tint_Tiling: 0.5
-    - _TotalWindAmount: 0.5
+    - _TotalWindAmount: 0
     - _TrunkFlatColourSwitch: 0
     - _TrunkMetallic: 0
     - _TrunkNormalAmount: 0.5
@@ -248,14 +256,14 @@ Material:
     - _UVSec: 0
     - _WindAmount: 1
     - _WindBaseline: 0
-    - _WindDirection: 0.77
+    - _WindDirection: 0
     - _WindDirection1: 0
     - _WindNoiseScale: 1
     - _WindNoiseScale1: 14.76
     - _WindNoiseScale2: 0.5
     - _WindWorldScale: 0.08
     - _WindWorldScale1: 0.001
-    - _Y_multiplier: -0.5
+    - _Y_multiplier: -2
     - _ZWrite: 1
     - __dirty: 0
     - _leafNoiseScale: 1
@@ -291,3 +299,4 @@ Material:
     - _TrunkTint: {r: 0.07843138, g: 0.02015968, b: 0, a: 0}
     - _vertColourEmit: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
+  m_AllowLocking: 1

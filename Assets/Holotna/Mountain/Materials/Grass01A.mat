@@ -130,8 +130,8 @@ Material:
     - _BUILTIN_ZWrite: 1
     - _BUILTIN_ZWriteControl: 0
     - _Bend_Distortion: 3
-    - _Bend_Speed: 3
-    - _Bend_Strength: 12
+    - _Bend_Speed: 0.1
+    - _Bend_Strength: 6.27
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
     - _BumpScale: 1

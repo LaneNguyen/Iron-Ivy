@@ -16,18 +16,18 @@ RenderSettings:
   serializedVersion: 10
   m_Fog: 1
   m_FogColor: {r: 0.8867924, g: 0.87971526, b: 0.82153785, a: 1}
-  m_FogMode: 3
-  m_FogDensity: 0.003
+  m_FogMode: 2
+  m_FogDensity: 0.001
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
   m_AmbientSkyColor: {r: 0.63529414, g: 0.69411767, b: 0.73333335, a: 0}
   m_AmbientEquatorColor: {r: 0.23833145, g: 0.26453543, b: 0.24529807, a: 0}
-  m_AmbientGroundColor: {r: 1.1800592, g: 1.3245955, b: 1.4980391, a: 0}
+  m_AmbientGroundColor: {r: 1.4108388, g: 1.4108388, b: 1.4108388, a: 0}
   m_AmbientIntensity: 1
   m_AmbientMode: 1
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 761861569}
-  m_HaloStrength: 0.5
+  m_SkyboxMaterial: {fileID: 2100000, guid: 11f9a890b6e86384aaf4d69fbe79a6c1, type: 2}
+  m_HaloStrength: 0
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
   m_HaloTexture: {fileID: 0}
@@ -805,7 +805,7 @@ MonoBehaviour:
       m_imageMaskLocation: 1
       m_strength: 1
       m_seaLevel: 256
-      m_maxWorldHeight: 42.352207
+      m_maxWorldHeight: 92.84517
       m_minWorldHeight: 0
       m_xOffSet: 0
       m_zOffSet: 0
@@ -999,7 +999,7 @@ MonoBehaviour:
       m_imageMaskLocation: 1
       m_strength: 1
       m_seaLevel: 256
-      m_maxWorldHeight: 42.352207
+      m_maxWorldHeight: 92.84517
       m_minWorldHeight: 0
       m_xOffSet: 0
       m_zOffSet: 0
@@ -1292,7 +1292,7 @@ MonoBehaviour:
     m_imageMaskLocation: 0
     m_strength: 1
     m_seaLevel: 256
-    m_maxWorldHeight: 42.352207
+    m_maxWorldHeight: 92.84517
     m_minWorldHeight: 0
     m_xOffSet: 0
     m_zOffSet: 0
@@ -1486,7 +1486,7 @@ MonoBehaviour:
     m_imageMaskLocation: 0
     m_strength: 1
     m_seaLevel: 256
-    m_maxWorldHeight: 42.352207
+    m_maxWorldHeight: 92.84517
     m_minWorldHeight: 0
     m_xOffSet: 0
     m_zOffSet: 0
@@ -1698,7 +1698,7 @@ MonoBehaviour:
     m_imageMaskLocation: 0
     m_strength: 1
     m_seaLevel: 256
-    m_maxWorldHeight: 42.352207
+    m_maxWorldHeight: 92.84517
     m_minWorldHeight: 0
     m_xOffSet: 0
     m_zOffSet: 0
@@ -3016,6 +3016,84 @@ Transform:
 Transform:
   m_CorrespondingSourceObject: {fileID: 8939172975259994909, guid: 8c8d8385f96bd054a88a3df780d77bcc, type: 3}
   m_PrefabInstance: {fileID: 1581708051}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &173002590
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1828462272}
+    m_Modifications:
+    - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.47
+      objectReference: {fileID: 0}
+    - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.47
+      objectReference: {fileID: 0}
+    - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.47
+      objectReference: {fileID: 0}
+    - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 43.27
+      objectReference: {fileID: 0}
+    - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 10.53
+      objectReference: {fileID: 0}
+    - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 50.14
+      objectReference: {fileID: 0}
+    - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: -0.832109
+      objectReference: {fileID: 0}
+    - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.5546123
+      objectReference: {fileID: 0}
+    - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -67.368
+      objectReference: {fileID: 0}
+    - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4189448818000646636, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+      propertyPath: m_Name
+      value: _Sp_Rock02 (2)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+--- !u!4 &173002591 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+  m_PrefabInstance: {fileID: 173002590}
   m_PrefabAsset: {fileID: 0}
 --- !u!114 &178240398
 MonoBehaviour:
@@ -12209,7 +12287,7 @@ MonoBehaviour:
       m_imageMaskLocation: 0
       m_strength: 1
       m_seaLevel: 256
-      m_maxWorldHeight: 42.352207
+      m_maxWorldHeight: 92.84517
       m_minWorldHeight: 0
       m_xOffSet: 0
       m_zOffSet: 0
@@ -12421,7 +12499,7 @@ MonoBehaviour:
       m_imageMaskLocation: 0
       m_strength: 1
       m_seaLevel: 256
-      m_maxWorldHeight: 42.352207
+      m_maxWorldHeight: 92.84517
       m_minWorldHeight: 0
       m_xOffSet: 0
       m_zOffSet: 0
@@ -12675,7 +12753,7 @@ MonoBehaviour:
       m_imageMaskLocation: 0
       m_strength: 1
       m_seaLevel: 256
-      m_maxWorldHeight: 42.352207
+      m_maxWorldHeight: 92.84517
       m_minWorldHeight: 0
       m_xOffSet: 0
       m_zOffSet: 0
@@ -12887,7 +12965,7 @@ MonoBehaviour:
       m_imageMaskLocation: 0
       m_strength: 1
       m_seaLevel: 256
-      m_maxWorldHeight: 42.352207
+      m_maxWorldHeight: 92.84517
       m_minWorldHeight: 0
       m_xOffSet: 0
       m_zOffSet: 0
@@ -13129,7 +13207,7 @@ MonoBehaviour:
     m_imageMaskLocation: 0
     m_strength: 1
     m_seaLevel: 256
-    m_maxWorldHeight: 42.352207
+    m_maxWorldHeight: 92.84517
     m_minWorldHeight: 0
     m_xOffSet: 0
     m_zOffSet: 0
@@ -13355,7 +13433,7 @@ MonoBehaviour:
     m_imageMaskLocation: 0
     m_strength: 1
     m_seaLevel: 256
-    m_maxWorldHeight: 42.352207
+    m_maxWorldHeight: 92.84517
     m_minWorldHeight: 0
     m_xOffSet: 0
     m_zOffSet: 0
@@ -14254,7 +14332,7 @@ MonoBehaviour:
       m_imageMaskLocation: 1
       m_strength: 1
       m_seaLevel: 256
-      m_maxWorldHeight: 42.352207
+      m_maxWorldHeight: 92.84517
       m_minWorldHeight: 0
       m_xOffSet: 0
       m_zOffSet: 0
@@ -14487,7 +14565,7 @@ MonoBehaviour:
     m_imageMaskLocation: 0
     m_strength: 1
     m_seaLevel: 256
-    m_maxWorldHeight: 42.352207
+    m_maxWorldHeight: 92.84517
     m_minWorldHeight: 0
     m_xOffSet: 0
     m_zOffSet: 0
@@ -14681,7 +14759,7 @@ MonoBehaviour:
     m_imageMaskLocation: 0
     m_strength: 1
     m_seaLevel: 256
-    m_maxWorldHeight: 42.352207
+    m_maxWorldHeight: 92.84517
     m_minWorldHeight: 0
     m_xOffSet: 0
     m_zOffSet: 0
@@ -14893,7 +14971,7 @@ MonoBehaviour:
     m_imageMaskLocation: 0
     m_strength: 1
     m_seaLevel: 256
-    m_maxWorldHeight: 42.352207
+    m_maxWorldHeight: 92.84517
     m_minWorldHeight: 0
     m_xOffSet: 0
     m_zOffSet: 0
@@ -15439,7 +15517,7 @@ MonoBehaviour:
   m_spawnRuleStampsToggleAllState: 1
   m_drawPreview: 0
   m_previewRuleIds: 
-  m_maxWorldHeight: 42.352207
+  m_maxWorldHeight: 92.84517
   m_minWorldHeight: 0
   m_showSeaLevelinStampPreview: 1
   m_terrainGeneratorPanelUnfolded: 1
@@ -16305,7 +16383,7 @@ MonoBehaviour:
   m_spawnRuleStampsToggleAllState: 1
   m_drawPreview: 0
   m_previewRuleIds: 
-  m_maxWorldHeight: 42.352207
+  m_maxWorldHeight: 92.84517
   m_minWorldHeight: 0
   m_showSeaLevelinStampPreview: 1
   m_terrainGeneratorPanelUnfolded: 1
@@ -18727,6 +18805,59 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7003140459109135157, guid: b069fcf720480ff42838cdf18ec6bcbd, type: 3}
   m_PrefabInstance: {fileID: 328627850}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &331122757
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 331122758}
+  - component: {fileID: 331122759}
+  m_Layer: 0
+  m_Name: GameObject (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &331122758
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 331122757}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0.17537795, z: -0, w: 0.9845012}
+  m_LocalPosition: {x: 7.13, y: -6.209999, z: -4.07}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1893782856}
+  m_LocalEulerAnglesHint: {x: 0, y: -20.201, z: 0}
+--- !u!65 &331122759
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 331122757}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 4.18, y: 8, z: 21.43}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &334145961
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -19801,7 +19932,7 @@ MonoBehaviour:
       m_imageMaskLocation: 1
       m_strength: 1
       m_seaLevel: 256
-      m_maxWorldHeight: 42.352207
+      m_maxWorldHeight: 92.84517
       m_minWorldHeight: 0
       m_xOffSet: 0
       m_zOffSet: 0
@@ -19995,7 +20126,7 @@ MonoBehaviour:
       m_imageMaskLocation: 1
       m_strength: 1
       m_seaLevel: 256
-      m_maxWorldHeight: 42.352207
+      m_maxWorldHeight: 92.84517
       m_minWorldHeight: 0
       m_xOffSet: 0
       m_zOffSet: 0
@@ -20207,7 +20338,7 @@ MonoBehaviour:
       m_imageMaskLocation: 1
       m_strength: 1
       m_seaLevel: 256
-      m_maxWorldHeight: 42.352207
+      m_maxWorldHeight: 92.84517
       m_minWorldHeight: 0
       m_xOffSet: 0
       m_zOffSet: 0
@@ -20452,7 +20583,7 @@ MonoBehaviour:
       m_imageMaskLocation: 1
       m_strength: 1
       m_seaLevel: 256
-      m_maxWorldHeight: 42.352207
+      m_maxWorldHeight: 92.84517
       m_minWorldHeight: 0
       m_xOffSet: 0
       m_zOffSet: 0
@@ -20697,7 +20828,7 @@ MonoBehaviour:
       m_imageMaskLocation: 1
       m_strength: 1
       m_seaLevel: 256
-      m_maxWorldHeight: 42.352207
+      m_maxWorldHeight: 92.84517
       m_minWorldHeight: 0
       m_xOffSet: 0
       m_zOffSet: 0
@@ -21117,7 +21248,7 @@ Transform:
   m_GameObject: {fileID: 446006839}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0.5628261, z: -0, w: 0.82657534}
-  m_LocalPosition: {x: 42.98, y: 8.36, z: -18.36}
+  m_LocalPosition: {x: 42.16, y: 8.36, z: -18.69}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -21142,7 +21273,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 13.5, y: 11.4, z: 10.5}
+  m_Size: {x: 18.23, y: 11.4, z: 10.13}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &449373161
 GameObject:
@@ -22826,7 +22957,7 @@ MonoBehaviour:
   m_currentStamperUndoOperation: 0
   m_stamperUndoOperations: []
   m_linkedBiomeController: {fileID: 0}
-  m_cachedRenderTexture: {fileID: 615685499}
+  m_cachedRenderTexture: {fileID: 0}
   m_cachedMaskTexture: {fileID: 22559894}
   m_drawPreview: 1
   m_showSeaLevelinStampPreview: 1
@@ -22881,43 +23012,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8440884292049102845, guid: 9922f644f9531f94fa83781758176b12, type: 3}
   m_PrefabInstance: {fileID: 1713213670}
   m_PrefabAsset: {fileID: 0}
---- !u!84 &615685499
-RenderTexture:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: Stamper Cached Render Texture
-  m_ImageContentsHash:
-    serializedVersion: 2
-    Hash: 00000000000000000000000000000000
-  m_IsAlphaChannelOptional: 0
-  serializedVersion: 6
-  m_Width: 65
-  m_Height: 65
-  m_AntiAliasing: 1
-  m_MipCount: -1
-  m_DepthStencilFormat: 0
-  m_ColorFormat: 49
-  m_MipMap: 0
-  m_GenerateMips: 1
-  m_SRGB: 0
-  m_UseDynamicScale: 0
-  m_UseDynamicScaleExplicit: 0
-  m_BindMS: 0
-  m_EnableCompatibleFormat: 1
-  m_EnableRandomWrite: 1
-  m_TextureSettings:
-    serializedVersion: 2
-    m_FilterMode: 0
-    m_Aniso: 1
-    m_MipBias: 0
-    m_WrapU: 1
-    m_WrapV: 1
-    m_WrapW: 1
-  m_Dimension: 2
-  m_VolumeDepth: 1
-  m_ShadowSamplingMode: 2
 --- !u!1001 &620607170
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -23028,10 +23122,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_detailQuality: 2
-  m_gaiaDetailDistance: 31.15
-  m_gaiaDetailFadeoutDistance: 2
-  m_unityDetailDistance: 35
-  m_unityDetailDensity: 0.162
+  m_gaiaDetailDistance: 15
+  m_gaiaDetailFadeoutDistance: 5
+  m_unityDetailDistance: 25
+  m_unityDetailDensity: 0.98
   m_terrain: {fileID: 625140418}
 --- !u!154 &625140417
 TerrainCollider:
@@ -23064,11 +23158,11 @@ Terrain:
   serializedVersion: 6
   m_TerrainData: {fileID: 15600000, guid: 94061e1d82ffe31459f1e826f11e5798, type: 2}
   m_TreeDistance: 100
-  m_TreeBillboardDistance: 50
+  m_TreeBillboardDistance: 500
   m_TreeCrossFadeLength: 20
   m_TreeMaximumFullLODCount: 20
-  m_DetailObjectDistance: 35
-  m_DetailObjectDensity: 0.162
+  m_DetailObjectDistance: 25
+  m_DetailObjectDensity: 0.98
   m_HeightmapPixelError: 5
   m_SplatMapDistance: 256
   m_HeightmapMinimumLODSimplification: 0
@@ -23276,7 +23370,7 @@ MonoBehaviour:
   m_spawnRuleStampsToggleAllState: 1
   m_drawPreview: 0
   m_previewRuleIds: 
-  m_maxWorldHeight: 42.352207
+  m_maxWorldHeight: 92.84517
   m_minWorldHeight: 0
   m_showSeaLevelinStampPreview: 1
   m_terrainGeneratorPanelUnfolded: 1
@@ -24210,8 +24304,8 @@ Transform:
   m_GameObject: {fileID: 681155379}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.1, z: 0}
-  m_LocalScale: {x: 50, y: 1, z: 50}
+  m_LocalPosition: {x: 66, y: -0.1, z: 59}
+  m_LocalScale: {x: 41.5, y: 1, z: 50}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1228113024}
@@ -24641,6 +24735,30 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 29fa835e1e042b04ba69395912b67acc, type: 3}
   m_PrefabInstance: {fileID: 1410588866}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &721212220
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cba17d399ab86974c8ef9551f6e8f8d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  transformSettings:
+    translation: {x: 500, y: 200, z: 350}
+    scale: {x: 15.624999, y: 1, z: 15.624999}
+    rotation: {x: 0, y: 0, z: 0}
+    flipScaleX: 0
+    flipScaleY: 0
+    flipScaleZ: 0
+  domainSettings:
+    noiseTypeName: Perlin
+    fractalTypeName: Fbm
+    noiseTypeParams: 
+    fractalTypeParams: '{"warpOffsets":{"x":0.0,"y":0.0,"z":0.0,"w":0.0},"octavesMinMax":{"x":0.0,"y":16.0},"amplitudeMinMax":{"x":0.0,"y":1.0},"frequencyMinMax":{"x":0.0,"y":2.0},"lacunarityMinMax":{"x":0.0,"y":4.0},"persistenceMinMax":{"x":0.0,"y":1.0},"warpIterationsMinMax":{"x":0.0,"y":8.0},"warpStrengthMinMax":{"x":-2.0,"y":2.0},"octaves":8.0,"amplitude":0.30000001192092898,"frequency":1.0,"persistence":0.5,"lacunarity":1.5,"warpIterations":0.0,"warpStrength":1.0,"warpEnabled":false,"warpExpanded":true}'
 --- !u!1001 &721409385
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -25021,7 +25139,7 @@ Light:
     m_Strength: 0.9
     m_Bias: 0.05
     m_NormalBias: 0.4
-    m_NearPlane: 0.1
+    m_NearPlane: 10
     m_CullingMatrixOverride:
       e00: 1
       e01: 0
@@ -25598,86 +25716,84 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8939172975259994909, guid: 8c8d8385f96bd054a88a3df780d77bcc, type: 3}
   m_PrefabInstance: {fileID: 246350701}
   m_PrefabAsset: {fileID: 0}
---- !u!21 &761861569
-Material:
-  serializedVersion: 8
+--- !u!1001 &764911329
+PrefabInstance:
   m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: Day Preset URP Environment SkyBox(Clone)
-  m_Shader: {fileID: 4800000, guid: 90f7c8c3c6fc91b449cd7f8ac651f571, type: 3}
-  m_Parent: {fileID: 0}
-  m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
-  m_InvalidKeywords:
-  - _MAPPING_LATITUDE_LONGITUDE_LAYOUT
-  - _SUNDISK_HIGH_QUALITY
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_LockedProperties: 
-  m_SavedProperties:
+  serializedVersion: 2
+  m_Modification:
     serializedVersion: 3
-    m_TexEnvs:
-    - _BackTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _DownTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _FrontTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _LeftTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _RightTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _Tex:
-        m_Texture: {fileID: 8900000, guid: 2e72a76db2572184ba807091fe4e4d82, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _UpTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Ints: []
-    m_Floats:
-    - _AtmosphereThickness: 1.82
-    - _Exposure: 0.75
-    - _FogBottomEnd: 0.012
-    - _FogBottomStart: 0
-    - _FogTopEnd: 1
-    - _FogTopStart: 1
-    - _ImageType: 0
-    - _Layout: 0
-    - _Mapping: 1
-    - _MirrorOnBack: 0
-    - _Rotation: 21
-    - _SunDisk: 2
-    - _SunSize: 0.04
-    - _SunSizeConvergence: 5
-    m_Colors:
-    - _FogColor: {r: 1, g: 0.2971698, b: 0.358324, a: 1}
-    - _GroundColor: {r: 0.36899996, g: 0.34899998, b: 0.34099993, a: 1}
-    - _SkyTint: {r: 0, g: 0, b: 0, a: 1}
-    - _Tint: {r: 0.5943396, g: 0.5943396, b: 0.5943396, a: 0.5}
-  m_BuildTextureStacks: []
-  m_AllowLocking: 1
+    m_TransformParent: {fileID: 1828462272}
+    m_Modifications:
+    - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.78
+      objectReference: {fileID: 0}
+    - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.66382974
+      objectReference: {fileID: 0}
+    - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.0038995
+      objectReference: {fileID: 0}
+    - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 29.99
+      objectReference: {fileID: 0}
+    - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 9.167796
+      objectReference: {fileID: 0}
+    - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -60.04
+      objectReference: {fileID: 0}
+    - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: -0.6449098
+      objectReference: {fileID: 0}
+    - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.7642587
+      objectReference: {fileID: 0}
+    - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 99.682
+      objectReference: {fileID: 0}
+    - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4189448818000646636, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+      propertyPath: m_Name
+      value: _Sp_Rock02 (1)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+--- !u!4 &764911330 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+  m_PrefabInstance: {fileID: 764911329}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &771481284
 GameObject:
   m_ObjectHideFlags: 0
@@ -26041,15 +26157,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 511752141008511495, guid: 46bc56a033ac04f418b8c002981cf4b0, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -5.57
+      value: 1.48
       objectReference: {fileID: 0}
     - target: {fileID: 511752141008511495, guid: 46bc56a033ac04f418b8c002981cf4b0, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 16.85
+      value: 17.78
       objectReference: {fileID: 0}
     - target: {fileID: 511752141008511495, guid: 46bc56a033ac04f418b8c002981cf4b0, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -35.39
+      value: -42.62
       objectReference: {fileID: 0}
     - target: {fileID: 511752141008511495, guid: 46bc56a033ac04f418b8c002981cf4b0, type: 3}
       propertyPath: m_LocalRotation.w
@@ -32078,6 +32194,84 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 12.2, y: 5.04, z: 47.3}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1001 &961707473
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1828462272}
+    m_Modifications:
+    - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.57
+      objectReference: {fileID: 0}
+    - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.57
+      objectReference: {fileID: 0}
+    - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.57
+      objectReference: {fileID: 0}
+    - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 43.91
+      objectReference: {fileID: 0}
+    - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 10.19
+      objectReference: {fileID: 0}
+    - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 62.31
+      objectReference: {fileID: 0}
+    - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: -0.99770176
+      objectReference: {fileID: 0}
+    - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.06775811
+      objectReference: {fileID: 0}
+    - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 7.77
+      objectReference: {fileID: 0}
+    - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4189448818000646636, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+      propertyPath: m_Name
+      value: _Sp_Rock02 (3)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+--- !u!4 &961707474 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
+  m_PrefabInstance: {fileID: 961707473}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &965276148 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7016022830637713196, guid: 0fe68fb18e05a154b8bf44b142482072, type: 3}
@@ -33002,7 +33196,7 @@ MonoBehaviour:
       m_imageMaskLocation: 1
       m_strength: 1
       m_seaLevel: 256
-      m_maxWorldHeight: 42.352207
+      m_maxWorldHeight: 92.84517
       m_minWorldHeight: 0
       m_xOffSet: 0
       m_zOffSet: 0
@@ -33253,7 +33447,7 @@ MonoBehaviour:
     m_imageMaskLocation: 0
     m_strength: 1
     m_seaLevel: 256
-    m_maxWorldHeight: 42.352207
+    m_maxWorldHeight: 92.84517
     m_minWorldHeight: 0
     m_xOffSet: 0
     m_zOffSet: 0
@@ -33447,7 +33641,7 @@ MonoBehaviour:
     m_imageMaskLocation: 0
     m_strength: 1
     m_seaLevel: 256
-    m_maxWorldHeight: 42.352207
+    m_maxWorldHeight: 92.84517
     m_minWorldHeight: 0
     m_xOffSet: 0
     m_zOffSet: 0
@@ -34668,7 +34862,7 @@ MonoBehaviour:
   m_spawnRuleStampsToggleAllState: 1
   m_drawPreview: 0
   m_previewRuleIds: 
-  m_maxWorldHeight: 42.352207
+  m_maxWorldHeight: 92.84517
   m_minWorldHeight: 0
   m_showSeaLevelinStampPreview: 1
   m_terrainGeneratorPanelUnfolded: 1
@@ -36713,7 +36907,7 @@ MonoBehaviour:
   m_spawnRuleStampsToggleAllState: 1
   m_drawPreview: 0
   m_previewRuleIds: 
-  m_maxWorldHeight: 42.352207
+  m_maxWorldHeight: 92.84517
   m_minWorldHeight: 0
   m_showSeaLevelinStampPreview: 1
   m_terrainGeneratorPanelUnfolded: 1
@@ -42380,7 +42574,7 @@ MonoBehaviour:
       m_imageMaskLocation: 0
       m_strength: 1
       m_seaLevel: 256
-      m_maxWorldHeight: 42.352207
+      m_maxWorldHeight: 92.84517
       m_minWorldHeight: 0
       m_xOffSet: 0
       m_zOffSet: 0
@@ -42592,7 +42786,7 @@ MonoBehaviour:
       m_imageMaskLocation: 0
       m_strength: 1
       m_seaLevel: 256
-      m_maxWorldHeight: 42.352207
+      m_maxWorldHeight: 92.84517
       m_minWorldHeight: 0
       m_xOffSet: 0
       m_zOffSet: 0
@@ -42846,7 +43040,7 @@ MonoBehaviour:
       m_imageMaskLocation: 0
       m_strength: 1
       m_seaLevel: 256
-      m_maxWorldHeight: 42.352207
+      m_maxWorldHeight: 92.84517
       m_minWorldHeight: 0
       m_xOffSet: 0
       m_zOffSet: 0
@@ -43058,7 +43252,7 @@ MonoBehaviour:
       m_imageMaskLocation: 0
       m_strength: 1
       m_seaLevel: 256
-      m_maxWorldHeight: 42.352207
+      m_maxWorldHeight: 92.84517
       m_minWorldHeight: 0
       m_xOffSet: 0
       m_zOffSet: 0
@@ -43300,7 +43494,7 @@ MonoBehaviour:
     m_imageMaskLocation: 0
     m_strength: 1
     m_seaLevel: 256
-    m_maxWorldHeight: 42.352207
+    m_maxWorldHeight: 92.84517
     m_minWorldHeight: 0
     m_xOffSet: 0
     m_zOffSet: 0
@@ -43526,7 +43720,7 @@ MonoBehaviour:
     m_imageMaskLocation: 0
     m_strength: 1
     m_seaLevel: 256
-    m_maxWorldHeight: 42.352207
+    m_maxWorldHeight: 92.84517
     m_minWorldHeight: 0
     m_xOffSet: 0
     m_zOffSet: 0
@@ -44006,7 +44200,7 @@ MonoBehaviour:
   m_spawnRuleStampsToggleAllState: 1
   m_drawPreview: 0
   m_previewRuleIds: 
-  m_maxWorldHeight: 42.352207
+  m_maxWorldHeight: 92.84517
   m_minWorldHeight: 0
   m_showSeaLevelinStampPreview: 1
   m_terrainGeneratorPanelUnfolded: 1
@@ -44858,6 +45052,59 @@ MonoBehaviour:
     m_warpOffset: {x: 0, y: 0, z: 0, w: 0}
   m_inputTerrain: {fileID: 0}
   m_advancedInputSettingsUnfolded: 0
+--- !u!1 &1341631381
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1341631382}
+  - component: {fileID: 1341631383}
+  m_Layer: 0
+  m_Name: GameObject (2)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1341631382
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1341631381}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.6927782, z: -0, w: 0.72115076}
+  m_LocalPosition: {x: 38.96, y: -31.48, z: 90.49}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1893782856}
+  m_LocalEulerAnglesHint: {x: 0, y: 87.701, z: 0}
+--- !u!65 &1341631383
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1341631381}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 4.74, y: 7.32, z: 16.86}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &1349606632
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -47872,7 +48119,7 @@ MonoBehaviour:
   m_spawnRuleStampsToggleAllState: 1
   m_drawPreview: 0
   m_previewRuleIds: 
-  m_maxWorldHeight: 42.352207
+  m_maxWorldHeight: 92.84517
   m_minWorldHeight: 0
   m_showSeaLevelinStampPreview: 1
   m_terrainGeneratorPanelUnfolded: 1
@@ -60756,7 +61003,7 @@ MonoBehaviour:
       m_imageMaskLocation: 1
       m_strength: 1
       m_seaLevel: 256
-      m_maxWorldHeight: 42.352207
+      m_maxWorldHeight: 92.84517
       m_minWorldHeight: 0
       m_xOffSet: 0
       m_zOffSet: 0
@@ -60968,7 +61215,7 @@ MonoBehaviour:
       m_imageMaskLocation: 1
       m_strength: 1
       m_seaLevel: 256
-      m_maxWorldHeight: 42.352207
+      m_maxWorldHeight: 92.84517
       m_minWorldHeight: 0
       m_xOffSet: 0
       m_zOffSet: 0
@@ -61222,7 +61469,7 @@ MonoBehaviour:
       m_imageMaskLocation: 1
       m_strength: 1
       m_seaLevel: 256
-      m_maxWorldHeight: 42.352207
+      m_maxWorldHeight: 92.84517
       m_minWorldHeight: 0
       m_xOffSet: 0
       m_zOffSet: 0
@@ -61434,7 +61681,7 @@ MonoBehaviour:
       m_imageMaskLocation: 1
       m_strength: 1
       m_seaLevel: 256
-      m_maxWorldHeight: 42.352207
+      m_maxWorldHeight: 92.84517
       m_minWorldHeight: 0
       m_xOffSet: 0
       m_zOffSet: 0
@@ -61688,7 +61935,7 @@ MonoBehaviour:
       m_imageMaskLocation: 1
       m_strength: 1
       m_seaLevel: 256
-      m_maxWorldHeight: 42.352207
+      m_maxWorldHeight: 92.84517
       m_minWorldHeight: 0
       m_xOffSet: 0
       m_zOffSet: 0
@@ -61900,7 +62147,7 @@ MonoBehaviour:
       m_imageMaskLocation: 1
       m_strength: 1
       m_seaLevel: 256
-      m_maxWorldHeight: 42.352207
+      m_maxWorldHeight: 92.84517
       m_minWorldHeight: 0
       m_xOffSet: 0
       m_zOffSet: 0
@@ -62154,7 +62401,7 @@ MonoBehaviour:
       m_imageMaskLocation: 1
       m_strength: 1
       m_seaLevel: 256
-      m_maxWorldHeight: 42.352207
+      m_maxWorldHeight: 92.84517
       m_minWorldHeight: 0
       m_xOffSet: 0
       m_zOffSet: 0
@@ -62366,7 +62613,7 @@ MonoBehaviour:
       m_imageMaskLocation: 1
       m_strength: 1
       m_seaLevel: 256
-      m_maxWorldHeight: 42.352207
+      m_maxWorldHeight: 92.84517
       m_minWorldHeight: 0
       m_xOffSet: 0
       m_zOffSet: 0
@@ -62620,7 +62867,7 @@ MonoBehaviour:
       m_imageMaskLocation: 1
       m_strength: 1
       m_seaLevel: 256
-      m_maxWorldHeight: 42.352207
+      m_maxWorldHeight: 92.84517
       m_minWorldHeight: 0
       m_xOffSet: 0
       m_zOffSet: 0
@@ -62832,7 +63079,7 @@ MonoBehaviour:
       m_imageMaskLocation: 1
       m_strength: 1
       m_seaLevel: 256
-      m_maxWorldHeight: 42.352207
+      m_maxWorldHeight: 92.84517
       m_minWorldHeight: 0
       m_xOffSet: 0
       m_zOffSet: 0
@@ -63086,7 +63333,7 @@ MonoBehaviour:
       m_imageMaskLocation: 1
       m_strength: 1
       m_seaLevel: 256
-      m_maxWorldHeight: 42.352207
+      m_maxWorldHeight: 92.84517
       m_minWorldHeight: 0
       m_xOffSet: 0
       m_zOffSet: 0
@@ -63298,7 +63545,7 @@ MonoBehaviour:
       m_imageMaskLocation: 1
       m_strength: 1
       m_seaLevel: 256
-      m_maxWorldHeight: 42.352207
+      m_maxWorldHeight: 92.84517
       m_minWorldHeight: 0
       m_xOffSet: 0
       m_zOffSet: 0
@@ -63540,7 +63787,7 @@ MonoBehaviour:
     m_imageMaskLocation: 0
     m_strength: 1
     m_seaLevel: 256
-    m_maxWorldHeight: 42.352207
+    m_maxWorldHeight: 92.84517
     m_minWorldHeight: 0
     m_xOffSet: 0
     m_zOffSet: 0
@@ -63766,7 +64013,7 @@ MonoBehaviour:
     m_imageMaskLocation: 0
     m_strength: 1
     m_seaLevel: 256
-    m_maxWorldHeight: 42.352207
+    m_maxWorldHeight: 92.84517
     m_minWorldHeight: 0
     m_xOffSet: 0
     m_zOffSet: 0
@@ -67978,30 +68225,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8c8d8385f96bd054a88a3df780d77bcc, type: 3}
---- !u!114 &1789209921
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cba17d399ab86974c8ef9551f6e8f8d4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  transformSettings:
-    translation: {x: 500, y: 200, z: 350}
-    scale: {x: 15.624999, y: 1, z: 15.624999}
-    rotation: {x: 0, y: 0, z: 0}
-    flipScaleX: 0
-    flipScaleY: 0
-    flipScaleZ: 0
-  domainSettings:
-    noiseTypeName: Perlin
-    fractalTypeName: Fbm
-    noiseTypeParams: 
-    fractalTypeParams: '{"warpOffsets":{"x":0.0,"y":0.0,"z":0.0,"w":0.0},"octavesMinMax":{"x":0.0,"y":16.0},"amplitudeMinMax":{"x":0.0,"y":1.0},"frequencyMinMax":{"x":0.0,"y":2.0},"lacunarityMinMax":{"x":0.0,"y":4.0},"persistenceMinMax":{"x":0.0,"y":1.0},"warpIterationsMinMax":{"x":0.0,"y":8.0},"warpStrengthMinMax":{"x":-2.0,"y":2.0},"octaves":8.0,"amplitude":0.30000001192092898,"frequency":1.0,"persistence":0.5,"lacunarity":1.5,"warpIterations":0.0,"warpStrength":1.0,"warpEnabled":false,"warpExpanded":true}'
 --- !u!114 &1796415190
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -68276,6 +68499,59 @@ Transform:
   - {fileID: 625140415}
   m_Father: {fileID: 493223563}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1814186770
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1814186771}
+  - component: {fileID: 1814186772}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1814186771
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1814186770}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.71, y: -6.21, z: 9.9}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1893782856}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &1814186772
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1814186770}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 4.74, y: 5.69, z: 16.86}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &1818218221
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -68464,9 +68740,12 @@ Transform:
   - {fileID: 1970579996}
   - {fileID: 1128482793}
   - {fileID: 1964796349}
+  - {fileID: 764911330}
   - {fileID: 652352640}
   - {fileID: 866167087}
   - {fileID: 1163065304}
+  - {fileID: 173002591}
+  - {fileID: 961707474}
   - {fileID: 1425713013}
   - {fileID: 976616530}
   m_Father: {fileID: 681282606}
@@ -69154,10 +69433,13 @@ Transform:
   m_GameObject: {fileID: 1893782855}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -21.700352, y: 8.675101, z: -60.415634}
+  m_LocalPosition: {x: -68.04, y: 46.92, z: 8.18}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1814186771}
+  - {fileID: 1341631382}
+  - {fileID: 331122758}
   m_Father: {fileID: 1174442711}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1895687720
@@ -70322,7 +70604,7 @@ MonoBehaviour:
       m_warpIterations: 0
       m_warpStrength: 1
       m_warpOffset: {x: 0, y: 0, z: 0, w: 0}
-    m_noiseSettings: {fileID: 1789209921}
+    m_noiseSettings: {fileID: 721212220}
     m_noiseToolSettings:
       worldHeightRemap: {x: 0, y: 0}
       coordSpace: 0
