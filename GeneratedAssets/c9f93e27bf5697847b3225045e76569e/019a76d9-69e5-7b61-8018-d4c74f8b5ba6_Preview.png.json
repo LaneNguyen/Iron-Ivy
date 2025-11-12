@@ -1,0 +1,11 @@
+{
+    "asset": "c9f93e27bf5697847b3225045e76569e",
+    "fileName": "019a76d9-69e5-7b61-8018-d4c74f8b5ba6_Preview.png",
+    "prompt": "green rusty iron",
+    "negativePrompt": "",
+    "model": "44ec3749-963a-44b1-aa54-dc19f6ed8ab2",
+    "modelName": "Unity Texture2D",
+    "customSeed": 1096899401,
+    "w3CTraceId": "59b24ae1d6d706b68b4cd8003a3d791e",
+    "refinementMode": "Generation"
+}

@@ -1,0 +1,20 @@
+{
+    "asset": "1019edca601989d478e814b34b686d8a",
+    "fileName": "019a77d5-a74c-718e-bc9b-8df6b3a57285.png",
+    "prompt": "Smiley face symbol ^_^",
+    "negativePrompt": "no messy, only symbol",
+    "model": "72533929-e41b-447e-b994-e637f7443b3f",
+    "modelName": "Gem Icons",
+    "customSeed": -1,
+    "w3CTraceId": "c1c93b978cb84ef04a7e2c634513b8c2",
+    "refinementMode": "Generation",
+    "pixelateTargetSize": 0,
+    "pixelateKeepImageSize": false,
+    "pixelatePixelBlockSize": 0,
+    "pixelateMode": 0,
+    "pixelateOutlineThickness": 0,
+    "doodles": {
+        "m_Items": []
+    },
+    "upscaleFactor": 0
+}

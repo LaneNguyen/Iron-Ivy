@@ -285,7 +285,6 @@ Shader "Toon/TFP_ToonWater"
 			CBUFFER_END
 			sampler2D _NormalMap;
 			sampler2D _NoiseTexture;
-			uniform float4 _CameraDepthTexture_TexelSize;
 
 
 						
@@ -638,7 +637,7 @@ Shader "Toon/TFP_ToonWater"
 			#endif
 			CBUFFER_END
 			sampler2D _NormalMap;
-			uniform float4 _CameraDepthTexture_TexelSize;
+			//uniform float4 _CameraDepthTexture_TexelSize;
 			sampler2D _NoiseTexture;
 
 
@@ -942,7 +941,7 @@ Shader "Toon/TFP_ToonWater"
 			#endif
 			CBUFFER_END
 			sampler2D _NormalMap;
-			uniform float4 _CameraDepthTexture_TexelSize;
+			 
 			sampler2D _NoiseTexture;
 
 
@@ -1251,7 +1250,7 @@ Shader "Toon/TFP_ToonWater"
 			CBUFFER_END
 			sampler2D _NormalMap;
 			sampler2D _NoiseTexture;
-			uniform float4 _CameraDepthTexture_TexelSize;
+			 
 
 
 						
@@ -1601,7 +1600,7 @@ Shader "Toon/TFP_ToonWater"
 			CBUFFER_END
 
 			sampler2D _NormalMap;
-			uniform float4 _CameraDepthTexture_TexelSize;
+			//uniform float4 _CameraDepthTexture_TexelSize;
 			sampler2D _NoiseTexture;
 
 
@@ -1871,7 +1870,7 @@ Shader "Toon/TFP_ToonWater"
 			CBUFFER_END
 
 			sampler2D _NormalMap;
-			uniform float4 _CameraDepthTexture_TexelSize;
+			//uniform float4 _CameraDepthTexture_TexelSize;
 			sampler2D _NoiseTexture;
 
 
@@ -2151,7 +2150,7 @@ Shader "Toon/TFP_ToonWater"
 			#endif
 			CBUFFER_END
 			sampler2D _NormalMap;
-			uniform float4 _CameraDepthTexture_TexelSize;
+			//uniform float4 _CameraDepthTexture_TexelSize;
 			sampler2D _NoiseTexture;
 
 
@@ -2427,7 +2426,7 @@ Shader "Toon/TFP_ToonWater"
 			#endif
 			CBUFFER_END
 			sampler2D _NormalMap;
-			uniform float4 _CameraDepthTexture_TexelSize;
+			//uniform float4 _CameraDepthTexture_TexelSize;
 			sampler2D _NoiseTexture;
 
 

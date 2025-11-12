@@ -65,15 +65,15 @@ namespace IronIvy.Gameplay
         public bool enableJump = false;
 
         [Header("Camera Integration (optional)")]
-        [Tooltip("TPS vcam ref used by CameraManager auto toggle")]
+        [Tooltip("TPS vcam ref used to auto gate by CameraManager")]
         public CinemachineCamera thirdPersonCamRef;
 
-        [Tooltip("auto enable by CameraManager (legacy). turn this OFF if using SetTPSActive from switcher")]
-        public bool autoEnableByCamera = false;
+        [Tooltip("auto gate by CameraManager (keep component enabled!)")]
+        public bool autoEnableByCamera = true;
 
         [Header("Mode Gate")]
-        [Tooltip("when false, TPS input/move is disabled, only pivot follow keeps running")]
-        public bool isTPSActive = true;
+        [Tooltip("when false, TPS input/move disabled; only pivot follow keeps running")]
+        public bool isTPSActive = false;
 
         // state
         private float yaw, pitch;
@@ -114,11 +114,14 @@ namespace IronIvy.Gameplay
 
         private void OnEnable()
         {
+            // stay enabled; just listen and gate
             if (autoEnableByCamera && CameraManager.HasInstance && thirdPersonCamRef != null)
             {
                 CameraManager.Instance.OnCameraChanged += HandleCameraChanged;
-                SyncEnableWithCurrentCamera();
             }
+
+            // gate by current camera once at start
+            GateByCurrentCamera();
         }
 
         private void OnDisable()
@@ -131,7 +134,7 @@ namespace IronIvy.Gameplay
         {
             if (!isTPSActive)
             {
-                // when inactive, iso controller will do it
+                // inactive: iso controller handles movement thi only keep pivot follow in LateUpdate
                 return;
             }
 
@@ -144,7 +147,7 @@ namespace IronIvy.Gameplay
             // run modifier
             float targetSpeed = (Input.GetKey(KeyCode.LeftShift) ? runSpeed : walkSpeed) * inputDir.magnitude;
 
-            // STEP 2: camera-relative move dir (flatten Y may avoid tilt issues?)
+            // STEP 2: camera-relative move dir (flatten Y to avoid tilt issues)
             Vector3 moveDir;
             if (cameraPivot)
             {
@@ -166,7 +169,7 @@ namespace IronIvy.Gameplay
                                                      : Mathf.Max(0.0001f, deceleration);
             currentVelocity = Vector3.SmoothDamp(currentVelocity, targetVelocity, ref velocityRef, smoothTime);
 
-            // STEP 3: CharacterController.Move (test jump)
+            // STEP 3: CharacterController.Move (with gravity)
             if (controller.isGrounded)
             {
                 verticalVel = -0.5f;
@@ -210,7 +213,7 @@ namespace IronIvy.Gameplay
 
         private void LateUpdate()
         {
-            // PIVOT FOLLOW: always run (even when isTPSActive == false)
+            // PIVOT FOLLOW: always run (even when TPS gate is closed)
             if (cameraPivot)
             {
                 Vector3 targetPos = new Vector3(
@@ -227,7 +230,7 @@ namespace IronIvy.Gameplay
             // RMB rotate only when TPS is active
             if (!isTPSActive) return;
 
-            // basic cursor lock for nicer feel
+            // basic cursor lock
             if (Input.GetMouseButtonDown(1))
             {
                 Cursor.lockState = CursorLockMode.Locked;
@@ -249,25 +252,35 @@ namespace IronIvy.Gameplay
             }
         }
 
-        // CameraManager legacy auto-enable (optional)
+        // ===== CameraManager auto gate (no enable/disable) =====
         private void HandleCameraChanged(CinemachineCamera oldCam, CinemachineCamera newCam)
         {
-            bool shouldEnable = (newCam != null && thirdPersonCamRef != null && newCam == thirdPersonCamRef);
-            if (enabled != shouldEnable) enabled = shouldEnable;
+            if (!autoEnableByCamera || thirdPersonCamRef == null) return;
+
+            bool active = (newCam != null && newCam == thirdPersonCamRef);
+            SetTPSActive(active);              // gate only
+            if (active) ResyncCameraAnglesFromPivot();
         }
 
-        private void SyncEnableWithCurrentCamera()
+        private void GateByCurrentCamera()
         {
-            if (!CameraManager.HasInstance || thirdPersonCamRef == null) return;
+            if (!autoEnableByCamera || thirdPersonCamRef == null || !CameraManager.HasInstance)
+            {
+                // keep inspector value if we cannot decide
+                SetTPSActive(isTPSActive);
+                return;
+            }
+
             var current = CameraManager.Instance.CurrentCamera;
-            bool shouldEnable = (current != null && current == thirdPersonCamRef);
-            if (enabled != shouldEnable) enabled = shouldEnable;
+            bool active = (current != null && current == thirdPersonCamRef);
+            SetTPSActive(active);              // gate only
+            if (active) ResyncCameraAnglesFromPivot();
         }
 
-        // called by switcher when swap camera modes
+        // called by external switcher too
         public void SetTPSActive(bool value)
         {
-            isTPSActive = value;
+            isTPSActive = value;               // do not toggle this.enabled here
             if (isTPSActive) ResyncCameraAnglesFromPivot();
         }
 
@@ -285,7 +298,7 @@ namespace IronIvy.Gameplay
 #if UNITY_EDITOR
         private void OnValidate()
         {
-            // cheap guards, not precise but fine
+            // quick guards
             minPitch = Mathf.Clamp(minPitch, -89f, 0f);
             maxPitch = Mathf.Clamp(maxPitch, 0f, 89f);
             walkSpeed = Mathf.Max(0f, walkSpeed);

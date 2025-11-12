@@ -1,0 +1,20 @@
+{
+    "asset": "1019edca601989d478e814b34b686d8a",
+    "fileName": "019a77d0-d8a6-71a3-87fb-dc47d0dbee98.png",
+    "prompt": "Smiley face",
+    "negativePrompt": "",
+    "model": "5b5b2af1-6ea4-4266-b087-cc9f3bf4f450",
+    "modelName": "Flux.1 Dev",
+    "customSeed": -1,
+    "w3CTraceId": "0d3a686f0b21efac1da3443628184055",
+    "refinementMode": "Generation",
+    "pixelateTargetSize": 0,
+    "pixelateKeepImageSize": false,
+    "pixelatePixelBlockSize": 0,
+    "pixelateMode": 0,
+    "pixelateOutlineThickness": 0,
+    "doodles": {
+        "m_Items": []
+    },
+    "upscaleFactor": 0
+}

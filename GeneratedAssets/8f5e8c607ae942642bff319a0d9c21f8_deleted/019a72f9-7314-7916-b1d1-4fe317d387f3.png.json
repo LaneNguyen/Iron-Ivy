@@ -1,0 +1,20 @@
+{
+    "asset": "8f5e8c607ae942642bff319a0d9c21f8",
+    "fileName": "019a72f9-7314-7916-b1d1-4fe317d387f3.png",
+    "prompt": "A cute robot design, emphasizing adorable features like big eyes, rounded shapes, and a friendly appearance.",
+    "negativePrompt": "",
+    "model": "5b5b2af1-6ea4-4266-b087-cc9f3bf4f450",
+    "modelName": "Flux.1 Dev",
+    "customSeed": -1,
+    "w3CTraceId": "61f0e9833532a5b75b6ada961c7e164d",
+    "refinementMode": "Generation",
+    "pixelateTargetSize": 0,
+    "pixelateKeepImageSize": false,
+    "pixelatePixelBlockSize": 0,
+    "pixelateMode": 0,
+    "pixelateOutlineThickness": 0,
+    "doodles": {
+        "m_Items": []
+    },
+    "upscaleFactor": 0
+}

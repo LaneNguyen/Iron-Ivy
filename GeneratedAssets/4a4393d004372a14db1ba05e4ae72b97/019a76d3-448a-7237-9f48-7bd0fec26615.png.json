@@ -1,0 +1,20 @@
+{
+    "asset": "4a4393d004372a14db1ba05e4ae72b97",
+    "fileName": "019a76d3-448a-7237-9f48-7bd0fec26615.png",
+    "prompt": "Robot surface texture",
+    "negativePrompt": "",
+    "model": "1a2140ea-ccbc-46b5-9008-e0ea714882dc",
+    "modelName": "3D Platformer Environments",
+    "customSeed": -1,
+    "w3CTraceId": "575ba666cec3a2f844ecadd029f1a018",
+    "refinementMode": "Generation",
+    "pixelateTargetSize": 0,
+    "pixelateKeepImageSize": false,
+    "pixelatePixelBlockSize": 0,
+    "pixelateMode": 0,
+    "pixelateOutlineThickness": 0,
+    "doodles": {
+        "m_Items": []
+    },
+    "upscaleFactor": 0
+}

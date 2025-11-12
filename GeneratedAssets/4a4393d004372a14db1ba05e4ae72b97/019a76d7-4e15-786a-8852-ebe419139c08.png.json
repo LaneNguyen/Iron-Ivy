@@ -1,0 +1,20 @@
+{
+    "asset": "4a4393d004372a14db1ba05e4ae72b97",
+    "fileName": "019a76d7-4e15-786a-8852-ebe419139c08.png",
+    "prompt": "Create a texture of a cute robot",
+    "negativePrompt": "",
+    "model": "44ec3749-963a-44b1-aa54-dc19f6ed8ab2",
+    "modelName": "Unity Texture2D",
+    "customSeed": -1,
+    "w3CTraceId": "835e0e51a4b4e8f74f5373835db35f2b",
+    "refinementMode": "Generation",
+    "pixelateTargetSize": 0,
+    "pixelateKeepImageSize": false,
+    "pixelatePixelBlockSize": 0,
+    "pixelateMode": 0,
+    "pixelateOutlineThickness": 0,
+    "doodles": {
+        "m_Items": []
+    },
+    "upscaleFactor": 0
+}

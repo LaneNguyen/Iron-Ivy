@@ -1,0 +1,2567 @@
+fileFormatVersion: 2
+guid: 5168c2860f3a53040b044323b24146cc
+ModelImporter:
+  serializedVersion: 24200
+  internalIDToNameTable: []
+  externalObjects: {}
+  materials:
+    materialImportMode: 2
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    removeConstantScaleCurves: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: "\nClip 'Take 001' has import animation warnings that
+      might lower retargeting quality:\nNote: Activate translation DOF on avatar
+      to improve retargeting quality.\n\t'Little_Bot_setup_char:Hip_06' has translation
+      animation that will be discarded.\n\t'Little_Bot_setup_char:Hip_06' is inbetween
+      humanoid transforms and has rotation animation that will be discarded.\n"
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 3
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 0
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    useSRGBMaterialColor: 1
+    sortHierarchyByName: 1
+    importPhysicalCameras: 1
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    nodeNameCollisionStrategy: 1
+    fileIdsGeneration: 2
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    keepQuads: 0
+    weldVertices: 1
+    bakeAxisConversion: 0
+    preserveHierarchy: 0
+    skinWeightsMode: 0
+    maxBonesPerVertex: 4
+    minBoneWeight: 0.001
+    optimizeBones: 1
+    generateMeshLods: 0
+    meshLodGenerationFlags: 0
+    maximumMeshLod: -1
+    meshOptimizationFlags: -1
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVMarginMethod: 1
+    secondaryUVMinLightmapResolution: 40
+    secondaryUVMinObjectScale: 1
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+    strictVertexDataChecks: 0
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  referencedClips: []
+  importAnimation: 1
+  humanDescription:
+    serializedVersion: 3
+    human: []
+    skeleton:
+    - name: LittleRobot(Clone)
+      parentName: 
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Skeleton
+      parentName: LittleRobot(Clone)
+      position: {x: 0.00032561866, y: 0, z: 0}
+      rotation: {x: 0.10438124, y: 0.22849402, z: 0.0068698875, w: 0.96790904}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane3
+      parentName: Skeleton
+      position: {x: 0.00193763, y: 0, z: 0.0063765594}
+      rotation: {x: 0.5000899, y: 0.224107, z: -0.13578469, w: 0.8253779}
+      scale: {x: 0.60457367, y: 0.49261925, z: 0.60457355}
+    - name: pPlane3_grass02_M_0
+      parentName: pPlane3
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane4
+      parentName: Skeleton
+      position: {x: -0.00406736, y: 0, z: 0.0052759396}
+      rotation: {x: 0.4973034, y: 0.24040365, z: -0.14565836, w: 0.82077956}
+      scale: {x: 0.4779227, y: 0.38942173, z: 0.47792256}
+    - name: pPlane4_grass02_M_0
+      parentName: pPlane4
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane5
+      parentName: Skeleton
+      position: {x: 0.0050391196, y: 0, z: -0.0017991499}
+      rotation: {x: 0.50008965, y: 0.22410703, z: -0.13578463, w: 0.82537806}
+      scale: {x: 0.43222535, y: 0.35218582, z: 0.43222466}
+    - name: pPlane5_grass02_M_0
+      parentName: pPlane5
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane6
+      parentName: Skeleton
+      position: {x: 0.009518949, y: 0, z: 0.00499219}
+      rotation: {x: 0.5000898, y: 0.22410713, z: -0.13578472, w: 0.8253779}
+      scale: {x: 0.34167936, y: 0.2784076, z: 0.34167913}
+    - name: pPlane6_grass02_M_0
+      parentName: pPlane6
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane7
+      parentName: Skeleton
+      position: {x: 0.0076771197, y: 0, z: 0.012366399}
+      rotation: {x: 0.49730384, y: 0.24040343, z: -0.14565848, w: 0.8207793}
+      scale: {x: 0.4322242, y: 0.35218623, z: 0.43222448}
+    - name: pPlane7_grass02_M_0
+      parentName: pPlane7
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane8
+      parentName: Skeleton
+      position: {x: -0.0155323, y: 0, z: -0.0030874698}
+      rotation: {x: 0.50008965, y: 0.22410703, z: -0.13578463, w: 0.82537806}
+      scale: {x: 0.43222535, y: 0.35218582, z: 0.43222466}
+    - name: pPlane8_grass02_M_0
+      parentName: pPlane8
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane9
+      parentName: Skeleton
+      position: {x: -0.021537298, y: 0, z: -0.00418809}
+      rotation: {x: 0.50836545, y: 0.16580349, z: -0.100459024, w: 0.8390362}
+      scale: {x: 0.43222427, y: 0.35218614, z: 0.4322245}
+    - name: pPlane9_grass02_M_0
+      parentName: pPlane9
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane10
+      parentName: Skeleton
+      position: {x: -0.0124308, y: 0, z: -0.0112632}
+      rotation: {x: 0.50008965, y: 0.22410703, z: -0.13578463, w: 0.82537806}
+      scale: {x: 0.43222535, y: 0.35218582, z: 0.43222466}
+    - name: pPlane10_grass02_M_0
+      parentName: pPlane10
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane11
+      parentName: Skeleton
+      position: {x: -0.00795097, y: 0, z: -0.00447183}
+      rotation: {x: 0.49730384, y: 0.24040343, z: -0.14565848, w: 0.8207793}
+      scale: {x: 0.4322242, y: 0.35218623, z: 0.43222448}
+    - name: pPlane11_grass02_M_0
+      parentName: pPlane11
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane12
+      parentName: Skeleton
+      position: {x: -0.0097928, y: 0, z: 0.00290233}
+      rotation: {x: 0.49730384, y: 0.24040343, z: -0.14565848, w: 0.8207793}
+      scale: {x: 0.4322242, y: 0.35218623, z: 0.43222448}
+    - name: pPlane12_grass02_M_0
+      parentName: pPlane12
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane13
+      parentName: Skeleton
+      position: {x: -0.0126685, y: 0, z: 0.00924621}
+      rotation: {x: 0.5000899, y: 0.224107, z: -0.13578469, w: 0.8253779}
+      scale: {x: 0.60457367, y: 0.49261925, z: 0.60457355}
+    - name: pPlane13_grass02_M_0
+      parentName: pPlane13
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane14
+      parentName: Skeleton
+      position: {x: -0.0186735, y: 0, z: 0.008145589}
+      rotation: {x: 0.50008965, y: 0.22410703, z: -0.13578463, w: 0.82537806}
+      scale: {x: 0.43222535, y: 0.35218582, z: 0.43222466}
+    - name: pPlane14_grass02_M_0
+      parentName: pPlane14
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane15
+      parentName: Skeleton
+      position: {x: -0.009499909, y: 0, z: 0.00879763}
+      rotation: {x: 0.5000898, y: 0.22410713, z: -0.13578472, w: 0.8253779}
+      scale: {x: 0.34167936, y: 0.2784076, z: 0.34167913}
+    - name: pPlane15_grass02_M_0
+      parentName: pPlane15
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane16
+      parentName: Skeleton
+      position: {x: -0.00502008, y: 0, z: 0.015589}
+      rotation: {x: 0.50836545, y: 0.16580349, z: -0.100459024, w: 0.8390362}
+      scale: {x: 0.43222427, y: 0.35218614, z: 0.4322245}
+    - name: pPlane16_grass02_M_0
+      parentName: pPlane16
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane17
+      parentName: Skeleton
+      position: {x: -0.0045486097, y: 0, z: 0.0162669}
+      rotation: {x: 0.48589256, y: 0.29724607, z: -0.1800987, w: 0.80194616}
+      scale: {x: 0.43222433, y: 0.35218596, z: 0.43222478}
+    - name: pPlane17_grass02_M_0
+      parentName: pPlane17
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane18
+      parentName: Skeleton
+      position: {x: 0.0149317, y: 8.88178e-18, z: 0.012908899}
+      rotation: {x: 0.5083653, y: 0.16580383, z: -0.100459225, w: 0.8390362}
+      scale: {x: 0.3416797, y: 0.27840766, z: 0.3416792}
+    - name: pPlane18_grass02_M_0
+      parentName: pPlane18
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane19
+      parentName: Skeleton
+      position: {x: 0.00792328, y: 0, z: 0.0188935}
+      rotation: {x: 0.50008965, y: 0.22410703, z: -0.13578463, w: 0.82537806}
+      scale: {x: 0.43222535, y: 0.35218582, z: 0.43222466}
+    - name: pPlane19_grass02_M_0
+      parentName: pPlane19
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane20
+      parentName: Skeleton
+      position: {x: 0.0170298, y: 0, z: 0.011818499}
+      rotation: {x: 0.50008965, y: 0.22410703, z: -0.13578463, w: 0.82537806}
+      scale: {x: 0.43222535, y: 0.35218582, z: 0.43222466}
+    - name: pPlane20_grass02_M_0
+      parentName: pPlane20
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane21
+      parentName: Skeleton
+      position: {x: 0.022513, y: 8.88178e-18, z: 0.0115246}
+      rotation: {x: 0.50008965, y: 0.22410703, z: -0.13578463, w: 0.82537806}
+      scale: {x: 0.43222535, y: 0.35218582, z: 0.43222466}
+    - name: pPlane21_grass02_M_0
+      parentName: pPlane21
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane22
+      parentName: Skeleton
+      position: {x: 0.0206712, y: 8.88178e-18, z: 0.0188987}
+      rotation: {x: 0.5000898, y: 0.22410713, z: -0.13578472, w: 0.8253779}
+      scale: {x: 0.34167936, y: 0.2784076, z: 0.34167913}
+    - name: pPlane22_grass02_M_0
+      parentName: pPlane22
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane23
+      parentName: Skeleton
+      position: {x: 0.0159716, y: -8.88178e-18, z: -0.0065803197}
+      rotation: {x: 0.5083653, y: 0.16580383, z: -0.100459225, w: 0.8390362}
+      scale: {x: 0.3416797, y: 0.27840766, z: 0.3416792}
+    - name: pPlane23_grass02_M_0
+      parentName: pPlane23
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane24
+      parentName: Skeleton
+      position: {x: 0.00996666, y: -8.88178e-18, z: -0.00768095}
+      rotation: {x: 0.50008965, y: 0.22410703, z: -0.13578463, w: 0.82537806}
+      scale: {x: 0.43222535, y: 0.35218582, z: 0.43222466}
+    - name: pPlane24_grass02_M_0
+      parentName: pPlane24
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane25
+      parentName: Skeleton
+      position: {x: 0.019073099, y: -8.88178e-18, z: -0.014756}
+      rotation: {x: 0.50008965, y: 0.22410703, z: -0.13578463, w: 0.82537806}
+      scale: {x: 0.43222535, y: 0.35218582, z: 0.43222466}
+    - name: pPlane25_grass02_M_0
+      parentName: pPlane25
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane26
+      parentName: Skeleton
+      position: {x: 0.023552999, y: -8.88178e-18, z: -0.007964689}
+      rotation: {x: 0.48589256, y: 0.29724607, z: -0.1800987, w: 0.80194616}
+      scale: {x: 0.43222433, y: 0.35218596, z: 0.43222478}
+    - name: pPlane26_grass02_M_0
+      parentName: pPlane26
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane27
+      parentName: Skeleton
+      position: {x: 0.021711098, y: -8.88178e-18, z: -0.000590529}
+      rotation: {x: 0.49730378, y: 0.24040347, z: -0.14565846, w: 0.8207793}
+      scale: {x: 0.34167933, y: 0.27840796, z: 0.34167904}
+    - name: pPlane27_grass02_M_0
+      parentName: pPlane27
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane28
+      parentName: Skeleton
+      position: {x: -0.00248136, y: 0, z: -0.0027799697}
+      rotation: {x: 0.50008965, y: 0.22410703, z: -0.13578463, w: 0.82537806}
+      scale: {x: 0.43222535, y: 0.35218582, z: 0.43222466}
+    - name: pPlane28_grass02_M_0
+      parentName: pPlane28
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane29
+      parentName: Skeleton
+      position: {x: -0.00848635, y: 0, z: -0.0038806}
+      rotation: {x: 0.50008965, y: 0.22410703, z: -0.13578463, w: 0.82537806}
+      scale: {x: 0.43222535, y: 0.35218582, z: 0.43222466}
+    - name: pPlane29_grass02_M_0
+      parentName: pPlane29
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane30
+      parentName: Skeleton
+      position: {x: 0.000620128, y: 0, z: -0.0109557}
+      rotation: {x: 0.50008965, y: 0.22410703, z: -0.13578463, w: 0.82537806}
+      scale: {x: 0.43222535, y: 0.35218582, z: 0.43222466}
+    - name: pPlane30_grass02_M_0
+      parentName: pPlane30
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane31
+      parentName: Skeleton
+      position: {x: 0.0050999597, y: 0, z: -0.00416434}
+      rotation: {x: 0.48589256, y: 0.29724607, z: -0.1800987, w: 0.80194616}
+      scale: {x: 0.43222433, y: 0.35218596, z: 0.43222478}
+    - name: pPlane31_grass02_M_0
+      parentName: pPlane31
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane32
+      parentName: Skeleton
+      position: {x: 0.0032581298, y: 0, z: 0.00320982}
+      rotation: {x: 0.50008965, y: 0.22410703, z: -0.13578463, w: 0.82537806}
+      scale: {x: 0.43222535, y: 0.35218582, z: 0.43222466}
+    - name: pPlane32_grass02_M_0
+      parentName: pPlane32
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane33
+      parentName: Skeleton
+      position: {x: -0.019951299, y: 0, z: -0.012244}
+      rotation: {x: 0.50008965, y: 0.22410703, z: -0.13578463, w: 0.82537806}
+      scale: {x: 0.43222535, y: 0.35218582, z: 0.43222466}
+    - name: pPlane33_grass02_M_0
+      parentName: pPlane33
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane34
+      parentName: Skeleton
+      position: {x: -0.0178719, y: 0, z: -0.01189}
+      rotation: {x: 0.48589256, y: 0.29724607, z: -0.1800987, w: 0.80194616}
+      scale: {x: 0.43222433, y: 0.35218596, z: 0.43222478}
+    - name: pPlane34_grass02_M_0
+      parentName: pPlane34
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane35
+      parentName: Skeleton
+      position: {x: -0.013499599, y: 0, z: -0.019183}
+      rotation: {x: 0.50008965, y: 0.22410703, z: -0.13578463, w: 0.82537806}
+      scale: {x: 0.43222535, y: 0.35218582, z: 0.43222466}
+    - name: pPlane35_grass02_M_0
+      parentName: pPlane35
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane36
+      parentName: Skeleton
+      position: {x: -0.01237, y: 0, z: -0.0136284}
+      rotation: {x: 0.50008965, y: 0.22410703, z: -0.13578463, w: 0.82537806}
+      scale: {x: 0.43222535, y: 0.35218582, z: 0.43222466}
+    - name: pPlane36_grass02_M_0
+      parentName: pPlane36
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane37
+      parentName: Skeleton
+      position: {x: -0.0142118, y: 0, z: -0.0062542097}
+      rotation: {x: 0.50008965, y: 0.22410703, z: -0.13578463, w: 0.82537806}
+      scale: {x: 0.43222535, y: 0.35218582, z: 0.43222466}
+    - name: pPlane37_grass02_M_0
+      parentName: pPlane37
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane38
+      parentName: Skeleton
+      position: {x: -0.017020399, y: 0, z: 0.0078168}
+      rotation: {x: 0.50836545, y: 0.16580349, z: -0.100459024, w: 0.8390362}
+      scale: {x: 0.43222427, y: 0.35218614, z: 0.4322245}
+    - name: pPlane38_grass02_M_0
+      parentName: pPlane38
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane39
+      parentName: Skeleton
+      position: {x: -0.023025401, y: 0, z: 0.0067161797}
+      rotation: {x: 0.48589274, y: 0.29724643, z: -0.1800991, w: 0.80194587}
+      scale: {x: 0.6045732, y: 0.492619, z: 0.6045734}
+    - name: pPlane39_grass02_M_0
+      parentName: pPlane39
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane40
+      parentName: Skeleton
+      position: {x: -0.0139189, y: 0, z: -0.00035890198}
+      rotation: {x: 0.48589274, y: 0.29724643, z: -0.1800991, w: 0.80194587}
+      scale: {x: 0.6045732, y: 0.492619, z: 0.6045734}
+    - name: pPlane40_grass02_M_0
+      parentName: pPlane40
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane41
+      parentName: Skeleton
+      position: {x: -0.00943907, y: 0, z: 0.00643244}
+      rotation: {x: 0.49730384, y: 0.24040343, z: -0.14565848, w: 0.8207793}
+      scale: {x: 0.4322242, y: 0.35218623, z: 0.43222448}
+    - name: pPlane41_grass02_M_0
+      parentName: pPlane41
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane42
+      parentName: Skeleton
+      position: {x: -0.0112809, y: 0, z: 0.0138066}
+      rotation: {x: 0.48589256, y: 0.29724607, z: -0.1800987, w: 0.80194616}
+      scale: {x: 0.43222433, y: 0.35218596, z: 0.43222478}
+    - name: pPlane42_grass02_M_0
+      parentName: pPlane42
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane43
+      parentName: Skeleton
+      position: {x: 0.009509279, y: 0, z: 0.0108376}
+      rotation: {x: 0.46254447, y: 0.37819153, z: -0.23517902, w: 0.7666255}
+      scale: {x: 0.47792247, y: 0.38942212, z: 0.47792318}
+    - name: pPlane43_grass02_M_0
+      parentName: pPlane43
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane44
+      parentName: Skeleton
+      position: {x: 0.00350429, y: 0, z: 0.00973701}
+      rotation: {x: 0.48589224, y: 0.29724637, z: -0.18009938, w: 0.8019461}
+      scale: {x: 0.34167966, y: 0.27840778, z: 0.34167936}
+    - name: pPlane44_grass02_M_0
+      parentName: pPlane44
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane45
+      parentName: Skeleton
+      position: {x: 0.0126108, y: 0, z: 0.00266192}
+      rotation: {x: 0.48589256, y: 0.29724607, z: -0.1800987, w: 0.80194616}
+      scale: {x: 0.43222433, y: 0.35218596, z: 0.43222478}
+    - name: pPlane45_grass02_M_0
+      parentName: pPlane45
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane46
+      parentName: Skeleton
+      position: {x: 0.0170906, y: 0, z: 0.00945327}
+      rotation: {x: 0.48589256, y: 0.29724607, z: -0.1800987, w: 0.80194616}
+      scale: {x: 0.43222433, y: 0.35218596, z: 0.43222478}
+    - name: pPlane46_grass02_M_0
+      parentName: pPlane46
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane47
+      parentName: Skeleton
+      position: {x: 0.0162522, y: 8.88178e-18, z: 0.00974221}
+      rotation: {x: 0.48589256, y: 0.29724607, z: -0.1800987, w: 0.80194616}
+      scale: {x: 0.43222433, y: 0.35218596, z: 0.43222478}
+    - name: pPlane47_grass02_M_0
+      parentName: pPlane47
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane48
+      parentName: Skeleton
+      position: {x: 0.0115527, y: -8.88178e-18, z: -0.0157369}
+      rotation: {x: 0.48589256, y: 0.29724607, z: -0.1800987, w: 0.80194616}
+      scale: {x: 0.43222433, y: 0.35218596, z: 0.43222478}
+    - name: pPlane48_grass02_M_0
+      parentName: pPlane48
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane49
+      parentName: Skeleton
+      position: {x: 0.00554767, y: -8.88178e-18, z: -0.0168375}
+      rotation: {x: 0.49730384, y: 0.24040343, z: -0.14565848, w: 0.8207793}
+      scale: {x: 0.4322242, y: 0.35218623, z: 0.43222448}
+    - name: pPlane49_grass02_M_0
+      parentName: pPlane49
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane50
+      parentName: Skeleton
+      position: {x: 0.0031573297, y: -8.88178e-18, z: -0.0159767}
+      rotation: {x: 0.48589256, y: 0.29724607, z: -0.1800987, w: 0.80194616}
+      scale: {x: 0.43222433, y: 0.35218596, z: 0.43222478}
+    - name: pPlane50_grass02_M_0
+      parentName: pPlane50
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane51
+      parentName: Skeleton
+      position: {x: 0.019134, y: -8.88178e-18, z: -0.0171212}
+      rotation: {x: 0.48589256, y: 0.29724607, z: -0.1800987, w: 0.80194616}
+      scale: {x: 0.43222433, y: 0.35218596, z: 0.43222478}
+    - name: pPlane51_grass02_M_0
+      parentName: pPlane51
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane52
+      parentName: Skeleton
+      position: {x: 0.0172921, y: -8.88178e-18, z: -0.00974706}
+      rotation: {x: 0.48589224, y: 0.29724637, z: -0.18009938, w: 0.8019461}
+      scale: {x: 0.34167966, y: 0.27840778, z: 0.34167936}
+    - name: pPlane52_grass02_M_0
+      parentName: pPlane52
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane2
+      parentName: Skeleton
+      position: {x: 0.0023133, y: 0, z: 0.0120612}
+      rotation: {x: 0.42463228, y: 0.27601627, z: -0.12275981, w: 0.85348254}
+      scale: {x: 0.36386, y: 0.2964805, z: 0.36385927}
+    - name: pPlane2_grass_M_0
+      parentName: pPlane2
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane53
+      parentName: Skeleton
+      position: {x: -0.0000066467796, y: 0, z: 0.0111298}
+      rotation: {x: 0.42463228, y: 0.27601627, z: -0.12275981, w: 0.85348254}
+      scale: {x: 0.36386, y: 0.2964805, z: 0.36385927}
+    - name: pPlane53_grass_M_0
+      parentName: pPlane53
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane54
+      parentName: Skeleton
+      position: {x: 0.011445499, y: 0, z: 0.013253599}
+      rotation: {x: 0.42463228, y: 0.27601627, z: -0.12275981, w: 0.85348254}
+      scale: {x: 0.36386, y: 0.2964805, z: 0.36385927}
+    - name: pPlane54_grass_M_0
+      parentName: pPlane54
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane55
+      parentName: Skeleton
+      position: {x: 0.011642801, y: 0, z: -0.0029198797}
+      rotation: {x: 0.42463228, y: 0.27601627, z: -0.12275981, w: 0.85348254}
+      scale: {x: 0.36386, y: 0.2964805, z: 0.36385927}
+    - name: pPlane55_grass_M_0
+      parentName: pPlane55
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane56
+      parentName: Skeleton
+      position: {x: 0.0213186, y: 0, z: 0.0041372697}
+      rotation: {x: 0.42463228, y: 0.27601627, z: -0.12275981, w: 0.85348254}
+      scale: {x: 0.36386, y: 0.2964805, z: 0.36385927}
+    - name: pPlane56_grass_M_0
+      parentName: pPlane56
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane57
+      parentName: Skeleton
+      position: {x: 0.019701298, y: 8.88178e-18, z: 0.012776999}
+      rotation: {x: 0.42463228, y: 0.27601627, z: -0.12275981, w: 0.85348254}
+      scale: {x: 0.36386, y: 0.2964805, z: 0.36385927}
+    - name: pPlane57_grass_M_0
+      parentName: pPlane57
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane58
+      parentName: Skeleton
+      position: {x: 0.00158684, y: 0, z: 0.018789299}
+      rotation: {x: 0.42463228, y: 0.27601627, z: -0.12275981, w: 0.85348254}
+      scale: {x: 0.36386, y: 0.2964805, z: 0.36385927}
+    - name: pPlane58_grass_M_0
+      parentName: pPlane58
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane59
+      parentName: Skeleton
+      position: {x: -0.0180109, y: 0, z: 0.013114001}
+      rotation: {x: 0.42463228, y: 0.27601627, z: -0.12275981, w: 0.85348254}
+      scale: {x: 0.36386, y: 0.2964805, z: 0.36385927}
+    - name: pPlane59_grass_M_0
+      parentName: pPlane59
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane60
+      parentName: Skeleton
+      position: {x: -0.0204125, y: 0, z: 0.00688175}
+      rotation: {x: 0.43462905, y: 0.19093476, z: -0.080499955, w: 0.87644815}
+      scale: {x: 0.36385977, y: 0.29648107, z: 0.36385936}
+    - name: pPlane60_grass_M_0
+      parentName: pPlane60
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane61
+      parentName: Skeleton
+      position: {x: -0.00319523, y: 0, z: 0.0115263}
+      rotation: {x: 0.43462905, y: 0.19093476, z: -0.080499955, w: 0.87644815}
+      scale: {x: 0.36385977, y: 0.29648107, z: 0.36385936}
+    - name: pPlane61_grass_M_0
+      parentName: pPlane61
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane62
+      parentName: Skeleton
+      position: {x: 0.0162291, y: 0, z: 0.0059028897}
+      rotation: {x: 0.43462968, y: 0.19093467, z: -0.080499806, w: 0.8764478}
+      scale: {x: 0.2876361, y: 0.23437153, z: 0.28763536}
+    - name: pPlane62_grass_M_0
+      parentName: pPlane62
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane63
+      parentName: Skeleton
+      position: {x: 0.0188499, y: 0, z: -0.009822059}
+      rotation: {x: 0.43462905, y: 0.19093476, z: -0.080499955, w: 0.87644815}
+      scale: {x: 0.36385977, y: 0.29648107, z: 0.36385936}
+    - name: pPlane63_grass_M_0
+      parentName: pPlane63
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane64
+      parentName: Skeleton
+      position: {x: 0.00917401, y: 0, z: -0.0168792}
+      rotation: {x: 0.43462905, y: 0.19093476, z: -0.080499955, w: 0.87644815}
+      scale: {x: 0.36385977, y: 0.29648107, z: 0.36385936}
+    - name: pPlane64_grass_M_0
+      parentName: pPlane64
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane65
+      parentName: Skeleton
+      position: {x: 0.0089767, y: 0, z: -0.000705752}
+      rotation: {x: 0.43462905, y: 0.19093476, z: -0.080499955, w: 0.87644815}
+      scale: {x: 0.36385977, y: 0.29648107, z: 0.36385936}
+    - name: pPlane65_grass_M_0
+      parentName: pPlane65
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane66
+      parentName: Skeleton
+      position: {x: -0.0024754198, y: 0, z: -0.00282956}
+      rotation: {x: 0.43462905, y: 0.19093476, z: -0.080499955, w: 0.87644815}
+      scale: {x: 0.36385977, y: 0.29648107, z: 0.36385936}
+    - name: pPlane66_grass_M_0
+      parentName: pPlane66
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane67
+      parentName: Skeleton
+      position: {x: -0.00246877, y: 0, z: 0.00479818}
+      rotation: {x: 0.43462935, y: 0.1909343, z: -0.080499664, w: 0.8764481}
+      scale: {x: 0.5089473, y: 0.41470113, z: 0.5089475}
+    - name: pPlane67_grass_M_0
+      parentName: pPlane67
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane68
+      parentName: Skeleton
+      position: {x: -0.0197165, y: 0, z: 0.0166793}
+      rotation: {x: 0.4115245, y: 0.3534326, z: -0.16133872, w: 0.8244409}
+      scale: {x: 0.3638598, y: 0.29648104, z: 0.36385936}
+    - name: pPlane68_grass_M_0
+      parentName: pPlane68
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane69
+      parentName: Skeleton
+      position: {x: -0.000118821, y: 0, z: 0.0223547}
+      rotation: {x: 0.4115245, y: 0.3534326, z: -0.16133872, w: 0.8244409}
+      scale: {x: 0.3638598, y: 0.29648104, z: 0.36385936}
+    - name: pPlane69_grass_M_0
+      parentName: pPlane69
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane70
+      parentName: Skeleton
+      position: {x: 0.017995698, y: 8.88178e-18, z: 0.0163424}
+      rotation: {x: 0.4115245, y: 0.3534326, z: -0.16133872, w: 0.8244409}
+      scale: {x: 0.3638598, y: 0.29648104, z: 0.36385936}
+    - name: pPlane70_grass_M_0
+      parentName: pPlane70
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane71
+      parentName: Skeleton
+      position: {x: 0.019613, y: 0, z: 0.0077026496}
+      rotation: {x: 0.41152474, y: 0.35343295, z: -0.16133887, w: 0.8244406}
+      scale: {x: 0.2876353, y: 0.23437124, z: 0.28763554}
+    - name: pPlane71_grass_M_0
+      parentName: pPlane71
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane72
+      parentName: Skeleton
+      position: {x: 0.00993712, y: 0, z: 0.000645503}
+      rotation: {x: 0.41152492, y: 0.35343286, z: -0.16133933, w: 0.8244405}
+      scale: {x: 0.50894755, y: 0.4147015, z: 0.508947}
+    - name: pPlane72_grass_M_0
+      parentName: pPlane72
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane73
+      parentName: Skeleton
+      position: {x: 0.009739799, y: 0, z: 0.016819}
+      rotation: {x: 0.4115245, y: 0.3534326, z: -0.16133872, w: 0.8244409}
+      scale: {x: 0.3638598, y: 0.29648104, z: 0.36385936}
+    - name: pPlane73_grass_M_0
+      parentName: pPlane73
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane74
+      parentName: Skeleton
+      position: {x: -0.00171231, y: 0, z: 0.0146951}
+      rotation: {x: 0.41152492, y: 0.35343286, z: -0.16133933, w: 0.8244405}
+      scale: {x: 0.50894755, y: 0.4147015, z: 0.508947}
+    - name: pPlane74_grass_M_0
+      parentName: pPlane74
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane75
+      parentName: Skeleton
+      position: {x: 0.00060763897, y: 0, z: 0.0156266}
+      rotation: {x: 0.4115245, y: 0.3534326, z: -0.16133872, w: 0.8244409}
+      scale: {x: 0.3638598, y: 0.29648104, z: 0.36385936}
+    - name: pPlane75_grass_M_0
+      parentName: pPlane75
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane76
+      parentName: Skeleton
+      position: {x: -0.0041350797, y: 0, z: 0.00755963}
+      rotation: {x: 0.42463297, y: 0.27601564, z: -0.1227598, w: 0.8534825}
+      scale: {x: 0.42720366, y: 0.34809485, z: 0.42720357}
+    - name: pPlane76_grass_M_0
+      parentName: pPlane76
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane77
+      parentName: Skeleton
+      position: {x: -0.00414172, y: 0, z: -0.0000681173}
+      rotation: {x: 0.42463306, y: 0.27601612, z: -0.12276025, w: 0.8534821}
+      scale: {x: 0.3054191, y: 0.24886157, z: 0.30541846}
+    - name: pPlane77_grass_M_0
+      parentName: pPlane77
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane78
+      parentName: Skeleton
+      position: {x: 0.0073103895, y: 0, z: 0.00205569}
+      rotation: {x: 0.42463306, y: 0.27601612, z: -0.12276025, w: 0.8534821}
+      scale: {x: 0.3054191, y: 0.24886157, z: 0.30541846}
+    - name: pPlane78_grass_M_0
+      parentName: pPlane78
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane79
+      parentName: Skeleton
+      position: {x: 0.0075076995, y: 0, z: -0.0141178}
+      rotation: {x: 0.42463306, y: 0.27601612, z: -0.12276025, w: 0.8534821}
+      scale: {x: 0.3054191, y: 0.24886157, z: 0.30541846}
+    - name: pPlane79_grass_M_0
+      parentName: pPlane79
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane80
+      parentName: Skeleton
+      position: {x: 0.0171835, y: 0, z: -0.0070606098}
+      rotation: {x: 0.42463306, y: 0.27601612, z: -0.12276025, w: 0.8534821}
+      scale: {x: 0.3054191, y: 0.24886157, z: 0.30541846}
+    - name: pPlane80_grass_M_0
+      parentName: pPlane80
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane81
+      parentName: Skeleton
+      position: {x: 0.0145628, y: 0, z: 0.0086643305}
+      rotation: {x: 0.42463306, y: 0.27601612, z: -0.12276025, w: 0.8534821}
+      scale: {x: 0.3054191, y: 0.24886157, z: 0.30541846}
+    - name: pPlane81_grass_M_0
+      parentName: pPlane81
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane82
+      parentName: Skeleton
+      position: {x: -0.0048615397, y: 0, z: 0.014287699}
+      rotation: {x: 0.42463306, y: 0.27601612, z: -0.12276025, w: 0.8534821}
+      scale: {x: 0.3054191, y: 0.24886157, z: 0.30541846}
+    - name: pPlane82_grass_M_0
+      parentName: pPlane82
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane83
+      parentName: Skeleton
+      position: {x: -0.0220789, y: 0, z: 0.00964319}
+      rotation: {x: 0.42463306, y: 0.27601612, z: -0.12276025, w: 0.8534821}
+      scale: {x: 0.3054191, y: 0.24886157, z: 0.30541846}
+    - name: pPlane83_grass_M_0
+      parentName: pPlane83
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane84
+      parentName: Skeleton
+      position: {x: -0.024547601, y: 0, z: -0.0043161297}
+      rotation: {x: 0.4346298, y: 0.19093412, z: -0.08049955, w: 0.8764479}
+      scale: {x: 0.42720276, y: 0.3480948, z: 0.4272034}
+    - name: pPlane84_grass_M_0
+      parentName: pPlane84
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane85
+      parentName: Skeleton
+      position: {x: -0.0073303, y: 0, z: 0.00032839997}
+      rotation: {x: 0.43462992, y: 0.19093446, z: -0.08049968, w: 0.8764478}
+      scale: {x: 0.3054191, y: 0.2488618, z: 0.30541858}
+    - name: pPlane85_grass_M_0
+      parentName: pPlane85
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane86
+      parentName: Skeleton
+      position: {x: 0.012094, y: 0, z: -0.00529499}
+      rotation: {x: 0.43462992, y: 0.19093446, z: -0.08049968, w: 0.8764478}
+      scale: {x: 0.3054191, y: 0.2488618, z: 0.30541858}
+    - name: pPlane86_grass_M_0
+      parentName: pPlane86
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane87
+      parentName: Skeleton
+      position: {x: 0.0147148, y: 0, z: -0.0210199}
+      rotation: {x: 0.43462992, y: 0.19093446, z: -0.08049968, w: 0.8764478}
+      scale: {x: 0.3054191, y: 0.2488618, z: 0.30541858}
+    - name: pPlane87_grass_M_0
+      parentName: pPlane87
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane88
+      parentName: Skeleton
+      position: {x: -0.00645789, y: 0, z: -0.020141201}
+      rotation: {x: 0.43462992, y: 0.19093446, z: -0.08049968, w: 0.8764478}
+      scale: {x: 0.3054191, y: 0.2488618, z: 0.30541858}
+    - name: pPlane88_grass_M_0
+      parentName: pPlane88
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane89
+      parentName: Skeleton
+      position: {x: 0.00484162, y: 0, z: -0.011903599}
+      rotation: {x: 0.43462992, y: 0.19093446, z: -0.08049968, w: 0.8764478}
+      scale: {x: 0.3054191, y: 0.2488618, z: 0.30541858}
+    - name: pPlane89_grass_M_0
+      parentName: pPlane89
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane90
+      parentName: Skeleton
+      position: {x: -0.00661049, y: 0, z: -0.0140274}
+      rotation: {x: 0.43462992, y: 0.19093446, z: -0.08049968, w: 0.8764478}
+      scale: {x: 0.3054191, y: 0.2488618, z: 0.30541858}
+    - name: pPlane90_grass_M_0
+      parentName: pPlane90
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane91
+      parentName: Skeleton
+      position: {x: -0.00660384, y: 0, z: -0.0063997}
+      rotation: {x: 0.43462992, y: 0.19093446, z: -0.08049968, w: 0.8764478}
+      scale: {x: 0.3054191, y: 0.2488618, z: 0.30541858}
+    - name: pPlane91_grass_M_0
+      parentName: pPlane91
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane92
+      parentName: Skeleton
+      position: {x: -0.023784498, y: 0, z: 0.0132086}
+      rotation: {x: 0.41152507, y: 0.35343277, z: -0.16133888, w: 0.82444054}
+      scale: {x: 0.30541888, y: 0.24886148, z: 0.30541858}
+    - name: pPlane92_grass_M_0
+      parentName: pPlane92
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane93
+      parentName: Skeleton
+      position: {x: -0.0065671997, y: 0, z: 0.0178531}
+      rotation: {x: 0.41152507, y: 0.35343277, z: -0.16133888, w: 0.82444054}
+      scale: {x: 0.30541888, y: 0.24886148, z: 0.30541858}
+    - name: pPlane93_grass_M_0
+      parentName: pPlane93
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane94
+      parentName: Skeleton
+      position: {x: 0.012857099, y: 0, z: 0.0122297}
+      rotation: {x: 0.4115252, y: 0.35343266, z: -0.16133912, w: 0.8244405}
+      scale: {x: 0.42720333, y: 0.34809497, z: 0.4272034}
+    - name: pPlane94_grass_M_0
+      parentName: pPlane94
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane95
+      parentName: Skeleton
+      position: {x: 0.0154779, y: 0, z: -0.00349523}
+      rotation: {x: 0.41152507, y: 0.35343277, z: -0.16133888, w: 0.82444054}
+      scale: {x: 0.30541888, y: 0.24886148, z: 0.30541858}
+    - name: pPlane95_grass_M_0
+      parentName: pPlane95
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane96
+      parentName: Skeleton
+      position: {x: 0.00580204, y: 0, z: -0.0105524}
+      rotation: {x: 0.41152507, y: 0.35343277, z: -0.16133888, w: 0.82444054}
+      scale: {x: 0.30541888, y: 0.24886148, z: 0.30541858}
+    - name: pPlane96_grass_M_0
+      parentName: pPlane96
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane97
+      parentName: Skeleton
+      position: {x: 0.00560473, y: 0, z: 0.00562108}
+      rotation: {x: 0.41152507, y: 0.35343277, z: -0.16133888, w: 0.82444054}
+      scale: {x: 0.30541888, y: 0.24886148, z: 0.30541858}
+    - name: pPlane97_grass_M_0
+      parentName: pPlane97
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane98
+      parentName: Skeleton
+      position: {x: -0.0058473903, y: 0, z: 0.00349727}
+      rotation: {x: 0.41152507, y: 0.35343277, z: -0.16133888, w: 0.82444054}
+      scale: {x: 0.30541888, y: 0.24886148, z: 0.30541858}
+    - name: pPlane98_grass_M_0
+      parentName: pPlane98
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane99
+      parentName: Skeleton
+      position: {x: -0.00584074, y: 0, z: 0.011124999}
+      rotation: {x: 0.41152507, y: 0.35343277, z: -0.16133888, w: 0.82444054}
+      scale: {x: 0.30541888, y: 0.24886148, z: 0.30541858}
+    - name: pPlane99_grass_M_0
+      parentName: pPlane99
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane3 1
+      parentName: Skeleton
+      position: {x: 0.001921405, y: -0.0022453517, z: 0.0077454573}
+      rotation: {x: 0.49946743, y: 0.2203525, z: -0.1380567, w: 0.8263882}
+      scale: {x: 0.5017025, y: 0.40879762, z: 0.5017023}
+    - name: pPlane3_grass02_M_0
+      parentName: pPlane3 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane4 1
+      parentName: Skeleton
+      position: {x: -0.0040402072, y: -0.0016052568, z: 0.0062542898}
+      rotation: {x: 0.4966365, y: 0.23666969, z: -0.1479177, w: 0.8218637}
+      scale: {x: 0.35867912, y: 0.29226, z: 0.35867932}
+    - name: pPlane4_grass02_M_0
+      parentName: pPlane4 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane5 1
+      parentName: Skeleton
+      position: {x: 0.0050275205, y: -0.0016052568, z: -0.0008204894}
+      rotation: {x: 0.49946722, y: 0.22035256, z: -0.13805664, w: 0.82638836}
+      scale: {x: 0.35868004, y: 0.29225963, z: 0.35867947}
+    - name: pPlane5_grass02_M_0
+      parentName: pPlane5 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane6 1
+      parentName: Skeleton
+      position: {x: 0.009507351, y: -0.0016052568, z: 0.0059708506}
+      rotation: {x: 0.49946722, y: 0.22035256, z: -0.13805664, w: 0.82638836}
+      scale: {x: 0.35868004, y: 0.29225963, z: 0.35867947}
+    - name: pPlane6_grass02_M_0
+      parentName: pPlane6 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane7 1
+      parentName: Skeleton
+      position: {x: 0.007704273, y: -0.0016052568, z: 0.01334475}
+      rotation: {x: 0.4966365, y: 0.23666969, z: -0.1479177, w: 0.8218637}
+      scale: {x: 0.35867912, y: 0.29226, z: 0.35867932}
+    - name: pPlane7_grass02_M_0
+      parentName: pPlane7 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane8 1
+      parentName: Skeleton
+      position: {x: -0.0155438995, y: -0.0016052568, z: -0.0021088095}
+      rotation: {x: 0.49946722, y: 0.22035256, z: -0.13805664, w: 0.82638836}
+      scale: {x: 0.35868004, y: 0.29225963, z: 0.35867947}
+    - name: pPlane8_grass02_M_0
+      parentName: pPlane8 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane9 1
+      parentName: Skeleton
+      position: {x: -0.021744465, y: -0.0022453517, z: -0.0028348614}
+      rotation: {x: 0.5079033, y: 0.16198784, z: -0.102769144, w: 0.83978134}
+      scale: {x: 0.50170213, y: 0.4087975, z: 0.5017024}
+    - name: pPlane9_grass02_M_0
+      parentName: pPlane9 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane10 1
+      parentName: Skeleton
+      position: {x: -0.012442399, y: -0.0016052568, z: -0.010284539}
+      rotation: {x: 0.49946722, y: 0.22035256, z: -0.13805664, w: 0.82638836}
+      scale: {x: 0.35868004, y: 0.29225963, z: 0.35867947}
+    - name: pPlane10_grass02_M_0
+      parentName: pPlane10 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane11 1
+      parentName: Skeleton
+      position: {x: -0.007923817, y: -0.0016052568, z: -0.00349348}
+      rotation: {x: 0.4966365, y: 0.23666969, z: -0.1479177, w: 0.8218637}
+      scale: {x: 0.35867912, y: 0.29226, z: 0.35867932}
+    - name: pPlane11_grass02_M_0
+      parentName: pPlane11 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane12 1
+      parentName: Skeleton
+      position: {x: -0.009771336, y: -0.0012689773, z: 0.0036757272}
+      rotation: {x: 0.49663648, y: 0.23666975, z: -0.14791769, w: 0.8218638}
+      scale: {x: 0.28354087, y: 0.23103546, z: 0.28354064}
+    - name: pPlane12_grass02_M_0
+      parentName: pPlane12 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane13 1
+      parentName: Skeleton
+      position: {x: -0.012778499, y: -0.0016052568, z: 0.00864159}
+      rotation: {x: 0.49946722, y: 0.22035256, z: -0.13805664, w: 0.82638836}
+      scale: {x: 0.35868004, y: 0.29225963, z: 0.35867947}
+    - name: pPlane13_grass02_M_0
+      parentName: pPlane13 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane14 1
+      parentName: Skeleton
+      position: {x: -0.018788125, y: -0.0022453517, z: 0.007931206}
+      rotation: {x: 0.49946743, y: 0.2203525, z: -0.1380567, w: 0.8263882}
+      scale: {x: 0.5017025, y: 0.40879762, z: 0.5017023}
+    - name: pPlane14_grass02_M_0
+      parentName: pPlane14 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane15 1
+      parentName: Skeleton
+      position: {x: -0.00950908, y: -0.0012689773, z: 0.009571271}
+      rotation: {x: 0.49946734, y: 0.22035265, z: -0.13805671, w: 0.8263882}
+      scale: {x: 0.28354093, y: 0.23103517, z: 0.28354073}
+    - name: pPlane15_grass02_M_0
+      parentName: pPlane15 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane16 1
+      parentName: Skeleton
+      position: {x: -0.0051371627, y: -0.0012689773, z: 0.016353786}
+      rotation: {x: 0.50790334, y: 0.16198787, z: -0.102769226, w: 0.8397813}
+      scale: {x: 0.28354117, y: 0.2310352, z: 0.28354076}
+    - name: pPlane16_grass02_M_0
+      parentName: pPlane16 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane17 1
+      parentName: Skeleton
+      position: {x: -0.003984292, y: -0.0016052568, z: 0.01583378}
+      rotation: {x: 0.48506883, y: 0.29359734, z: -0.1823057, w: 0.8032892}
+      scale: {x: 0.3586792, y: 0.29225975, z: 0.35867956}
+    - name: pPlane17_grass02_M_0
+      parentName: pPlane17 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane18 1
+      parentName: Skeleton
+      position: {x: 0.014911691, y: -0.0016052568, z: 0.012412955}
+      rotation: {x: 0.5079035, y: 0.16198753, z: -0.102769025, w: 0.8397813}
+      scale: {x: 0.35867915, y: 0.29225993, z: 0.35867935}
+    - name: pPlane18_grass02_M_0
+      parentName: pPlane18 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane19 1
+      parentName: Skeleton
+      position: {x: 0.007911681, y: -0.0016052568, z: 0.019872159}
+      rotation: {x: 0.49946722, y: 0.22035256, z: -0.13805664, w: 0.82638836}
+      scale: {x: 0.35868004, y: 0.29225963, z: 0.35867947}
+    - name: pPlane19_grass02_M_0
+      parentName: pPlane19 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane20 1
+      parentName: Skeleton
+      position: {x: 0.01702063, y: -0.0012689773, z: 0.0125921415}
+      rotation: {x: 0.49946734, y: 0.22035265, z: -0.13805671, w: 0.8263882}
+      scale: {x: 0.28354093, y: 0.23103517, z: 0.28354073}
+    - name: pPlane20_grass02_M_0
+      parentName: pPlane20 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane21 1
+      parentName: Skeleton
+      position: {x: 0.022624874, y: -0.0022453517, z: 0.011430097}
+      rotation: {x: 0.49946743, y: 0.2203525, z: -0.1380567, w: 0.8263882}
+      scale: {x: 0.5017025, y: 0.40879762, z: 0.5017023}
+    - name: pPlane21_grass02_M_0
+      parentName: pPlane21 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane22 1
+      parentName: Skeleton
+      position: {x: 0.020787701, y: -0.0016052568, z: 0.018413961}
+      rotation: {x: 0.49946722, y: 0.22035256, z: -0.13805664, w: 0.82638836}
+      scale: {x: 0.35868004, y: 0.29225963, z: 0.35867947}
+    - name: pPlane22_grass02_M_0
+      parentName: pPlane22 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane23 1
+      parentName: Skeleton
+      position: {x: 0.015854517, y: -0.0012689773, z: -0.005815534}
+      rotation: {x: 0.50790334, y: 0.16198787, z: -0.102769226, w: 0.8397813}
+      scale: {x: 0.28354117, y: 0.2310352, z: 0.28354076}
+    - name: pPlane23_grass02_M_0
+      parentName: pPlane23 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane24 1
+      parentName: Skeleton
+      position: {x: 0.009955061, y: -0.0016052568, z: -0.0067022895}
+      rotation: {x: 0.49946722, y: 0.22035256, z: -0.13805664, w: 0.82638836}
+      scale: {x: 0.35868004, y: 0.29225963, z: 0.35867947}
+    - name: pPlane24_grass02_M_0
+      parentName: pPlane24 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane25 1
+      parentName: Skeleton
+      position: {x: 0.0190615, y: -0.0016052568, z: -0.013777339}
+      rotation: {x: 0.49946722, y: 0.22035256, z: -0.13805664, w: 0.82638836}
+      scale: {x: 0.35868004, y: 0.29225963, z: 0.35867947}
+    - name: pPlane25_grass02_M_0
+      parentName: pPlane25 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane26 1
+      parentName: Skeleton
+      position: {x: 0.023716468, y: -0.0016052568, z: -0.0069997096}
+      rotation: {x: 0.48506883, y: 0.29359734, z: -0.1823057, w: 0.8032892}
+      scale: {x: 0.3586792, y: 0.29225975, z: 0.35867956}
+    - name: pPlane26_grass02_M_0
+      parentName: pPlane26 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane27 1
+      parentName: Skeleton
+      position: {x: 0.021749076, y: -0.0022453517, z: 0.000777937}
+      rotation: {x: 0.4966365, y: 0.23666957, z: -0.14791776, w: 0.8218638}
+      scale: {x: 0.50170183, y: 0.40879774, z: 0.5017023}
+    - name: pPlane27_grass02_M_0
+      parentName: pPlane27 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane28 1
+      parentName: Skeleton
+      position: {x: -0.0024929591, y: -0.0016052568, z: -0.0018013094}
+      rotation: {x: 0.49946722, y: 0.22035256, z: -0.13805664, w: 0.82638836}
+      scale: {x: 0.35868004, y: 0.29225963, z: 0.35867947}
+    - name: pPlane28_grass02_M_0
+      parentName: pPlane28 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane29 1
+      parentName: Skeleton
+      position: {x: -0.008502575, y: -0.0022453517, z: -0.0025117027}
+      rotation: {x: 0.49946743, y: 0.2203525, z: -0.1380567, w: 0.8263882}
+      scale: {x: 0.5017025, y: 0.40879762, z: 0.5017023}
+    - name: pPlane29_grass02_M_0
+      parentName: pPlane29 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane30 1
+      parentName: Skeleton
+      position: {x: 0.0006085288, y: -0.0016052568, z: -0.00997704}
+      rotation: {x: 0.49946722, y: 0.22035256, z: -0.13805664, w: 0.82638836}
+      scale: {x: 0.35868004, y: 0.29225963, z: 0.35867947}
+    - name: pPlane30_grass02_M_0
+      parentName: pPlane30 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane31 1
+      parentName: Skeleton
+      position: {x: 0.0052634273, y: -0.0016052568, z: -0.0031993594}
+      rotation: {x: 0.48506883, y: 0.29359734, z: -0.1823057, w: 0.8032892}
+      scale: {x: 0.3586792, y: 0.29225975, z: 0.35867956}
+    - name: pPlane31_grass02_M_0
+      parentName: pPlane31 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane32 1
+      parentName: Skeleton
+      position: {x: 0.003241905, y: -0.0022453517, z: 0.004578717}
+      rotation: {x: 0.49946743, y: 0.2203525, z: -0.1380567, w: 0.8263882}
+      scale: {x: 0.5017025, y: 0.40879762, z: 0.5017023}
+    - name: pPlane32_grass02_M_0
+      parentName: pPlane32 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane33 1
+      parentName: Skeleton
+      position: {x: -0.0199629, y: -0.0016052568, z: -0.011265339}
+      rotation: {x: 0.49946722, y: 0.22035256, z: -0.13805664, w: 0.82638836}
+      scale: {x: 0.35868004, y: 0.29225963, z: 0.35867947}
+    - name: pPlane33_grass02_M_0
+      parentName: pPlane33 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane34 1
+      parentName: Skeleton
+      position: {x: -0.025792832, y: -0.0016052568, z: -0.012379618}
+      rotation: {x: 0.48506883, y: 0.29359734, z: -0.1823057, w: 0.8032892}
+      scale: {x: 0.3586792, y: 0.29225975, z: 0.35867956}
+    - name: pPlane34_grass02_M_0
+      parentName: pPlane34 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane35 1
+      parentName: Skeleton
+      position: {x: -0.0168614, y: -0.0016052568, z: -0.019441038}
+      rotation: {x: 0.49946722, y: 0.22035256, z: -0.13805664, w: 0.82638836}
+      scale: {x: 0.35868004, y: 0.29225963, z: 0.35867947}
+    - name: pPlane35_grass02_M_0
+      parentName: pPlane35 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane36 1
+      parentName: Skeleton
+      position: {x: -0.012381598, y: -0.0016052568, z: -0.01264974}
+      rotation: {x: 0.49946722, y: 0.22035256, z: -0.13805664, w: 0.82638836}
+      scale: {x: 0.35868004, y: 0.29225963, z: 0.35867947}
+    - name: pPlane36_grass02_M_0
+      parentName: pPlane36 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane37 1
+      parentName: Skeleton
+      position: {x: -0.01422097, y: -0.0012689773, z: -0.0054805684}
+      rotation: {x: 0.49946734, y: 0.22035265, z: -0.13805671, w: 0.8263882}
+      scale: {x: 0.28354093, y: 0.23103517, z: 0.28354073}
+    - name: pPlane37_grass02_M_0
+      parentName: pPlane37 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane38 1
+      parentName: Skeleton
+      position: {x: -0.017168509, y: -0.0016052568, z: 0.008784255}
+      rotation: {x: 0.5079035, y: 0.16198753, z: -0.102769025, w: 0.8397813}
+      scale: {x: 0.35867915, y: 0.29225993, z: 0.35867935}
+    - name: pPlane38_grass02_M_0
+      parentName: pPlane38 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane39 1
+      parentName: Skeleton
+      position: {x: -0.022861931, y: -0.0016052568, z: 0.0076811602}
+      rotation: {x: 0.48506883, y: 0.29359734, z: -0.1823057, w: 0.8032892}
+      scale: {x: 0.3586792, y: 0.29225975, z: 0.35867956}
+    - name: pPlane39_grass02_M_0
+      parentName: pPlane39 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane40 1
+      parentName: Skeleton
+      position: {x: -0.013690251, y: -0.0022453517, z: 0.0009908602}
+      rotation: {x: 0.48506898, y: 0.29359776, z: -0.18230613, w: 0.8032889}
+      scale: {x: 0.501702, y: 0.40879744, z: 0.50170225}
+    - name: pPlane40_grass02_M_0
+      parentName: pPlane40 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane41 1
+      parentName: Skeleton
+      position: {x: -0.009417606, y: -0.0012689773, z: 0.0072058374}
+      rotation: {x: 0.49663648, y: 0.23666975, z: -0.14791769, w: 0.8218638}
+      scale: {x: 0.28354087, y: 0.23103546, z: 0.28354064}
+    - name: pPlane41_grass02_M_0
+      parentName: pPlane41 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane42 1
+      parentName: Skeleton
+      position: {x: -0.011117432, y: -0.0016052568, z: 0.014771581}
+      rotation: {x: 0.48506883, y: 0.29359734, z: -0.1823057, w: 0.8032892}
+      scale: {x: 0.3586792, y: 0.29225975, z: 0.35867956}
+    - name: pPlane42_grass02_M_0
+      parentName: pPlane42 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane43 1
+      parentName: Skeleton
+      position: {x: 0.009860755, y: -0.001601101, z: 0.01175831}
+      rotation: {x: 0.46147045, y: 0.3747028, z: -0.23727924, w: 0.7683368}
+      scale: {x: 0.358679, y: 0.29226014, z: 0.35867986}
+    - name: pPlane43_grass02_M_0
+      parentName: pPlane43 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane44 1
+      parentName: Skeleton
+      position: {x: 0.0036677576, y: -0.0016052568, z: 0.01070199}
+      rotation: {x: 0.48506883, y: 0.29359734, z: -0.1823057, w: 0.8032892}
+      scale: {x: 0.3586792, y: 0.29225975, z: 0.35867956}
+    - name: pPlane44_grass02_M_0
+      parentName: pPlane44 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane45 1
+      parentName: Skeleton
+      position: {x: 0.012740022, y: -0.0012689773, z: 0.0034247509}
+      rotation: {x: 0.48506847, y: 0.29359764, z: -0.1823064, w: 0.8032891}
+      scale: {x: 0.28354117, y: 0.2310353, z: 0.2835409}
+    - name: pPlane45_grass02_M_0
+      parentName: pPlane45 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane46 1
+      parentName: Skeleton
+      position: {x: 0.017319249, y: -0.0022453517, z: 0.010803032}
+      rotation: {x: 0.48506898, y: 0.29359776, z: -0.18230613, w: 0.8032889}
+      scale: {x: 0.501702, y: 0.40879744, z: 0.50170225}
+    - name: pPlane46_grass02_M_0
+      parentName: pPlane46 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane47 1
+      parentName: Skeleton
+      position: {x: 0.015378021, y: -0.0012689773, z: 0.01759023}
+      rotation: {x: 0.48506847, y: 0.29359764, z: -0.1823064, w: 0.8032891}
+      scale: {x: 0.28354117, y: 0.2310353, z: 0.2835409}
+    - name: pPlane47_grass02_M_0
+      parentName: pPlane47 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane48 1
+      parentName: Skeleton
+      position: {x: 0.011716167, y: -0.0016052568, z: -0.014771919}
+      rotation: {x: 0.48506883, y: 0.29359734, z: -0.1823057, w: 0.8032892}
+      scale: {x: 0.3586792, y: 0.29225975, z: 0.35867956}
+    - name: pPlane48_grass02_M_0
+      parentName: pPlane48 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane49 1
+      parentName: Skeleton
+      position: {x: 0.0055748224, y: -0.0016052568, z: -0.01585915}
+      rotation: {x: 0.4966365, y: 0.23666969, z: -0.1479177, w: 0.8218637}
+      scale: {x: 0.35867912, y: 0.29226, z: 0.35867932}
+    - name: pPlane49_grass02_M_0
+      parentName: pPlane49 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane50 1
+      parentName: Skeleton
+      position: {x: 0.014817568, y: -0.0016052568, z: -0.022947619}
+      rotation: {x: 0.48506883, y: 0.29359734, z: -0.1823057, w: 0.8032892}
+      scale: {x: 0.3586792, y: 0.29225975, z: 0.35867956}
+    - name: pPlane50_grass02_M_0
+      parentName: pPlane50 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane51 1
+      parentName: Skeleton
+      position: {x: 0.019297468, y: -0.0016052568, z: -0.016156219}
+      rotation: {x: 0.48506883, y: 0.29359734, z: -0.1823057, w: 0.8032892}
+      scale: {x: 0.3586792, y: 0.29225975, z: 0.35867956}
+    - name: pPlane51_grass02_M_0
+      parentName: pPlane51 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane52 1
+      parentName: Skeleton
+      position: {x: 0.017455567, y: -0.0016052568, z: -0.008782079}
+      rotation: {x: 0.48506883, y: 0.29359734, z: -0.1823057, w: 0.8032892}
+      scale: {x: 0.3586792, y: 0.29225975, z: 0.35867956}
+    - name: pPlane52_grass02_M_0
+      parentName: pPlane52 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane2 1
+      parentName: Skeleton
+      position: {x: -0.00014232424, y: 0.0019167429, z: 0.01707645}
+      rotation: {x: 0.43885744, y: 0.40983185, z: -0.05278941, w: 0.7979068}
+      scale: {x: 0.36386, y: 0.2964805, z: 0.36385927}
+    - name: pPlane2_grass_M_0
+      parentName: pPlane2 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane53 1
+      parentName: Skeleton
+      position: {x: -0.00014897101, y: 0.0019167429, z: 0.00944875}
+      rotation: {x: 0.43885744, y: 0.40983185, z: -0.05278941, w: 0.7979068}
+      scale: {x: 0.36386, y: 0.2964805, z: 0.36385927}
+    - name: pPlane53_grass_M_0
+      parentName: pPlane53 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane54 1
+      parentName: Skeleton
+      position: {x: 0.011303175, y: 0.0019167429, z: 0.01157255}
+      rotation: {x: 0.43885744, y: 0.40983185, z: -0.05278941, w: 0.7979068}
+      scale: {x: 0.36386, y: 0.2964805, z: 0.36385927}
+    - name: pPlane54_grass_M_0
+      parentName: pPlane54 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane55 1
+      parentName: Skeleton
+      position: {x: 0.011500475, y: 0.0019167429, z: -0.0046009296}
+      rotation: {x: 0.43885744, y: 0.40983185, z: -0.05278941, w: 0.7979068}
+      scale: {x: 0.36386, y: 0.2964805, z: 0.36385927}
+    - name: pPlane55_grass_M_0
+      parentName: pPlane55 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane56 1
+      parentName: Skeleton
+      position: {x: 0.021176275, y: 0.0019167429, z: 0.0024562206}
+      rotation: {x: 0.43885744, y: 0.40983185, z: -0.05278941, w: 0.7979068}
+      scale: {x: 0.36386, y: 0.2964805, z: 0.36385927}
+    - name: pPlane56_grass_M_0
+      parentName: pPlane56 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane57 1
+      parentName: Skeleton
+      position: {x: 0.018555576, y: 0.0019167429, z: 0.018181149}
+      rotation: {x: 0.43885744, y: 0.40983185, z: -0.05278941, w: 0.7979068}
+      scale: {x: 0.36386, y: 0.2964805, z: 0.36385927}
+    - name: pPlane57_grass_M_0
+      parentName: pPlane57 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane58 1
+      parentName: Skeleton
+      position: {x: -0.00086878426, y: 0.0019167429, z: 0.02380455}
+      rotation: {x: 0.43885744, y: 0.40983185, z: -0.05278941, w: 0.7979068}
+      scale: {x: 0.36386, y: 0.2964805, z: 0.36385927}
+    - name: pPlane58_grass_M_0
+      parentName: pPlane58 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane59 1
+      parentName: Skeleton
+      position: {x: -0.018142879, y: 0.0026810407, z: 0.018489733}
+      rotation: {x: 0.4388577, y: 0.4098317, z: -0.052789416, w: 0.79790676}
+      scale: {x: 0.5089469, y: 0.41470152, z: 0.50894773}
+    - name: pPlane59_grass_M_0
+      parentName: pPlane59 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane60 1
+      parentName: Skeleton
+      position: {x: -0.020223763, y: 0.0019167429, z: 0.0052052727}
+      rotation: {x: 0.4419196, y: 0.32955799, z: -0.009471352, w: 0.8342715}
+      scale: {x: 0.36385977, y: 0.29648107, z: 0.36385936}
+    - name: pPlane60_grass_M_0
+      parentName: pPlane60 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane61 1
+      parentName: Skeleton
+      position: {x: -0.0029312342, y: 0.0026810407, z: 0.009181337}
+      rotation: {x: 0.4419199, y: 0.32955754, z: -0.0094710225, w: 0.83427155}
+      scale: {x: 0.5089473, y: 0.41470113, z: 0.5089475}
+    - name: pPlane61_grass_M_0
+      parentName: pPlane61 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane62 1
+      parentName: Skeleton
+      position: {x: 0.0163783, y: 0.0015152103, z: 0.004577616}
+      rotation: {x: 0.44192022, y: 0.32955787, z: -0.009471106, w: 0.8342712}
+      scale: {x: 0.2876361, y: 0.23437153, z: 0.28763536}
+    - name: pPlane62_grass_M_0
+      parentName: pPlane62 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane63 1
+      parentName: Skeleton
+      position: {x: 0.019038636, y: 0.0019167429, z: -0.011498537}
+      rotation: {x: 0.4419196, y: 0.32955799, z: -0.009471352, w: 0.8342715}
+      scale: {x: 0.36385977, y: 0.29648107, z: 0.36385936}
+    - name: pPlane63_grass_M_0
+      parentName: pPlane63 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane64 1
+      parentName: Skeleton
+      position: {x: -0.004060133, y: 0.0019167429, z: -0.014685076}
+      rotation: {x: 0.4419196, y: 0.32955799, z: -0.009471352, w: 0.8342715}
+      scale: {x: 0.36385977, y: 0.29648107, z: 0.36385936}
+    - name: pPlane64_grass_M_0
+      parentName: pPlane64 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane65 1
+      parentName: Skeleton
+      position: {x: 0.009165436, y: 0.0019167429, z: -0.0023822288}
+      rotation: {x: 0.4419196, y: 0.32955799, z: -0.009471352, w: 0.8342715}
+      scale: {x: 0.36385977, y: 0.29648107, z: 0.36385936}
+    - name: pPlane65_grass_M_0
+      parentName: pPlane65 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane66 1
+      parentName: Skeleton
+      position: {x: -0.002286683, y: 0.0019167429, z: -0.0045060366}
+      rotation: {x: 0.4419196, y: 0.32955799, z: -0.009471352, w: 0.8342715}
+      scale: {x: 0.36385977, y: 0.29648107, z: 0.36385936}
+    - name: pPlane66_grass_M_0
+      parentName: pPlane66 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane67 1
+      parentName: Skeleton
+      position: {x: -0.0022800332, y: 0.0019167429, z: 0.0031217032}
+      rotation: {x: 0.4419196, y: 0.32955799, z: -0.009471352, w: 0.8342715}
+      scale: {x: 0.36385977, y: 0.29648107, z: 0.36385936}
+    - name: pPlane67_grass_M_0
+      parentName: pPlane67 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane68 1
+      parentName: Skeleton
+      position: {x: -0.01770548, y: 0.0019167429, z: 0.015432152}
+      rotation: {x: 0.43213212, y: 0.48156223, z: -0.092975415, w: 0.7567795}
+      scale: {x: 0.3638598, y: 0.29648104, z: 0.36385936}
+    - name: pPlane68_grass_M_0
+      parentName: pPlane68 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane69 1
+      parentName: Skeleton
+      position: {x: 0.0003228929, y: 0.0019167429, z: 0.021025551}
+      rotation: {x: 0.43213212, y: 0.48156223, z: -0.092975415, w: 0.7567795}
+      scale: {x: 0.3638598, y: 0.29648104, z: 0.36385936}
+    - name: pPlane69_grass_M_0
+      parentName: pPlane69 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane70 1
+      parentName: Skeleton
+      position: {x: 0.01654402, y: 0.0019167429, z: 0.021801151}
+      rotation: {x: 0.43213212, y: 0.48156223, z: -0.092975415, w: 0.7567795}
+      scale: {x: 0.3638598, y: 0.29648104, z: 0.36385936}
+    - name: pPlane70_grass_M_0
+      parentName: pPlane70 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane71 1
+      parentName: Skeleton
+      position: {x: 0.01916482, y: 0.0019167429, z: 0.0060762023}
+      rotation: {x: 0.43213212, y: 0.48156223, z: -0.092975415, w: 0.7567795}
+      scale: {x: 0.3638598, y: 0.29648104, z: 0.36385936}
+    - name: pPlane71_grass_M_0
+      parentName: pPlane71 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane72 1
+      parentName: Skeleton
+      position: {x: 0.009488939, y: 0.0019167429, z: -0.0009809446}
+      rotation: {x: 0.43213212, y: 0.48156223, z: -0.092975415, w: 0.7567795}
+      scale: {x: 0.3638598, y: 0.29648104, z: 0.36385936}
+    - name: pPlane72_grass_M_0
+      parentName: pPlane72 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane73 1
+      parentName: Skeleton
+      position: {x: 0.009385507, y: 0.0015152103, z: 0.015533275}
+      rotation: {x: 0.43213236, y: 0.48156253, z: -0.09297554, w: 0.75677913}
+      scale: {x: 0.2876353, y: 0.23437124, z: 0.28763554}
+    - name: pPlane73_grass_M_0
+      parentName: pPlane73 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane74 1
+      parentName: Skeleton
+      position: {x: -0.00216049, y: 0.0019167429, z: 0.013068652}
+      rotation: {x: 0.43213212, y: 0.48156223, z: -0.092975415, w: 0.7567795}
+      scale: {x: 0.3638598, y: 0.29648104, z: 0.36385936}
+    - name: pPlane74_grass_M_0
+      parentName: pPlane74 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane75 1
+      parentName: Skeleton
+      position: {x: -0.0023325484, y: 0.0026810407, z: 0.020047916}
+      rotation: {x: 0.43213266, y: 0.48156244, z: -0.092975974, w: 0.756779}
+      scale: {x: 0.50894755, y: 0.4147015, z: 0.508947}
+    - name: pPlane75_grass_M_0
+      parentName: pPlane75 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane76 1
+      parentName: Skeleton
+      position: {x: -0.0042545428, y: 0.001608889, z: 0.00614858}
+      rotation: {x: 0.43885824, y: 0.40983164, z: -0.052789703, w: 0.79790646}
+      scale: {x: 0.3054191, y: 0.24886157, z: 0.30541846}
+    - name: pPlane76_grass_M_0
+      parentName: pPlane76 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane77 1
+      parentName: Skeleton
+      position: {x: -0.0042611826, y: 0.001608889, z: -0.0014791671}
+      rotation: {x: 0.43885824, y: 0.40983164, z: -0.052789703, w: 0.79790646}
+      scale: {x: 0.3054191, y: 0.24886157, z: 0.30541846}
+    - name: pPlane77_grass_M_0
+      parentName: pPlane77 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane78 1
+      parentName: Skeleton
+      position: {x: 0.007190927, y: 0.001608889, z: 0.0006446402}
+      rotation: {x: 0.43885824, y: 0.40983164, z: -0.052789703, w: 0.79790646}
+      scale: {x: 0.3054191, y: 0.24886157, z: 0.30541846}
+    - name: pPlane78_grass_M_0
+      parentName: pPlane78 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane79 1
+      parentName: Skeleton
+      position: {x: 0.007388237, y: 0.001608889, z: -0.015528849}
+      rotation: {x: 0.43885824, y: 0.40983164, z: -0.052789703, w: 0.79790646}
+      scale: {x: 0.3054191, y: 0.24886157, z: 0.30541846}
+    - name: pPlane79_grass_M_0
+      parentName: pPlane79 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane80 1
+      parentName: Skeleton
+      position: {x: 0.017064037, y: 0.001608889, z: -0.008471659}
+      rotation: {x: 0.43885824, y: 0.40983164, z: -0.052789703, w: 0.79790646}
+      scale: {x: 0.3054191, y: 0.24886157, z: 0.30541846}
+    - name: pPlane80_grass_M_0
+      parentName: pPlane80 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane81 1
+      parentName: Skeleton
+      position: {x: 0.014468362, y: 0.0012718447, z: 0.007548878}
+      rotation: {x: 0.43885753, y: 0.40983135, z: -0.052789237, w: 0.79790705}
+      scale: {x: 0.24143746, y: 0.19672844, z: 0.24143697}
+    - name: pPlane81_grass_M_0
+      parentName: pPlane81 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane82 1
+      parentName: Skeleton
+      position: {x: -0.0049559777, y: 0.0012718447, z: 0.013172247}
+      rotation: {x: 0.43885753, y: 0.40983135, z: -0.052789237, w: 0.79790705}
+      scale: {x: 0.24143746, y: 0.19672844, z: 0.24143697}
+    - name: pPlane82_grass_M_0
+      parentName: pPlane82 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane83 1
+      parentName: Skeleton
+      position: {x: -0.022198362, y: 0.001608889, z: 0.00823214}
+      rotation: {x: 0.43885824, y: 0.40983164, z: -0.052789703, w: 0.79790646}
+      scale: {x: 0.3054191, y: 0.24886157, z: 0.30541846}
+    - name: pPlane83_grass_M_0
+      parentName: pPlane83 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane84 1
+      parentName: Skeleton
+      position: {x: -0.024389176, y: 0.001608889, z: -0.0057233386}
+      rotation: {x: 0.4419204, y: 0.32955763, z: -0.009470934, w: 0.8342712}
+      scale: {x: 0.3054191, y: 0.2488618, z: 0.30541858}
+    - name: pPlane84_grass_M_0
+      parentName: pPlane84 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane85 1
+      parentName: Skeleton
+      position: {x: -0.007171876, y: 0.001608889, z: -0.0010788087}
+      rotation: {x: 0.4419204, y: 0.32955763, z: -0.009470934, w: 0.8342712}
+      scale: {x: 0.3054191, y: 0.2488618, z: 0.30541858}
+    - name: pPlane85_grass_M_0
+      parentName: pPlane85 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane86 1
+      parentName: Skeleton
+      position: {x: 0.012252424, y: 0.001608889, z: -0.006702198}
+      rotation: {x: 0.4419204, y: 0.32955763, z: -0.009470934, w: 0.8342712}
+      scale: {x: 0.3054191, y: 0.2488618, z: 0.30541858}
+    - name: pPlane86_grass_M_0
+      parentName: pPlane86 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane87 1
+      parentName: Skeleton
+      position: {x: 0.0014503242, y: 0.001608889, z: -0.018556608}
+      rotation: {x: 0.4419204, y: 0.32955763, z: -0.009470934, w: 0.8342712}
+      scale: {x: 0.3054191, y: 0.2488618, z: 0.30541858}
+    - name: pPlane87_grass_M_0
+      parentName: pPlane87 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane88 1
+      parentName: Skeleton
+      position: {x: -0.0064443853, y: 0.001608889, z: -0.018158508}
+      rotation: {x: 0.4419204, y: 0.32955763, z: -0.009470934, w: 0.8342712}
+      scale: {x: 0.3054191, y: 0.2488618, z: 0.30541858}
+    - name: pPlane88_grass_M_0
+      parentName: pPlane88 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane89 1
+      parentName: Skeleton
+      position: {x: 0.005000044, y: 0.001608889, z: -0.013310809}
+      rotation: {x: 0.4419204, y: 0.32955763, z: -0.009470934, w: 0.8342712}
+      scale: {x: 0.3054191, y: 0.2488618, z: 0.30541858}
+    - name: pPlane89_grass_M_0
+      parentName: pPlane89 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane90 1
+      parentName: Skeleton
+      position: {x: -0.0064520654, y: 0.001608889, z: -0.015434608}
+      rotation: {x: 0.4419204, y: 0.32955763, z: -0.009470934, w: 0.8342712}
+      scale: {x: 0.3054191, y: 0.2488618, z: 0.30541858}
+    - name: pPlane90_grass_M_0
+      parentName: pPlane90 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane91 1
+      parentName: Skeleton
+      position: {x: -0.0064454153, y: 0.001608889, z: -0.0078069083}
+      rotation: {x: 0.4419204, y: 0.32955763, z: -0.009470934, w: 0.8342712}
+      scale: {x: 0.3054191, y: 0.2488618, z: 0.30541858}
+    - name: pPlane91_grass_M_0
+      parentName: pPlane91 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane92 1
+      parentName: Skeleton
+      position: {x: -0.021689689, y: 0.0012718447, z: 0.004781539}
+      rotation: {x: 0.43213212, y: 0.48156288, z: -0.09297571, w: 0.75677913}
+      scale: {x: 0.24143776, y: 0.19672872, z: 0.24143721}
+    - name: pPlane92_grass_M_0
+      parentName: pPlane92 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane93 1
+      parentName: Skeleton
+      position: {x: -0.00686459, y: 0.0012718447, z: 0.01677388}
+      rotation: {x: 0.43213212, y: 0.48156288, z: -0.09297571, w: 0.75677913}
+      scale: {x: 0.24143776, y: 0.19672872, z: 0.24143721}
+    - name: pPlane93_grass_M_0
+      parentName: pPlane93 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane94 1
+      parentName: Skeleton
+      position: {x: 0.012480903, y: 0.001608889, z: 0.010864486}
+      rotation: {x: 0.4321327, y: 0.48156235, z: -0.092975475, w: 0.75677913}
+      scale: {x: 0.30541858, y: 0.24886148, z: 0.30541888}
+    - name: pPlane94_grass_M_0
+      parentName: pPlane94 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane95 1
+      parentName: Skeleton
+      position: {x: 0.015101703, y: 0.001608889, z: -0.0048604435}
+      rotation: {x: 0.4321327, y: 0.48156235, z: -0.092975475, w: 0.75677913}
+      scale: {x: 0.30541858, y: 0.24886148, z: 0.30541888}
+    - name: pPlane95_grass_M_0
+      parentName: pPlane95 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane96 1
+      parentName: Skeleton
+      position: {x: 0.0054258434, y: 0.001608889, z: -0.011917613}
+      rotation: {x: 0.4321327, y: 0.48156235, z: -0.092975475, w: 0.75677913}
+      scale: {x: 0.30541858, y: 0.24886148, z: 0.30541888}
+    - name: pPlane96_grass_M_0
+      parentName: pPlane96 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane97 1
+      parentName: Skeleton
+      position: {x: 0.005228533, y: 0.001608889, z: 0.004255866}
+      rotation: {x: 0.4321327, y: 0.48156235, z: -0.092975475, w: 0.75677913}
+      scale: {x: 0.30541858, y: 0.24886148, z: 0.30541888}
+    - name: pPlane97_grass_M_0
+      parentName: pPlane97 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane98 1
+      parentName: Skeleton
+      position: {x: -0.006223587, y: 0.001608889, z: 0.002132056}
+      rotation: {x: 0.4321327, y: 0.48156235, z: -0.092975475, w: 0.75677913}
+      scale: {x: 0.30541858, y: 0.24886148, z: 0.30541888}
+    - name: pPlane98_grass_M_0
+      parentName: pPlane98 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: pPlane99 1
+      parentName: Skeleton
+      position: {x: -0.0062169367, y: 0.001608889, z: 0.009759786}
+      rotation: {x: 0.4321327, y: 0.48156235, z: -0.092975475, w: 0.75677913}
+      scale: {x: 0.30541858, y: 0.24886148, z: 0.30541888}
+    - name: pPlane99_grass_M_0
+      parentName: pPlane99 1
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:ikHandle1
+      parentName: Skeleton
+      position: {x: -0.00593815, y: 0.0138195, z: 0.00153166}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:ikHandle2
+      parentName: Skeleton
+      position: {x: 0.00454627, y: 0.0076754997, z: -0.00146574}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:ikHandle3
+      parentName: Skeleton
+      position: {x: -0.0020103198, y: 0.0011646299, z: -0.00390718}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:curve4
+      parentName: Skeleton
+      position: {x: -0.018362274, y: 0.04299942, z: 0.0036148836}
+      rotation: {x: 0.5677757, y: 0.02812689, z: 0.7764153, w: -0.27206415}
+      scale: {x: 0.10930496, y: 0.10930507, z: 0.109304935}
+    - name: Little_Bot_setup_char:wq_nurbsCircle3
+      parentName: Little_Bot_setup_char:curve4
+      position: {x: 0.008581985, y: -0.0022438953, z: 0.0047757896}
+      rotation: {x: -0.5499693, y: -0.2520336, z: 0.5008864, w: 0.6189716}
+      scale: {x: 9.148735, y: 9.148744, z: 9.148742}
+    - name: Little_Bot_setup_char:wq_nurbsCircle3 3
+      parentName: Little_Bot_setup_char:curve4
+      position: {x: -0.00007031261, y: -0.0142643, z: 0.00021637733}
+      rotation: {x: -0.10680853, y: 0.1309097, z: 0.10634363, w: 0.97987026}
+      scale: {x: 9.148742, y: 9.148739, z: 9.148743}
+    - name: Little_Bot_setup_char:wq_nurbsCircle3 2
+      parentName: Little_Bot_setup_char:curve4
+      position: {x: 0.014553853, y: -0.0021442985, z: -0.0014734302}
+      rotation: {x: 0.020188125, y: 0.05081498, z: 0.7313378, w: 0.67982006}
+      scale: {x: 9.148745, y: 9.148741, z: 9.14874}
+    - name: Little_Bot_setup_char:wq_nurbsCircle3 1
+      parentName: Little_Bot_setup_char:curve4
+      position: {x: 0.012636223, y: 0.0031458836, z: -0.009434879}
+      rotation: {x: -0.032409243, y: 0.35704243, z: 0.8217177, w: 0.4430017}
+      scale: {x: 9.1487465, y: 9.148744, z: 9.148738}
+    - name: Little_Bot_setup_char:curve4 1
+      parentName: Skeleton
+      position: {x: 0.0033769174, y: 0.009999951, z: -0.00022668291}
+      rotation: {x: -0.32788745, y: -0.24062404, z: 0.1502848, w: 0.90111285}
+      scale: {x: 0.9999994, y: 1.0000004, z: 0.99999994}
+    - name: Little_Bot_setup_char:wq_nurbsCircle3
+      parentName: Little_Bot_setup_char:curve4 1
+      position: {x: 0.00074242946, y: -0.0007693481, z: -0.0013972117}
+      rotation: {x: -0.31335074, y: 0.86347365, z: 0.33610806, w: -0.20798087}
+      scale: {x: 0.99999994, y: 1.0000007, z: 0.99999946}
+    - name: Little_Bot_setup_char:wq_nurbsCircle3 3
+      parentName: Little_Bot_setup_char:curve4 1
+      position: {x: 0.0010024338, y: -0.0009947033, z: -0.00078932155}
+      rotation: {x: -0.27254066, y: 0.92971575, z: 0.21786988, w: -0.11782601}
+      scale: {x: 0.9999998, y: 0.9999997, z: 1.0000001}
+    - name: Little_Bot_setup_char:wq_nurbsCircle3 2
+      parentName: Little_Bot_setup_char:curve4 1
+      position: {x: 0.0007566089, y: -0.0013628163, z: 0.00008388997}
+      rotation: {x: -0.15187232, y: 0.97845113, z: -0.12850651, w: 0.055265356}
+      scale: {x: 1.0000004, y: 0.9999999, z: 0.9999997}
+    - name: Little_Bot_setup_char:wq_nurbsCircle3 1
+      parentName: Little_Bot_setup_char:curve4 1
+      position: {x: 0.00043626165, y: -0.00057322095, z: 0.000834162}
+      rotation: {x: -0.2200472, y: 0.62087315, z: -0.5859278, w: 0.47200042}
+      scale: {x: 1, y: 1.0000005, z: 0.9999999}
+    - name: Little_Bot_setup_char:curve1
+      parentName: Skeleton
+      position: {x: -0.0018908153, y: 0.0011930855, z: -0.00387822}
+      rotation: {x: 0.050483275, y: -0.22383112, z: 0.011610305, w: 0.9732504}
+      scale: {x: 1.0000005, y: 0.9999995, z: 0.99999994}
+    - name: Little_Bot_setup_char:curve5
+      parentName: Skeleton
+      position: {x: -0.00116702, y: 0.00462846, z: -0.00881397}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:curve8
+      parentName: Skeleton
+      position: {x: 0.0029699998, y: 0.0113454, z: -0.01084613}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:curve6
+      parentName: Skeleton
+      position: {x: 0.000046245827, y: 0.0086761005, z: -0.0012510743}
+      rotation: {x: -0.06740757, y: -0.22137327, z: -0.011576865, w: 0.9727878}
+      scale: {x: 1.0000005, y: 0.9999995, z: 0.9999998}
+    - name: Little_Bot_setup_char:nurbsCircle1
+      parentName: Little_Bot_setup_char:curve6
+      position: {x: 6.93889e-20, y: 0.0011728499, z: 0.000476244}
+      rotation: {x: -0.045722153, y: -0.010846006, z: 0.017704485, w: 0.9987384}
+      scale: {x: 1.0000001, y: 0.99999994, z: 1.0000004}
+    - name: Little_Bot_setup_char:nurbsCircle2
+      parentName: Little_Bot_setup_char:nurbsCircle1
+      position: {x: 0.000027365, y: 0.00478887, z: 0}
+      rotation: {x: -0.015826559, y: 0.022928953, z: -0.02791013, w: 0.99922216}
+      scale: {x: 1.0000005, y: 0.9999999, z: 1.0000005}
+    - name: Little_Bot_setup_char:w_curve7
+      parentName: Little_Bot_setup_char:nurbsCircle2
+      position: {x: -0.000009538619, y: 0.00137674, z: -1.11022e-18}
+      rotation: {x: -0.0052018114, y: -0.030371891, z: -0.004001805, w: 0.99951714}
+      scale: {x: 0.99999994, y: 1.0000001, z: 1}
+    - name: Little_Bot_setup_char:w_nurbsCircle3
+      parentName: Little_Bot_setup_char:w_curve7
+      position: {x: -0.0063678697, y: 0.00218378, z: 5.5511197e-19}
+      rotation: {x: 0, y: -2.77556e-17, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:w_nurbsCircle4
+      parentName: Little_Bot_setup_char:w_curve7
+      position: {x: 0.0063322196, y: 0.00218378, z: 0}
+      rotation: {x: 0, y: -2.77556e-17, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:w_curve9
+      parentName: Little_Bot_setup_char:nurbsCircle1
+      position: {x: -0.0012774699, y: 0.00402265, z: 3.0531098e-18}
+      rotation: {x: -0.00024622004, y: -0.010296807, z: -0.046442978, w: 0.99886787}
+      scale: {x: 0.99999994, y: 1, z: 1.0000001}
+    - name: Little_Bot_setup_char:w_curve8
+      parentName: Little_Bot_setup_char:nurbsCircle1
+      position: {x: 0.0012774699, y: 0.0040227, z: 6.1062295e-18}
+      rotation: {x: 0.0057705, y: -0.020759823, z: 0.009022861, w: 0.99972713}
+      scale: {x: 0.99999976, y: 1.0000005, z: 0.9999995}
+    - name: Little_Bot_setup_char:Hip1_00
+      parentName: Skeleton
+      position: {x: -0.00767875, y: 0.0228994, z: 0.0066220895}
+      rotation: {x: 0.060037564, y: 0.93288535, z: 0.19480601, w: -0.29693612}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:L_Wing1_03
+      parentName: Little_Bot_setup_char:Hip1_00
+      position: {x: -0.000055302, y: 4.44089e-18, z: -0.00039650899}
+      rotation: {x: 0.3648811, y: 0.17127705, z: -0.06793792, w: 0.91263926}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:R_Wing1_04
+      parentName: Little_Bot_setup_char:Hip1_00
+      position: {x: 0.000055302, y: 0, z: -0.00039650899}
+      rotation: {x: 0.86267525, y: 0.06870722, z: 0.28840908, w: -0.4097451}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:L_Wing_01
+      parentName: Little_Bot_setup_char:Hip1_00
+      position: {x: -0.00034828598, y: 0, z: -1.11022e-18}
+      rotation: {x: -0.023686508, y: 0.025276909, z: -0.5003462, w: 0.8651323}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:R_Wing_02
+      parentName: Little_Bot_setup_char:Hip1_00
+      position: {x: 0.00034828598, y: 0, z: -1.11022e-18}
+      rotation: {x: 0.8645361, y: 0.5021381, z: 0.017106418, w: -0.011918577}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:Hip_06
+      parentName: Skeleton
+      position: {x: -0.000282088, y: 0.00866624, z: -0.00084101496}
+      rotation: {x: 0.10886998, y: -0.20419896, z: -0.6960508, w: 0.67967886}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:R_upfoot_030
+      parentName: Little_Bot_setup_char:Hip_06
+      position: {x: -0.000082093895, y: 0.00166058, z: -3.85861e-10}
+      rotation: {x: -0.28120205, y: -0.16030695, z: 0.14358413, w: 0.93520623}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:R_knee_031
+      parentName: Little_Bot_setup_char:R_upfoot_030
+      position: {x: 0.0032486701, y: 0.0000956106, z: -0.00043608097}
+      rotation: {x: 0.9515467, y: 0.016170498, z: -0.3070599, w: 0.003409903}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:R_Foot_032
+      parentName: Little_Bot_setup_char:R_knee_031
+      position: {x: 0.00485451, y: 0.000089664594, z: -0.00018599599}
+      rotation: {x: -0.056212142, y: -0.05273107, z: -0.6494962, w: 0.75644845}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:Spine_07
+      parentName: Little_Bot_setup_char:Hip_06
+      position: {x: -0.0012861501, y: 0, z: 1.3877799e-19}
+      rotation: {x: 0.99878496, y: 0.014850897, z: 0.045691, w: -0.010976543}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:R_shouder_019
+      parentName: Little_Bot_setup_char:Spine_07
+      position: {x: -0.0040299296, y: -0.0012544601, z: 1.11022e-18}
+      rotation: {x: -0.008199165, y: -0.0081991665, z: 0.80924726, w: -0.5873539}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:R_arm_020
+      parentName: Little_Bot_setup_char:R_shouder_019
+      position: {x: 0.000980911, y: 0.000000058024497, z: 0}
+      rotation: {x: 0.16329072, y: -0.014992414, z: 0.14855938, w: 0.9752135}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:R_elbow_021
+      parentName: Little_Bot_setup_char:R_arm_020
+      position: {x: 0.0033642198, y: 0.0000611714, z: -0.000187586}
+      rotation: {x: -0.0002023577, y: 0.073264346, z: 0.01006729, w: 0.99726176}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:R_hand_022
+      parentName: Little_Bot_setup_char:R_elbow_021
+      position: {x: 0.00413263, y: -0.000042986998, z: 0.00011126699}
+      rotation: {x: 0.043132283, y: 0.28858602, z: -0.73414993, w: 0.61309195}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:R_middle_024
+      parentName: Little_Bot_setup_char:R_hand_022
+      position: {x: -0.0000165195, y: 0.0015360799, z: 0.000501742}
+      rotation: {x: 0.12106207, y: -0.12550905, z: 0.47187325, w: 0.86424947}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:R_ring_023
+      parentName: Little_Bot_setup_char:R_hand_022
+      position: {x: -0.0000421281, y: 0.0012910899, z: 0.00119197}
+      rotation: {x: 0.2947351, y: -0.20968106, z: 0.47986615, w: 0.79930824}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:R_index_025
+      parentName: Little_Bot_setup_char:R_hand_022
+      position: {x: 0.0000052916603, y: 0.0015572599, z: -0.000080664504}
+      rotation: {x: -0.09527181, y: 0.038367607, z: 0.31584305, w: 0.9432361}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:R_Thumb_026
+      parentName: Little_Bot_setup_char:R_hand_022
+      position: {x: -0.000096322, y: 0.00100229, z: -0.000445792}
+      rotation: {x: -0.3379381, y: 0.45132613, z: 0.2722761, w: 0.7797232}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:L_shouder_012
+      parentName: Little_Bot_setup_char:Spine_07
+      position: {x: -0.00401529, y: 0.0013004299, z: -1.3877799e-18}
+      rotation: {x: 0.81181365, y: -0.58389413, z: -0.000938326, w: -0.0050473907}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:L_arm_013
+      parentName: Little_Bot_setup_char:L_shouder_012
+      position: {x: -0.00098095, y: 0, z: 0}
+      rotation: {x: -0.2449656, y: -0.059917435, z: 0.16208379, w: 0.9540076}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:L_elbow_014
+      parentName: Little_Bot_setup_char:L_arm_013
+      position: {x: -0.0033642699, y: -0.0000612088, z: 0.000187586}
+      rotation: {x: 0.007871268, y: 0.054049257, z: 0.004324178, w: 0.99849796}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:L_hand_05
+      parentName: Little_Bot_setup_char:L_elbow_014
+      position: {x: -0.0041326, y: 0.0000430132, z: -0.000111258}
+      rotation: {x: -0.13233057, y: -0.20004697, z: 0.733727, w: -0.6357001}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:L_Thumb_018
+      parentName: Little_Bot_setup_char:L_hand_05
+      position: {x: 0.0000963224, y: -0.00100229, z: 0.000445792}
+      rotation: {x: -0.50919497, y: 0.34766796, z: 0.50299394, w: 0.60567695}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:L_index_017
+      parentName: Little_Bot_setup_char:L_hand_05
+      position: {x: -0.00000528504, y: -0.00155725, z: 0.0000806662}
+      rotation: {x: -0.12831905, y: 0.08749762, z: 0.055392724, w: 0.9863113}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:L_ring_015
+      parentName: Little_Bot_setup_char:L_hand_05
+      position: {x: 0.0000421387, y: -0.0012910899, z: -0.00119197}
+      rotation: {x: 0.06176984, y: -0.22760215, z: 0.8783206, w: 0.4158543}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:L_middle_016
+      parentName: Little_Bot_setup_char:L_hand_05
+      position: {x: 0.0000165201, y: -0.0015360699, z: -0.000501737}
+      rotation: {x: 0.08804373, y: -0.19185406, z: 0.72274226, w: 0.65809125}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:neck_08
+      parentName: Little_Bot_setup_char:Spine_07
+      position: {x: -0.00478895, y: -2.08167e-18, z: 1.3877799e-18}
+      rotation: {x: 0.99937856, y: 0.021593291, z: -0.015812593, w: 0.022938645}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:Head_09
+      parentName: Little_Bot_setup_char:neck_08
+      position: {x: -0.00137677, y: -2.7755598e-19, z: -8.32667e-19}
+      rotation: {x: 0.017710708, y: -0.025215913, z: 0.70147336, w: 0.71202934}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:R_ear_011
+      parentName: Little_Bot_setup_char:Head_09
+      position: {x: 0.0063678697, y: 0.00218378, z: -3.85861e-10}
+      rotation: {x: 1, y: -8.32667e-16, z: 4.71845e-16, w: -6.123234e-17}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:L_ear_010
+      parentName: Little_Bot_setup_char:Head_09
+      position: {x: -0.0063678697, y: 0.00218378, z: 2.4979998e-18}
+      rotation: {x: 2.77556e-17, y: -1.38778e-16, z: -2.08167e-16, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:L_upfoot_027
+      parentName: Little_Bot_setup_char:Hip_06
+      position: {x: -0.000082095, y: -0.00166058, z: -2.7755598e-19}
+      rotation: {x: 0.044856355, y: 0.995994, z: -0.07729404, w: 0.0031038383}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:L_knee_028
+      parentName: Little_Bot_setup_char:L_upfoot_027
+      position: {x: -0.0032486701, y: -0.0000956121, z: 0.00043608097}
+      rotation: {x: 0.97597474, y: -0.0017226522, z: -0.21769692, w: 0.0088554835}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:L_Foot_029
+      parentName: Little_Bot_setup_char:L_knee_028
+      position: {x: -0.00485451, y: -0.000089662295, z: 0.000185995}
+      rotation: {x: -0.07262458, y: -0.0042197094, z: -0.6573958, w: 0.75002575}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:rad_Little_Bot_setup_char:butterfly_M_0
+      parentName: LittleRobot(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:Wings_Little_Bot_setup_char:butterfly_M_0
+      parentName: LittleRobot(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:little_robot:earR_Little_Bot_setup_char:Little_Robot_M_0
+      parentName: LittleRobot(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:little_robot:Head_Little_Bot_setup_char:Little_Robot_M_0
+      parentName: LittleRobot(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:little_robot:earR1_Little_Bot_setup_char:Little_Robot_M_0
+      parentName: LittleRobot(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:little_robot:neckle_Little_Bot_setup_char:Little_Robot_M_0
+      parentName: LittleRobot(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:little_robot:body_Little_Bot_setup_char:Little_Robot_M_0
+      parentName: LittleRobot(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:little_robot:ArmR_arm01_Little_Bot_setup_char:Little_Robot_M_0
+      parentName: LittleRobot(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:little_robot:arm01_Little_Bot_setup_char:Little_Robot_M_0
+      parentName: LittleRobot(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:little_robot:arm02_Little_Bot_setup_char:Little_Robot_M_0
+      parentName: LittleRobot(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:little_robot:finger4_Little_Bot_setup_char:Little_Robot_M_0
+      parentName: LittleRobot(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:little_robot:finger3_Little_Bot_setup_char:Little_Robot_M_0
+      parentName: LittleRobot(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:little_robot:finger1_Little_Bot_setup_char:Little_Robot_M_0
+      parentName: LittleRobot(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:little_robot:finger0_Little_Bot_setup_char:Little_Robot_M_0
+      parentName: LittleRobot(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:little_robot:hand_Little_Bot_setup_char:Little_Robot_M_0
+      parentName: LittleRobot(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:little_robot:pCube7_Little_Bot_setup_char:Little_Robot_M_0
+      parentName: LittleRobot(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:little_robot:pCylinder5_Little_Bot_setup_char:Little_Robot_M_0
+      parentName: LittleRobot(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:little_robot:pCylinder6_Little_Bot_setup_char:Little_Robot_M_0
+      parentName: LittleRobot(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:little_robot:pCube26_Little_Bot_setup_char:Little_Robot_M_0
+      parentName: LittleRobot(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:little_robot:group4_pCube27_Little_Bot_setup_char:Little_Robot_M_0
+      parentName: LittleRobot(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:little_robot:pCube22_Little_Bot_setup_char:Little_Robot_M_0
+      parentName: LittleRobot(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:little_robot:ArmR_arm01_Little_Bot_setup_char:Little_Robot_M_0
+        1
+      parentName: LittleRobot(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:little_robot:arm01_Little_Bot_setup_char:Little_Robot_M_0
+        1
+      parentName: LittleRobot(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:little_robot:arm02_Little_Bot_setup_char:Little_Robot_M_0
+        1
+      parentName: LittleRobot(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:little_robot:finger4_Little_Bot_setup_char:Little_Robot_M_0
+        1
+      parentName: LittleRobot(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:little_robot:finger3_Little_Bot_setup_char:Little_Robot_M_0
+        1
+      parentName: LittleRobot(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:little_robot:finger1_Little_Bot_setup_char:Little_Robot_M_0
+        1
+      parentName: LittleRobot(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:little_robot:finger0_Little_Bot_setup_char:Little_Robot_M_0
+        1
+      parentName: LittleRobot(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:little_robot:hand_Little_Bot_setup_char:Little_Robot_M_0
+        1
+      parentName: LittleRobot(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:little_robot:pCube7_Little_Bot_setup_char:Little_Robot_M_0
+        1
+      parentName: LittleRobot(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:little_robot:pCylinder5_Little_Bot_setup_char:Little_Robot_M_0
+        1
+      parentName: LittleRobot(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:little_robot:pCylinder6_Little_Bot_setup_char:Little_Robot_M_0
+        1
+      parentName: LittleRobot(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:little_robot:pCube26_Little_Bot_setup_char:Little_Robot_M_0
+        1
+      parentName: LittleRobot(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:little_robot:group4_pCube27_Little_Bot_setup_char:Little_Robot_M_0
+        1
+      parentName: LittleRobot(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: floor_floor1_0
+      parentName: LittleRobot(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: floor2_floor3_0
+      parentName: LittleRobot(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: floor4_floor3_0
+      parentName: LittleRobot(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    globalScale: 1
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  autoGenerateAvatarMappingIfUnspecified: 1
+  animationType: 3
+  humanoidOversampling: 1
+  avatarSetup: 1
+  addHumanoidExtraRootOnlyWhenUsingAvatar: 1
+  importBlendShapeDeformPercent: 1
+  remapMaterialsIfMaterialImportModeIsNone: 0
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

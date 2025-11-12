@@ -1,0 +1,20 @@
+{
+    "asset": "1019edca601989d478e814b34b686d8a",
+    "fileName": "019a77d4-457e-7472-9659-89e21385d179.png",
+    "prompt": "Smiley face symbol ^_^",
+    "negativePrompt": "no messy, only symbol",
+    "model": "8c363d16-0086-48af-b7dd-20ac69e7eafd",
+    "modelName": "Cyberpunk",
+    "customSeed": -1,
+    "w3CTraceId": "b6a9cf9f3ba85c2ed9c8fd44243665d0",
+    "refinementMode": "Generation",
+    "pixelateTargetSize": 0,
+    "pixelateKeepImageSize": false,
+    "pixelatePixelBlockSize": 0,
+    "pixelateMode": 0,
+    "pixelateOutlineThickness": 0,
+    "doodles": {
+        "m_Items": []
+    },
+    "upscaleFactor": 0
+}

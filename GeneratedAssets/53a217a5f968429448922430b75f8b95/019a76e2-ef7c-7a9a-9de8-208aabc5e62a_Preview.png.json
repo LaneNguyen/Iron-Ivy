@@ -1,0 +1,11 @@
+{
+    "asset": "53a217a5f968429448922430b75f8b95",
+    "fileName": "019a76e2-ef7c-7a9a-9de8-208aabc5e62a_Preview.png",
+    "prompt": "black tv screen\n",
+    "negativePrompt": "",
+    "model": "44ec3749-963a-44b1-aa54-dc19f6ed8ab2",
+    "modelName": "Unity Texture2D",
+    "customSeed": 729937540,
+    "w3CTraceId": "79ae8792d8fe041ea422195c0b782baf",
+    "refinementMode": "Generation"
+}

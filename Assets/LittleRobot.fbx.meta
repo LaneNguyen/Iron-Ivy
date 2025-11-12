@@ -1,0 +1,799 @@
+fileFormatVersion: 2
+guid: 1d6f4295192aef94e8106386bbba4c1d
+ModelImporter:
+  serializedVersion: 24200
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Lit
+    second: {fileID: 2100000, guid: 7e2f156c652678c4da7dc27dd1c5d117, type: 2}
+  materials:
+    materialImportMode: 2
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    removeConstantScaleCurves: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 3
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 0
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 70
+    meshCompression: 0
+    addColliders: 0
+    useSRGBMaterialColor: 1
+    sortHierarchyByName: 1
+    importPhysicalCameras: 1
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    nodeNameCollisionStrategy: 1
+    fileIdsGeneration: 2
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    keepQuads: 0
+    weldVertices: 1
+    bakeAxisConversion: 0
+    preserveHierarchy: 0
+    skinWeightsMode: 0
+    maxBonesPerVertex: 4
+    minBoneWeight: 0.001
+    optimizeBones: 1
+    generateMeshLods: 0
+    meshLodGenerationFlags: 0
+    maximumMeshLod: -1
+    meshOptimizationFlags: -1
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVMarginMethod: 1
+    secondaryUVMinLightmapResolution: 40
+    secondaryUVMinObjectScale: 1
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+    strictVertexDataChecks: 0
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  referencedClips: []
+  importAnimation: 1
+  humanDescription:
+    serializedVersion: 3
+    human:
+    - boneName: Little_Bot_setup_char:Hip_06
+      humanName: Hips
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Little_Bot_setup_char:L_upfoot_027
+      humanName: LeftUpperLeg
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Little_Bot_setup_char:R_upfoot_030
+      humanName: RightUpperLeg
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Little_Bot_setup_char:L_knee_028
+      humanName: LeftLowerLeg
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Little_Bot_setup_char:R_knee_031
+      humanName: RightLowerLeg
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Little_Bot_setup_char:L_Foot_029
+      humanName: LeftFoot
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Little_Bot_setup_char:R_Foot_032
+      humanName: RightFoot
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Little_Bot_setup_char:Spine_07
+      humanName: Spine
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Little_Bot_setup_char:neck_08
+      humanName: Neck
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Little_Bot_setup_char:Head_09
+      humanName: Head
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Little_Bot_setup_char:L_shouder_012
+      humanName: LeftShoulder
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Little_Bot_setup_char:R_shouder_019
+      humanName: RightShoulder
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Little_Bot_setup_char:L_arm_013
+      humanName: LeftUpperArm
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Little_Bot_setup_char:R_arm_020
+      humanName: RightUpperArm
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Little_Bot_setup_char:L_elbow_014
+      humanName: LeftLowerArm
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Little_Bot_setup_char:R_elbow_021
+      humanName: RightLowerArm
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Little_Bot_setup_char:L_hand_05
+      humanName: LeftHand
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Little_Bot_setup_char:R_hand_022
+      humanName: RightHand
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Little_Bot_setup_char:L_ear_010
+      humanName: LeftEye
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Little_Bot_setup_char:R_ear_011
+      humanName: RightEye
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Little_Bot_setup_char:L_Thumb_018
+      humanName: Left Thumb Proximal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Little_Bot_setup_char:L_index_017
+      humanName: Left Index Proximal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Little_Bot_setup_char:L_middle_016
+      humanName: Left Middle Proximal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Little_Bot_setup_char:L_ring_015
+      humanName: Left Ring Proximal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Little_Bot_setup_char:R_Thumb_026
+      humanName: Right Thumb Proximal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Little_Bot_setup_char:R_index_025
+      humanName: Right Index Proximal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Little_Bot_setup_char:R_middle_024
+      humanName: Right Middle Proximal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    - boneName: Little_Bot_setup_char:R_ring_023
+      humanName: Right Ring Proximal
+      limit:
+        min: {x: 0, y: 0, z: 0}
+        max: {x: 0, y: 0, z: 0}
+        value: {x: 0, y: 0, z: 0}
+        length: 0
+        modified: 0
+    skeleton:
+    - name: LittleRobot(Clone)
+      parentName: 
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: -0.2275771, y: -0.118334904, z: -0.6770361, w: 0.6898026}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Geometry
+      parentName: LittleRobot(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: RightElbowJoint
+      parentName: Geometry
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: LeftElbowJoint
+      parentName: Geometry
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: RightForearm
+      parentName: Geometry
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: LeftForearm
+      parentName: Geometry
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: RightUpperarm
+      parentName: Geometry
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: LeftUpperarm
+      parentName: Geometry
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: MainBody
+      parentName: Geometry
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: LeftEar
+      parentName: Geometry
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: RightEar
+      parentName: Geometry
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: RightFinger1
+      parentName: Geometry
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: LeftFinger1
+      parentName: Geometry
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: RightFinger2
+      parentName: Geometry
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: LeftFinger2
+      parentName: Geometry
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: RightFinger3
+      parentName: Geometry
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: LeftFinger3
+      parentName: Geometry
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: RightFinger4
+      parentName: Geometry
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: LeftFinger4
+      parentName: Geometry
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: RightCalf
+      parentName: Geometry
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: LeftCalf
+      parentName: Geometry
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: RightHand
+      parentName: Geometry
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: LeftHand
+      parentName: Geometry
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Head
+      parentName: Geometry
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Neck
+      parentName: Geometry
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: RightFoot
+      parentName: Geometry
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: LeftFoot
+      parentName: Geometry
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:little_robot:pCube22_Little_Bot_setup_char:Little_Robot_M_0
+      parentName: Geometry
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: RightThigh
+      parentName: Geometry
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: LeftThigh
+      parentName: Geometry
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: RightKnee
+      parentName: Geometry
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: LeftKnee
+      parentName: Geometry
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: RightHeel
+      parentName: Geometry
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: LeftHeel
+      parentName: Geometry
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Skeleton
+      parentName: LittleRobot(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:curve1
+      parentName: Skeleton
+      position: {x: -0.0013235707, y: 0.0008351598, z: -0.002714754}
+      rotation: {x: 0.050483275, y: -0.2238311, z: 0.011610306, w: 0.9732504}
+      scale: {x: 1.0000005, y: 0.9999995, z: 0.99999994}
+    - name: Little_Bot_setup_char:curve4
+      parentName: Skeleton
+      position: {x: -0.012853593, y: 0.030099593, z: 0.0025304186}
+      rotation: {x: 0.5677758, y: 0.028126782, z: 0.77641535, w: -0.2720641}
+      scale: {x: 0.10930496, y: 0.10930507, z: 0.109304935}
+    - name: Little_Bot_setup_char:wq_nurbsCircle3
+      parentName: Little_Bot_setup_char:curve4
+      position: {x: 0.006007389, y: -0.0015707267, z: 0.0033430527}
+      rotation: {x: -0.54996926, y: -0.2520335, z: 0.5008864, w: 0.6189715}
+      scale: {x: 9.148735, y: 9.148744, z: 9.148742}
+    - name: Little_Bot_setup_char:wq_nurbsCircle3_1
+      parentName: Little_Bot_setup_char:curve4
+      position: {x: 0.008845356, y: 0.0022021185, z: -0.0066044154}
+      rotation: {x: -0.03240932, y: 0.35704255, z: 0.8217176, w: 0.4430016}
+      scale: {x: 9.1487465, y: 9.148744, z: 9.148738}
+    - name: Little_Bot_setup_char:wq_nurbsCircle3_2
+      parentName: Little_Bot_setup_char:curve4
+      position: {x: 0.010187697, y: -0.001501009, z: -0.0010314011}
+      rotation: {x: 0.02018809, y: 0.050815016, z: 0.73133785, w: 0.67982006}
+      scale: {x: 9.148745, y: 9.148741, z: 9.14874}
+    - name: Little_Bot_setup_char:wq_nurbsCircle3_3
+      parentName: Little_Bot_setup_char:curve4
+      position: {x: -0.00004921883, y: -0.009985009, z: 0.00015146413}
+      rotation: {x: -0.106808476, y: 0.1309097, z: 0.106343634, w: 0.97987026}
+      scale: {x: 9.148742, y: 9.148739, z: 9.148743}
+    - name: Little_Bot_setup_char:curve4_1
+      parentName: Skeleton
+      position: {x: 0.0023638422, y: 0.0069999658, z: -0.00015867803}
+      rotation: {x: -0.32788745, y: -0.24062398, z: 0.15028481, w: 0.9011129}
+      scale: {x: 0.9999994, y: 1.0000004, z: 0.99999994}
+    - name: Little_Bot_setup_char:wq_nurbsCircle3_1
+      parentName: Little_Bot_setup_char:curve4_1
+      position: {x: 0.00051970064, y: -0.0005385437, z: -0.0009780482}
+      rotation: {x: -0.3133507, y: 0.8634736, z: 0.33610806, w: -0.20798095}
+      scale: {x: 0.99999994, y: 1.0000007, z: 0.99999946}
+    - name: Little_Bot_setup_char:wq_nurbsCircle3_1_1
+      parentName: Little_Bot_setup_char:curve4_1
+      position: {x: 0.00030538315, y: -0.00040125466, z: 0.0005839134}
+      rotation: {x: -0.22004728, y: 0.62087315, z: -0.5859279, w: 0.47200036}
+      scale: {x: 1, y: 1.0000005, z: 0.9999999}
+    - name: Little_Bot_setup_char:wq_nurbsCircle3_2_1
+      parentName: Little_Bot_setup_char:curve4_1
+      position: {x: 0.0005296262, y: -0.0009539713, z: 0.00005872298}
+      rotation: {x: -0.1518723, y: 0.97845113, z: -0.12850651, w: 0.055265337}
+      scale: {x: 1.0000004, y: 0.9999999, z: 0.9999997}
+    - name: Little_Bot_setup_char:wq_nurbsCircle3_3_1
+      parentName: Little_Bot_setup_char:curve4_1
+      position: {x: 0.0007017037, y: -0.00069629226, z: -0.0005525251}
+      rotation: {x: -0.27254063, y: 0.9297158, z: 0.21786982, w: -0.11782601}
+      scale: {x: 0.9999998, y: 0.9999997, z: 1.0000001}
+    - name: Little_Bot_setup_char:curve5
+      parentName: Skeleton
+      position: {x: -0.00081691396, y: 0.003239922, z: -0.0061697788}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:curve6
+      parentName: Skeleton
+      position: {x: 0.000032372078, y: 0.0060732705, z: -0.000875752}
+      rotation: {x: -0.06740753, y: -0.22137336, z: -0.011576863, w: 0.97278774}
+      scale: {x: 1.0000005, y: 0.9999995, z: 0.9999998}
+    - name: Little_Bot_setup_char:nurbsCircle1
+      parentName: Little_Bot_setup_char:curve6
+      position: {x: 4.8572227e-20, y: 0.00082099496, z: 0.00033337076}
+      rotation: {x: -0.04572205, y: -0.010845965, z: 0.017704489, w: 0.9987384}
+      scale: {x: 1.0000001, y: 0.99999994, z: 1.0000004}
+    - name: Little_Bot_setup_char:nurbsCircle2
+      parentName: Little_Bot_setup_char:nurbsCircle1
+      position: {x: 0.000019155501, y: 0.003352209, z: 0}
+      rotation: {x: -0.015826486, y: 0.022928959, z: -0.02791004, w: 0.99922216}
+      scale: {x: 1.0000005, y: 0.9999999, z: 1.0000005}
+    - name: Little_Bot_setup_char:w_curve7
+      parentName: Little_Bot_setup_char:nurbsCircle2
+      position: {x: -0.000006677033, y: 0.00096371805, z: -7.77154e-19}
+      rotation: {x: -0.0052018645, y: -0.030371958, z: -0.00400181, w: 0.99951714}
+      scale: {x: 0.99999994, y: 1.0000001, z: 1}
+    - name: Little_Bot_setup_char:w_nurbsCircle3
+      parentName: Little_Bot_setup_char:w_curve7
+      position: {x: -0.004457508, y: 0.0015286461, z: 3.8857838e-19}
+      rotation: {x: 0, y: -2.77556e-17, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:w_nurbsCircle4
+      parentName: Little_Bot_setup_char:w_curve7
+      position: {x: 0.004432554, y: 0.0015286461, z: 0}
+      rotation: {x: 0, y: -2.77556e-17, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:w_curve8
+      parentName: Little_Bot_setup_char:nurbsCircle1
+      position: {x: 0.00089422887, y: 0.00281589, z: 4.2743603e-18}
+      rotation: {x: 0.0057705, y: -0.02075988, z: 0.009022862, w: 0.99972713}
+      scale: {x: 0.99999976, y: 1.0000005, z: 0.9999995}
+    - name: Little_Bot_setup_char:w_curve9
+      parentName: Little_Bot_setup_char:nurbsCircle1
+      position: {x: -0.00089422887, y: 0.002815855, z: 2.1371768e-18}
+      rotation: {x: -0.00024617775, y: -0.010296833, z: -0.046442848, w: 0.99886787}
+      scale: {x: 0.99999994, y: 1, z: 1.0000001}
+    - name: Little_Bot_setup_char:curve8
+      parentName: Skeleton
+      position: {x: 0.0020789998, y: 0.00794178, z: -0.0075922906}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:Hip1_00
+      parentName: Skeleton
+      position: {x: -0.0053751245, y: 0.016029581, z: 0.004635463}
+      rotation: {x: 0.06003756, y: 0.93288535, z: 0.19480592, w: -0.29693612}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:L_Wing1_03
+      parentName: Little_Bot_setup_char:Hip1_00
+      position: {x: -0.0000387114, y: 3.1086231e-18, z: -0.00027755628}
+      rotation: {x: 0.3648811, y: 0.17127705, z: -0.06793792, w: 0.91263926}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:L_Wing_01
+      parentName: Little_Bot_setup_char:Hip1_00
+      position: {x: -0.00024380017, y: 0, z: -7.77154e-19}
+      rotation: {x: -0.023686562, y: 0.025276877, z: -0.5003462, w: 0.8651322}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:R_Wing1_04
+      parentName: Little_Bot_setup_char:Hip1_00
+      position: {x: 0.0000387114, y: 0, z: -0.00027755628}
+      rotation: {x: 0.86267513, y: 0.068707354, z: 0.28840905, w: -0.40974522}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:R_Wing_02
+      parentName: Little_Bot_setup_char:Hip1_00
+      position: {x: 0.00024380017, y: 0, z: -7.77154e-19}
+      rotation: {x: 0.86453617, y: 0.5021381, z: 0.017106399, w: -0.011918591}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:ikHandle1
+      parentName: Skeleton
+      position: {x: -0.004156705, y: 0.009673649, z: 0.001072162}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:ikHandle2
+      parentName: Skeleton
+      position: {x: 0.0031823888, y: 0.00537285, z: -0.001026018}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:ikHandle3
+      parentName: Skeleton
+      position: {x: -0.0014072239, y: 0.00081524084, z: -0.0027350262}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:Hip_06
+      parentName: Skeleton
+      position: {x: -0.0052477326, y: -0.00012201769, z: 0.0028224594}
+      rotation: {x: 0.06605682, y: 0.2794349, z: -0.015980573, w: 0.9577564}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:L_upfoot_027
+      parentName: Little_Bot_setup_char:Hip_06
+      position: {x: -0.0000574665, y: -0.001162406, z: -1.9428919e-19}
+      rotation: {x: 0.044856366, y: 0.995994, z: -0.07729393, w: 0.003103895}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:L_knee_028
+      parentName: Little_Bot_setup_char:L_upfoot_027
+      position: {x: -0.002274069, y: -0.00006692847, z: 0.00030525666}
+      rotation: {x: 0.9759747, y: -0.0017226483, z: -0.21769696, w: 0.008855363}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:L_Foot_029
+      parentName: Little_Bot_setup_char:L_knee_028
+      position: {x: -0.0033981572, y: -0.0000627636, z: 0.00013019648}
+      rotation: {x: -0.072624624, y: -0.004219639, z: -0.65739566, w: 0.7500259}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:R_upfoot_030
+      parentName: Little_Bot_setup_char:Hip_06
+      position: {x: -0.000057465728, y: 0.001162406, z: -2.7010272e-10}
+      rotation: {x: -0.28120208, y: -0.16030698, z: 0.14358415, w: 0.93520623}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:R_knee_031
+      parentName: Little_Bot_setup_char:R_upfoot_030
+      position: {x: 0.002274069, y: 0.00006692742, z: -0.00030525666}
+      rotation: {x: 0.9515467, y: 0.01617047, z: -0.30705997, w: 0.0034099452}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:R_Foot_032
+      parentName: Little_Bot_setup_char:R_knee_031
+      position: {x: 0.0033981572, y: 0.00006276521, z: -0.0001301972}
+      rotation: {x: -0.056212142, y: -0.052731045, z: -0.6494962, w: 0.7564485}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:Spine_07
+      parentName: Little_Bot_setup_char:Hip_06
+      position: {x: -0.000900305, y: 0, z: 9.7144595e-20}
+      rotation: {x: 0.99878496, y: 0.014850908, z: 0.04569104, w: -0.01097658}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:neck_08
+      parentName: Little_Bot_setup_char:Spine_07
+      position: {x: -0.003352265, y: -1.457169e-18, z: 9.71446e-19}
+      rotation: {x: 0.99937856, y: 0.021593282, z: -0.015812451, w: 0.022938628}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:Head_09
+      parentName: Little_Bot_setup_char:neck_08
+      position: {x: -0.000963739, y: -1.9428919e-19, z: -5.8286687e-19}
+      rotation: {x: 0.017710691, y: -0.025215987, z: 0.7014733, w: 0.71202934}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:R_ear_011
+      parentName: Little_Bot_setup_char:Head_09
+      position: {x: 0.004457508, y: 0.0015286461, z: -2.7010272e-10}
+      rotation: {x: 1, y: -0.00000004371139, z: -0.00000004371139, w: 1.2591713e-15}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:L_ear_010
+      parentName: Little_Bot_setup_char:Head_09
+      position: {x: -0.004457508, y: 0.0015286461, z: 1.7485998e-18}
+      rotation: {x: 4.1633366e-16, y: -1.38778e-16, z: -2.08167e-16, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:R_shouder_019
+      parentName: Little_Bot_setup_char:Spine_07
+      position: {x: -0.0028209507, y: -0.00087812205, z: 7.77154e-19}
+      rotation: {x: -0.0081991395, y: -0.0081992205, z: 0.8092468, w: -0.5873545}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:R_arm_020
+      parentName: Little_Bot_setup_char:R_shouder_019
+      position: {x: 0.00068663765, y: 0.00000004061715, z: 0}
+      rotation: {x: 0.16329134, y: -0.014992593, z: 0.14855841, w: 0.9752136}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:R_elbow_021
+      parentName: Little_Bot_setup_char:R_arm_020
+      position: {x: 0.0023549537, y: 0.00004281998, z: -0.00013131021}
+      rotation: {x: -0.00020232794, y: 0.07326449, z: 0.010067435, w: 0.99726176}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:R_hand_022
+      parentName: Little_Bot_setup_char:R_elbow_021
+      position: {x: 0.0028928411, y: -0.000030090896, z: 0.000077886885}
+      rotation: {x: 0.04313297, y: 0.2885858, z: -0.73415065, w: 0.6130912}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:R_ring_023
+      parentName: Little_Bot_setup_char:R_hand_022
+      position: {x: -0.00002948967, y: 0.00090376294, z: 0.00083437894}
+      rotation: {x: 0.294735, y: -0.20968124, z: 0.47986618, w: 0.7993081}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:R_middle_024
+      parentName: Little_Bot_setup_char:R_hand_022
+      position: {x: -0.00001156365, y: 0.0010752559, z: 0.00035121938}
+      rotation: {x: 0.121062055, y: -0.12550901, z: 0.47187322, w: 0.86424947}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:R_index_025
+      parentName: Little_Bot_setup_char:R_hand_022
+      position: {x: 0.0000037041623, y: 0.0010900819, z: -0.00005646515}
+      rotation: {x: -0.09527196, y: 0.038367547, z: 0.31584308, w: 0.9432361}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:R_Thumb_026
+      parentName: Little_Bot_setup_char:R_hand_022
+      position: {x: -0.0000674254, y: 0.0007016031, z: -0.00031205436}
+      rotation: {x: -0.3379382, y: 0.45132613, z: 0.2722761, w: 0.77972317}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:L_shouder_012
+      parentName: Little_Bot_setup_char:Spine_07
+      position: {x: -0.0028107031, y: 0.0009103009, z: -9.71446e-19}
+      rotation: {x: 0.81181407, y: -0.58389354, z: -0.00093827385, w: -0.005047448}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:L_arm_013
+      parentName: Little_Bot_setup_char:L_shouder_012
+      position: {x: -0.000686665, y: 0, z: 0}
+      rotation: {x: -0.24496546, y: -0.059917502, z: 0.16208439, w: 0.9540076}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:L_elbow_014
+      parentName: Little_Bot_setup_char:L_arm_013
+      position: {x: -0.0023549886, y: -0.000042846157, z: 0.00013131021}
+      rotation: {x: 0.007871579, y: 0.054049063, z: 0.0043244283, w: 0.9984979}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:L_hand_05
+      parentName: Little_Bot_setup_char:L_elbow_014
+      position: {x: -0.0028928202, y: 0.000030109239, z: -0.000077880606}
+      rotation: {x: -0.1323303, y: -0.20004718, z: 0.73372704, w: -0.63570005}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:L_ring_015
+      parentName: Little_Bot_setup_char:L_hand_05
+      position: {x: 0.000029497092, y: -0.00090376294, z: -0.00083437894}
+      rotation: {x: 0.061769716, y: -0.22760235, z: 0.8783205, w: 0.41585425}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:L_middle_016
+      parentName: Little_Bot_setup_char:L_hand_05
+      position: {x: 0.0000115640705, y: -0.0010752489, z: -0.0003512159}
+      rotation: {x: 0.08804388, y: -0.19185394, z: 0.7227422, w: 0.65809125}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:L_index_017
+      parentName: Little_Bot_setup_char:L_hand_05
+      position: {x: -0.000003699528, y: -0.001090075, z: 0.00005646634}
+      rotation: {x: -0.12831922, y: 0.08749762, z: 0.05539274, w: 0.9863113}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Little_Bot_setup_char:L_Thumb_018
+      parentName: Little_Bot_setup_char:L_hand_05
+      position: {x: 0.00006742568, y: -0.0007016031, z: 0.00031205436}
+      rotation: {x: -0.5091951, y: 0.34766796, z: 0.5029939, w: 0.6056769}
+      scale: {x: 1, y: 1, z: 1}
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    globalScale: 0.7
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  autoGenerateAvatarMappingIfUnspecified: 1
+  animationType: 3
+  humanoidOversampling: 1
+  avatarSetup: 1
+  addHumanoidExtraRootOnlyWhenUsingAvatar: 1
+  importBlendShapeDeformPercent: 1
+  remapMaterialsIfMaterialImportModeIsNone: 0
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

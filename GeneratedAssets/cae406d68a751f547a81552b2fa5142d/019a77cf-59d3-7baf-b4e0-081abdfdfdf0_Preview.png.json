@@ -1,0 +1,11 @@
+{
+    "asset": "cae406d68a751f547a81552b2fa5142d",
+    "fileName": "019a77cf-59d3-7baf-b4e0-081abdfdfdf0_Preview.png",
+    "prompt": "smiling face with symbol",
+    "negativePrompt": "",
+    "model": "44ec3749-963a-44b1-aa54-dc19f6ed8ab2",
+    "modelName": "Unity Texture2D",
+    "customSeed": 68418850,
+    "w3CTraceId": "e96f21751d09d3ef539ad3727c4a9451",
+    "refinementMode": "Generation"
+}

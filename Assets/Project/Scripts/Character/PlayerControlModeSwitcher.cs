@@ -7,160 +7,112 @@ namespace IronIvy.Gameplay
     public class PlayerControlModeSwitcher : MonoBehaviour
     {
         [Header("Controllers")]
-        [SerializeField] private IsoPlayerController isoController;   // old iso move
-        [SerializeField] private PlayerThirdPersonController tpsController;   // new tps move
+        [SerializeField] private IsoPlayerController isoController;                 // ISO move
+        [SerializeField] private PlayerThirdPersonController tpsController;         // TPS move (keep enabled)
 
-        [Header("Prefer ref match (more reliable)")]
-        [SerializeField] private CinemachineCamera isoCamRef;   
-        [SerializeField] private CinemachineCamera tpsCamRef;   
+        [Header("Prefer ref match")]
+        [SerializeField] private CinemachineCamera isoCamRef;                       // drag ISO vcam
+        [SerializeField] private CinemachineCamera tpsCamRef;                       // drag TPS vcam
 
-        [Header("Fallback: match by name contains")]
-        [SerializeField] private string isoCameraId = "isocamera";   // vcam name 
-        [SerializeField] private string tpsCameraId = "3rdcamera";   // vcam name
+        [Header("Fallback: name contains")]
+        [SerializeField] private string isoCameraId = "isocamera";
+        [SerializeField] private string tpsCameraId = "3rdcamera";
 
-        [Header("Options")]
+        [Header("Debug")]
         [SerializeField] private bool logDebug = false;
 
-        private void OnEnable()
+        void OnEnable()
         {
-            EnforceSingleEnabled();
-
-            TrySyncToCurrentCamera();
+            // make sure TPS component stays enabled so pivot follow always runs
+            if (tpsController && !tpsController.enabled) tpsController.enabled = true;
 
             if (CameraManager.HasInstance)
-            {
                 CameraManager.Instance.OnCameraChanged += HandleCameraChanged;
 
-                // and sync again from manager's current (covers scene start)
-                var cur = CameraManager.Instance.CurrentCamera;
-                ApplyByCamera(cur);
-            }
-            else if (logDebug)
-            {
-                Debug.Log("[PCM Switcher] CameraManager not ready, using current controller state.");
-            }
+            // sync once with current camera (if any)
+            var cur = CameraManager.HasInstance ? CameraManager.Instance.CurrentCamera : null;
+            if (cur) ApplyByCamera(cur);
+            else DefaultISOIfAmbiguous();
         }
 
-        private void OnDisable()
+        void OnDisable()
         {
             if (CameraManager.HasInstance)
                 CameraManager.Instance.OnCameraChanged -= HandleCameraChanged;
         }
 
-        private void HandleCameraChanged(CinemachineCamera oldCam, CinemachineCamera newCam)
+        void HandleCameraChanged(CinemachineCamera oldCam, CinemachineCamera newCam)
         {
-            if (logDebug) Debug.Log($"[PCM Switcher] OnCameraChanged -> {(newCam ? newCam.name : "null")}");
-            ApplyByCamera(newCam);
+            if (logDebug) Debug.Log($"[PCM] OnCameraChanged -> {(newCam ? newCam.name : "null")}");
+            if (newCam) ApplyByCamera(newCam);
         }
 
-        private void ApplyByCamera(CinemachineCamera cam)
+        void ApplyByCamera(CinemachineCamera cam)
         {
-            if (cam == null)
-            {
-                if (logDebug) Debug.Log("[PCM Switcher] cam null, keep current mode.");
-                return;
-            }
+            // 1) ref match
+            if (tpsCamRef && cam == tpsCamRef) { SetTPS(); return; }
+            if (isoCamRef && cam == isoCamRef) { SetISO(); return; }
 
-            // 1) prefer reference equality (most reliable)
-            if (tpsCamRef && cam == tpsCamRef)
-            {
-                SetTPS();
-                return;
-            }
-            if (isoCamRef && cam == isoCamRef)
-            {
-                SetISO();
-                return;
-            }
+            // 2) name contains
+            string n = cam.name.ToLowerInvariant();
+            if (!string.IsNullOrEmpty(tpsCameraId) && n.Contains(tpsCameraId.ToLowerInvariant())) { SetTPS(); return; }
+            if (!string.IsNullOrEmpty(isoCameraId) && n.Contains(isoCameraId.ToLowerInvariant())) { SetISO(); return; }
 
-            // 2) fallback: by name contains
-            string nameLower = cam.name.ToLowerInvariant();
-            bool hitTPS = !string.IsNullOrEmpty(tpsCameraId) && nameLower.Contains(tpsCameraId.ToLowerInvariant());
-            bool hitISO = !string.IsNullOrEmpty(isoCameraId) && nameLower.Contains(isoCameraId.ToLowerInvariant());
-
-            if (hitTPS)
-            {
-                SetTPS();
-            }
-            else if (hitISO)
-            {
-                SetISO();
-            }
-            else
-            {
-                if (logDebug) Debug.Log($"[PCM Switcher] no match for camera: {cam.name}. keep mode.");
-            }
+            if (logDebug) Debug.Log($"[PCM] no match for camera: {cam.name}. keep current.");
         }
 
         public void SetISO()
         {
-            // enable iso, disable tps; also gate TPS input
-            if (tpsController)
-            {
-                tpsController.SetTPSActive(false); // gate first so it stops reading input
-                tpsController.enabled = false;     // optional: fully disable, since pivot follow runs even when disabled? -> in your TPS we kept it enabled before; now we disable for safety
-            }
+            // ISO on; TPS gate closed (but component stays enabled)
             if (isoController) isoController.enabled = true;
 
-            if (logDebug) Debug.Log("[PCM Switcher] MODE = ISO");
+            if (tpsController)
+            {
+                tpsController.SetTPSActive(false);     // close gate (no input, only pivot follow)
+                // do NOT disable tpsController here
+            }
+
+            if (logDebug) Debug.Log("[PCM] MODE = ISO");
         }
 
         public void SetTPS()
         {
-            // enable tps, disable iso; resync angles to avoid snap
+            // TPS gate open; ISO off
             if (isoController) isoController.enabled = false;
 
             if (tpsController)
             {
-                tpsController.enabled = true;          // make sure component is ON
+                if (!tpsController.enabled) tpsController.enabled = true; // paranoia
                 tpsController.ResyncCameraAnglesFromPivot();
-                tpsController.SetTPSActive(true);      // open gate after enabled
+                tpsController.SetTPSActive(true);      // open gate (RMB + move)
             }
 
-            if (logDebug) Debug.Log("[PCM Switcher] MODE = TPS");
+            if (logDebug) Debug.Log("[PCM] MODE = TPS");
         }
 
-        private void EnforceSingleEnabled()
+        void DefaultISOIfAmbiguous()
         {
+            // if both controllers on or both off at start, prefer ISO
             bool isoOn = isoController && isoController.enabled;
             bool tpsOn = tpsController && tpsController.enabled;
 
-            // if both on or both off -> default ISO
             if ((isoOn && tpsOn) || (!isoOn && !tpsOn))
             {
                 if (isoController) isoController.enabled = true;
                 if (tpsController)
                 {
-                    tpsController.SetTPSActive(false); // just in case
-                    tpsController.enabled = false;
+                    if (!tpsController.enabled) tpsController.enabled = true; // keep enabled
+                    tpsController.SetTPSActive(false);
                 }
+                if (logDebug) Debug.Log("[PCM] default ISO at start");
             }
-        }
-
-        private void TrySyncToCurrentCamera()
-        {
-            // best effort even if manager not ready, using refs if assigned
-            if (!CameraManager.HasInstance)
-            {
-                if (tpsCamRef && tpsCamRef.isActiveAndEnabled) { SetTPS(); return; }
-                if (isoCamRef && isoCamRef.isActiveAndEnabled) { SetISO(); return; }
-                // else keep current state
-                return;
-            }
-
-            var cur = CameraManager.Instance.CurrentCamera;
-            ApplyByCamera(cur);
         }
 
 #if UNITY_EDITOR
-        private void OnValidate()
+        void OnValidate()
         {
             if (isoController == tpsController && isoController != null)
-                Debug.LogWarning("[PCM Switcher] isoController and tpsController point to same component. nope.");
-
-            // small guard: empty ids are fine but warn if both empty
-            if (string.IsNullOrWhiteSpace(isoCameraId) && string.IsNullOrWhiteSpace(tpsCameraId) && !isoCamRef && !tpsCamRef)
-                Debug.LogWarning("[PCM Switcher] no refs and empty ids -> cannot match camera. assign refs or ids.");
+                Debug.LogWarning("[PCM] isoController and tpsController reference same component.");
         }
 #endif
     }

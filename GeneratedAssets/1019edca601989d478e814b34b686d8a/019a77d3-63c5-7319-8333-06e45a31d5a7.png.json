@@ -1,0 +1,20 @@
+{
+    "asset": "1019edca601989d478e814b34b686d8a",
+    "fileName": "019a77d3-63c5-7319-8333-06e45a31d5a7.png",
+    "prompt": "Smiley face symbol only ^_^",
+    "negativePrompt": "no messy, only symbol",
+    "model": "9b6d7135-dd33-43ae-b148-cd1212ca7052",
+    "modelName": "16-bit Pixel",
+    "customSeed": -1,
+    "w3CTraceId": "e8fbaa3c0dfeebd3c8f60a9d77a7f163",
+    "refinementMode": "Generation",
+    "pixelateTargetSize": 0,
+    "pixelateKeepImageSize": false,
+    "pixelatePixelBlockSize": 0,
+    "pixelateMode": 0,
+    "pixelateOutlineThickness": 0,
+    "doodles": {
+        "m_Items": []
+    },
+    "upscaleFactor": 0
+}

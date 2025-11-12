@@ -1,0 +1,20 @@
+{
+    "asset": "4a4393d004372a14db1ba05e4ae72b97",
+    "fileName": "019a76d5-5824-732b-aeaa-7b280127a5ff.png",
+    "prompt": "Create a texture of an old rusty robot with green look",
+    "negativePrompt": "",
+    "model": "1a2140ea-ccbc-46b5-9008-e0ea714882dc",
+    "modelName": "3D Platformer Environments",
+    "customSeed": -1,
+    "w3CTraceId": "03cf7c505dc72acd8227dff767d4656d",
+    "refinementMode": "Generation",
+    "pixelateTargetSize": 0,
+    "pixelateKeepImageSize": false,
+    "pixelatePixelBlockSize": 0,
+    "pixelateMode": 0,
+    "pixelateOutlineThickness": 0,
+    "doodles": {
+        "m_Items": []
+    },
+    "upscaleFactor": 0
+}
