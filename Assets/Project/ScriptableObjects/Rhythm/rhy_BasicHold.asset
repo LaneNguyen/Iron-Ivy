@@ -14,12 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Data.RhythmPattern
   patternId: baischoldrhythm
   displayName: Basic Hold
-  bpm: 80
-  hitWindowSeconds: 0.2
+  bpm: 20
+  hitWindowSeconds: 0.5
   sequence:
+  - type: 1
+    beats: 1
   - type: 0
     beats: 1
-  - type: 1
-    beats: 1
-  - type: 1
-    beats: 2

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace IronIvy.Data
@@ -25,5 +26,10 @@ namespace IronIvy.Data
             new Step{ type = StepType.Tap, beats = 1 },
             new Step{ type = StepType.Hold, beats = 2 }
         };
+
+        internal int GetTotalBeats()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
