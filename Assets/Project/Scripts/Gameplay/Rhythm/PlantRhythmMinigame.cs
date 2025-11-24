@@ -6,48 +6,58 @@ using IronIvy.UI;
 
 namespace IronIvy.Gameplay.Rhythm
 {
+    // Minigame rhythm cho cây
+    // dựa trên RhythmMinigameBase v4
     public class PlantRhythmMinigame : RhythmMinigameBase
     {
         [Header("Plant")]
         public PlantDefinition plant;
         public Transform root;
 
-        // 3 stage object
-        private GameObject a, b, c;
+        private GameObject stage1;
+        private GameObject stage2;
+        private GameObject stage3;
 
         [Header("HUD")]
         public RhythmHUD hud;
 
-        // Progress (tính theo beat)
-        private int computedTotalBeats;
+        // lưu tổng beat của playlist cho progress bar
+        private int totalBeatsForProgress;
+
+        private bool lastInWindow = false;
 
         public override void StartGame()
         {
             if (plant == null)
             {
-                Debug.LogWarning("[PlantRhythm] Missing plant.");
+                Debug.LogWarning("Missing PlantDefinition");
                 return;
             }
 
-            // Spawn 3 stages
-            if (plant.prefabStage1) a = Instantiate(plant.prefabStage1, root);
-            if (plant.prefabStage2) b = Instantiate(plant.prefabStage2, root);
-            if (plant.prefabStage3) c = Instantiate(plant.prefabStage3, root);
-            Lower(a); Lower(b); Lower(c);
+            // spawn các stage của cây
+            if (plant.prefabStage1) stage1 = Instantiate(plant.prefabStage1, root);
+            if (plant.prefabStage2) stage2 = Instantiate(plant.prefabStage2, root);
+            if (plant.prefabStage3) stage3 = Instantiate(plant.prefabStage3, root);
 
-            // Camera profile
+            Lower(stage1);
+            Lower(stage2);
+            Lower(stage3);
+
+            // camera + bgm cho minigame
             MinigameCameraManager.Instance.ApplyPlantProfile();
-
-            // BGM
             if (plant.musicLoop != null)
                 AudioManager.Instance.PlayBGM(plant.musicLoop.name);
 
-            // Reset scoring
+            // reset trust
             trust = 0f;
+            lastInWindow = false;
 
+            // base sẽ gọi BuildPatternPlaylist rồi PreparePattern
             base.StartGame();
 
-            // HUD
+            // tính progress total từ playlist
+            totalBeatsForProgress = playlistTotalBeats;
+
             if (hud == null)
                 hud = FindObjectOfType<RhythmHUD>();
 
@@ -55,11 +65,11 @@ namespace IronIvy.Gameplay.Rhythm
             {
                 hud.BindMinigame(this);
 
-                // Step đầu → hiển thị TAP / HOLD
+                // set hint theo bước đầu tiên
                 if (pattern != null && pattern.sequence != null && pattern.sequence.Length > 0)
                 {
-                    var step = pattern.sequence[0];
-                    string hint = step.type == RhythmPattern.StepType.Hold ? "HOLD (SPACE)" : "TAP (SPACE)";
+                    var step0 = pattern.sequence[0];
+                    string hint = step0.type == RhythmPattern.StepType.Hold ? "HOLD (SPACE)" : "TAP (SPACE)";
                     hud.SetKeyHints(new[] { hint });
                 }
                 else
@@ -71,49 +81,88 @@ namespace IronIvy.Gameplay.Rhythm
                 hud.SetTrust01(0f);
                 hud.SetProgress(0f);
                 hud.SetHitMiss(0, 0);
-            }
+                hud.SetHoldVisual(0f);
 
-            computedTotalBeats = totalBeats;
+                hud.SetBeatWindow(targetCenter01, targetHalfWidth01);
+                hud.SetBeatPhase(0f, false);
+            }
         }
 
-        protected override void BuildPatternPlaylist(List<RhythmPattern> list)
+        protected override void BuildPatternPlaylist(List<RhythmPattern> outList)
         {
-            if (plant?.patterns == null) return;
+            if (plant == null || plant.patterns == null)
+                return;
 
             foreach (var p in plant.patterns)
-                if (p) list.Add(p);
+                if (p != null) outList.Add(p);
 
+            // xử lý playback mode
             switch (plant.playbackMode)
             {
                 case RhythmPlaybackMode.Single:
-                    if (list.Count > 1)
-                        list.RemoveRange(1, list.Count - 1);
+                    if (outList.Count > 1)
+                        outList.RemoveRange(1, outList.Count - 1);
                     break;
 
                 case RhythmPlaybackMode.Shuffle:
-                    RhythmManager.Shuffle(list);
+                    RhythmManager.Shuffle(outList);
                     break;
-                    // Sequential: giữ nguyên
+                    // Sequential: để nguyên list
             }
         }
 
+        // callbacks cho beat
+
         protected override void OnBeat()
         {
-            // Pulse key
+            lastInWindow = false;
+
             if (hud != null)
-                hud.PulseKey(0);
+            {
+                hud.SetBeatWindow(targetCenter01, targetHalfWidth01);
+                hud.SetHoldVisual(0f);
+                hud.ClearPulseKey(0);
+            }
         }
 
         protected override void OnBeatProgress(float phase, bool inWindow)
         {
+            bool prev = lastInWindow;
+            lastInWindow = inWindow;
+
             if (hud != null)
             {
                 hud.SetBeatPhase(phase, inWindow);
 
-                if (computedTotalBeats > 0)
-                    hud.SetProgress((float)beatIndex / Mathf.Max(1, computedTotalBeats));
+                // vào window thì pulse một cái
+                if (!prev && inWindow)
+                    hud.PulseKey(0);
+
+                // ra khỏi window thì ngưng
+                if (prev && !inWindow)
+                    hud.ClearPulseKey(0);
+
+                // global progress theo playlist
+                if (totalBeatsForProgress > 0)
+                {
+                    float progress = (playlistBeatIndex + phase) / Mathf.Max(1, totalBeatsForProgress);
+                    hud.SetProgress(progress);
+                }
 
                 hud.SetHitMiss(beatsHit, beatsMiss);
+
+                // hold visual
+                RhythmPattern.Step current = GetCurrentStep();
+                if (current.type == RhythmPattern.StepType.Hold)
+                {
+                    float required = Mathf.Max(0.01f, holdRequiredSeconds);
+                    float hold01 = Mathf.Clamp01(holdTimer / required);
+                    hud.SetHoldVisual(hold01);
+                }
+                else
+                {
+                    hud.SetHoldVisual(0f);
+                }
             }
         }
 
@@ -131,25 +180,31 @@ namespace IronIvy.Gameplay.Rhythm
 
         protected override void OnStepJudged(RhythmPattern.Step step, bool good)
         {
-            // Toggle plant stage
-            int i = seqIndex % 3;
-            Toggle(i == 0 ? a : i == 1 ? b : c, good);
+            // lấy stage theo index đơn giản
+            int idx = currentStepIndex % 3;
+            GameObject target =
+                idx == 0 ? stage1 :
+                idx == 1 ? stage2 :
+                           stage3;
 
+            // spawn VFX nếu có
             if (good && plant.successVFX)
                 Instantiate(plant.successVFX, root.position, Quaternion.identity);
 
-            // Trust
+            Toggle(target, good);
+
+            // tính trust mỗi beat
             trust += good ? 11f : -4f;
             trust = Mathf.Clamp(trust, 0f, 100f);
 
             if (hud != null)
                 hud.SetTrust01(trust / 100f);
 
-            // Update TAP/HOLD hint theo step tiếp theo nếu có
-            if (pattern != null && pattern.sequence != null && seqIndex + 1 < pattern.sequence.Length)
+            // hint cho step kế
+            if (pattern != null && pattern.sequence != null && pattern.sequence.Length > 0)
             {
-                var nextStep = pattern.sequence[seqIndex + 1];
-                string hint = nextStep.type == RhythmPattern.StepType.Hold ? "HOLD (SPACE)" : "TAP (SPACE)";
+                RhythmPattern.Step current = GetCurrentStep();
+                string hint = current.type == RhythmPattern.StepType.Hold ? "HOLD (SPACE)" : "TAP (SPACE)";
                 hud.SetKeyHints(new[] { hint });
             }
         }
@@ -162,9 +217,11 @@ namespace IronIvy.Gameplay.Rhythm
             {
                 hud.SetStatus(success ? "Success" : "Fail", success);
                 hud.SetHitMiss(beatsHit, beatsMiss);
+                hud.SetProgress(1f);
+                hud.ClearPulseKey(0);
             }
 
-            // Yield item
+            // reward theo trust
             int yield = (trust >= 90f) ? 3 :
                         (trust >= 60f) ? 2 :
                         (trust >= 30f) ? 1 : 0;
@@ -176,10 +233,7 @@ namespace IronIvy.Gameplay.Rhythm
         private void Toggle(GameObject go, bool up)
         {
             if (!go) return;
-
-            go.transform.localPosition = up
-                ? new Vector3(0, 0.2f, 0)
-                : new Vector3(0, -0.2f, 0);
+            go.transform.localPosition = up ? new Vector3(0, 0.2f, 0) : new Vector3(0, -0.2f, 0);
         }
 
         private void Lower(GameObject go)

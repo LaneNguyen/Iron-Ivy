@@ -1,138 +1,109 @@
 ﻿using UnityEngine;
 using Unity.Cinemachine;
 using IronIvy.Systems.Camera;
+using IronIvy.Gameplay;
 
 namespace IronIvy.Gameplay
 {
-    /// <summary>
-    /// Rất đơn giản: quản lý bật tắt 2 controller (ISO / TPS) và ưu tiên camera tương ứng.
-    /// - Không disable CharacterController, chỉ enable/disable script controller.
-    /// - Không phụ thuộc nhiều vào CameraManager, tránh bị "kẹt" khi camera lạ xuất hiện.
-    /// </summary>
+    // switch giữa 2 chế độ điều khiển:
+    // - iso controller: topdown / isometric
+    // - tps controller: third person + pivot orbit
+    //
+    // lưu ý:
+    // - TPS luôn enable component => LateUpdate chạy để pivot follow player
+    // - bật/tắt input TPS thì để CameraManager + PlayerThirdPersonController lo
+    //   (qua autoEnableByCamera + OnCameraChanged)
     public class PlayerControlModeSwitcher : MonoBehaviour
     {
         [Header("Controllers")]
-        [SerializeField] private IsoPlayerController isoController;                 // ISO move (top-down / isometric)
-        [SerializeField] private PlayerThirdPersonController tpsController;         // TPS move (over shoulder)
+        [Tooltip("script điều khiển iso (topdown)")]
+        public IsoPlayerController isoController;
+
+        [Tooltip("script điều khiển third person")]
+        public PlayerThirdPersonController tpsController;
 
         [Header("Preferred cameras (optional)")]
-        [SerializeField] private CinemachineCamera isoCamRef;                       // ISO vcam
-        [SerializeField] private CinemachineCamera tpsCamRef;                       // TPS vcam
+        [Tooltip("camera dùng cho iso view (nếu có)")]
+        public CinemachineCamera isoCamRef;
+
+        [Tooltip("camera dùng cho third person view (nếu có)")]
+        public CinemachineCamera tpsCamRef;
 
         [Header("Settings")]
-        [Tooltip("Start game bằng ISO mode (true) hay TPS mode (false)")]
-        [SerializeField] private bool startWithIso = true;
+        [Tooltip("start game bằng iso hay không")]
+        public bool startWithIso = true;
 
-        [Tooltip("Tự động set Priority cho camera khi switch mode")]
-        [SerializeField] private bool autoSwitchCamera = true;
+        [Tooltip("khi đổi mode thì tự switch camera luôn")]
+        public bool autoSwitchCamera = true;
 
-        [Tooltip("In log debug khi switch mode để dễ trace")]
-        [SerializeField] private bool logDebug = false;
+        [Tooltip("in log nhỏ nhỏ cho dễ debug")]
+        public bool logDebug = false;
 
-        // 0 = ISO, 1 = TPS
-        private int currentMode = 0;
+        // state hiện tại
+        private bool isIsoMode = true;
 
         private void Awake()
         {
-            // Nếu inspector chưa kéo sẵn thì thử tìm trên cùng GameObject
-            if (!isoController)
-                isoController = GetComponent<IsoPlayerController>();
-            if (!tpsController)
-                tpsController = GetComponent<PlayerThirdPersonController>();
+            // đảm bảo TPS controller luôn bật component
+            // để pivot follow player mọi lúc
+            if (tpsController != null)
+                tpsController.enabled = true;
         }
 
         private void Start()
         {
-            // đảm bảo luôn có ít nhất 1 controller chạy
             if (startWithIso)
                 SwitchToIso();
             else
                 SwitchToTps();
         }
 
-        /// <summary>
-        /// Public API: gọi từ UI / input khác để chuyển sang ISO mode.
-        /// </summary>
+        private void Update()
+        {
+            // demo: nhấn Tab để test nhanh
+            if (Input.GetKeyDown(KeyCode.Tab))
+            {
+                if (isIsoMode)
+                    SwitchToTps();
+                else
+                    SwitchToIso();
+            }
+        }
+
         public void SwitchToIso()
         {
-            currentMode = 0;
+            isIsoMode = true;
 
-            if (isoController)
-                isoController.enabled = true;          // bật ISO
-            if (tpsController)
-                tpsController.enabled = false;         // tắt TPS (script)
+            // bật iso controller
+            if (isoController != null)
+                isoController.enabled = true;
 
-            // gate TPS state nội bộ cho chắc
-            if (tpsController)
-                tpsController.SetTPSActive(false);
-
-            // chỉnh camera nếu có
-            if (autoSwitchCamera)
-                ActivateCamera(isoCamRef, tpsCamRef);
-
-            if (logDebug) Debug.Log("[PCM] Switched to ISO mode");
-        }
-
-        /// <summary>
-        /// Public API: gọi từ UI / input khác để chuyển sang TPS mode.
-        /// </summary>
-        public void SwitchToTps()
-        {
-            currentMode = 1;
-
-            if (isoController)
-                isoController.enabled = false;         // tắt ISO script
-            if (tpsController)
+            // TPS input sẽ tự OFF vì camera sẽ chuyển sang isoCamRef
+            if (autoSwitchCamera && CameraManager.HasInstance && isoCamRef != null)
             {
-                tpsController.enabled = true;          // bật TPS script
-                tpsController.SetTPSActive(true);      // mở gate nội bộ
-                tpsController.ResyncCameraAnglesFromPivot();
+                CameraManager.Instance.SwitchCamera(isoCamRef);
             }
 
-            if (autoSwitchCamera)
-                ActivateCamera(tpsCamRef, isoCamRef);
-
-            if (logDebug) Debug.Log("[PCM] Switched to TPS mode");
+            if (logDebug)
+                Debug.Log("[PlayerControlModeSwitcher] switched to ISO mode");
         }
 
-        /// <summary>
-        /// Toggle giữa 2 mode (có thể gán vào phím tắt sau này).
-        /// </summary>
-        public void ToggleMode()
+        public void SwitchToTps()
         {
-            if (currentMode == 0) SwitchToTps();
-            else SwitchToIso();
+            isIsoMode = false;
+
+            // tắt iso controller
+            if (isoController != null)
+                isoController.enabled = false;
+
+            // chỉ cần đổi camera, PlayerThirdPersonController sẽ nhận event
+            if (autoSwitchCamera && CameraManager.HasInstance && tpsCamRef != null)
+            {
+                CameraManager.Instance.SwitchCamera(tpsCamRef);
+            }
+
+            if (logDebug)
+                Debug.Log("[PlayerControlModeSwitcher] switched to TPS mode");
         }
-
-        /// <summary>
-        /// Helper: set priority cho 2 camera, cameraActive được ưu tiên cao hơn.
-        /// </summary>
-        private void ActivateCamera(CinemachineCamera cameraActive, CinemachineCamera cameraInactive)
-        {
-            if (cameraActive != null)
-                cameraActive.Priority = 20;
-            if (cameraInactive != null)
-                cameraInactive.Priority = 5;
-
-            // ❌ GỠ BỎ phần này:
-            // if (CameraManager.HasInstance && cameraActive != null)
-            // {
-            //     CameraManager.Instance.SetCurrentCamera(cameraActive);
-            // }
-        }
-
-
-#if UNITY_EDITOR
-        private void OnValidate()
-        {
-            if (!isoController)
-                isoController = GetComponent<IsoPlayerController>();
-            if (!tpsController)
-                tpsController = GetComponent<PlayerThirdPersonController>();
-
-            if (isoController == tpsController && isoController != null)
-                Debug.LogWarning("[PCM] isoController and tpsController reference same component.");
-        }
-#endif
     }
 }

@@ -190,11 +190,11 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
-    - _GustAmount: 0.166
+    - _GustAmount: 0
     - _GustFreq: 0.224
     - _GustLargeFreq: 0.094
-    - _GustScale: 0.311
-    - _GustSmallFreq: 0.468
+    - _GustScale: 0
+    - _GustSmallFreq: 0
     - _JitterAmount: 0.552
     - _JitterFreq: 0.19
     - _LOD_FADE_CROSSFADE: 0
@@ -235,14 +235,14 @@ Material:
     - _UVSec: 0
     - _WindAmount: 1
     - _WindBaseline: 0
-    - _WindDirection: 0.77
+    - _WindDirection: 0
     - _WindDirection1: 0
     - _WindNoiseScale: 1
     - _WindNoiseScale1: 14.76
     - _WindNoiseScale2: 0.5
     - _WindWorldScale: 0.08
     - _WindWorldScale1: 0.001
-    - _Y_multiplier: -0.5
+    - _Y_multiplier: -2
     - _ZWrite: 1
     - __dirty: 0
     - _leafNoiseScale: 1

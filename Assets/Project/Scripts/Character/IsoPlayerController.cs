@@ -3,6 +3,9 @@ using UnityEngine.InputSystem;
 
 namespace IronIvy.Gameplay
 {
+    // controller isometric cho player
+    // - có thể dùng New Input System hoặc legacy axis
+    // - chỉ lo move + interact đơn giản
     [RequireComponent(typeof(CharacterController))]
     public class IsoPlayerController : MonoBehaviour
     {
@@ -36,14 +39,14 @@ namespace IronIvy.Gameplay
         [Tooltip("Tốc độ quay tối đa (độ/giây)")]
         public float rotationMaxDegree = 360f;
 
-        [Tooltip("Bỏ rung input nhỏ (0–0.2). 0.1 là hợp lý cho stick/phím/analog")]
+        [Tooltip("Bỏ rung input nhỏ (0-0.2). 0.1 là khá ổn cho keyboard hoặc stick")]
         public float inputDeadZone = 0.08f;
 
         [Header("Tham chiếu")]
         [Tooltip("Camera dùng để định hướng move. Để trống sẽ lấy Camera.main")]
         public Camera mainCamera;
 
-        [Tooltip("Animator cần tham số Speed (float). Nếu để trống sẽ tự tìm")]
+        [Tooltip("Animator cần tham số Speed (float). Nếu để trống sẽ tự tìm quanh player")]
         public Animator animator;
 
         private CharacterController _cc;
@@ -62,6 +65,7 @@ namespace IronIvy.Gameplay
 
             if (!mainCamera) mainCamera = Camera.main;
 
+            // cố gắng auto tìm animator
             if (!animator)
             {
                 animator = GetComponent<Animator>();
@@ -69,10 +73,10 @@ namespace IronIvy.Gameplay
             }
 
 #if ENABLE_INPUT_SYSTEM
-            // chỉ cần có MoveAction là đủ để dùng New Input
+            // chỉ cần có moveAction là bật new input
             _useNewInput = (moveAction != null);
             if (!_useNewInput)
-                Debug.LogWarning("[IsoPlayerController] No MoveAction assigned, falling back to legacy axes or zero.");
+                Debug.LogWarning("IsoPlayerController no MoveAction, fallback legacy or no move");
 #else
             _useNewInput = false;
 #endif
@@ -100,14 +104,14 @@ namespace IronIvy.Gameplay
 
         private void Update()
         {
-            // 1) Đọc input
+            // 1. đọc input (new input hoặc legacy)
             Vector2 rawMove = ReadMove();
             if (rawMove.sqrMagnitude < inputDeadZone * inputDeadZone)
                 rawMove = Vector2.zero;
 
             _moveInput = rawMove;
 
-            // 2) Chuyển sang hướng world theo camera
+            // 2. convert sang world dir theo camera
             Vector3 moveDir = Vector3.zero;
             if (_moveInput.sqrMagnitude > 0.0001f)
             {
@@ -117,40 +121,55 @@ namespace IronIvy.Gameplay
                 }
                 else
                 {
-                    Vector3 camF = mainCamera.transform.forward; camF.y = 0f; camF.Normalize();
-                    Vector3 camR = mainCamera.transform.right; camR.y = 0f; camR.Normalize();
+                    Vector3 camF = mainCamera.transform.forward;
+                    camF.y = 0f;
+                    camF.Normalize();
+
+                    Vector3 camR = mainCamera.transform.right;
+                    camR.y = 0f;
+                    camR.Normalize();
+
                     moveDir = camR * _moveInput.x + camF * _moveInput.y;
                     if (moveDir.sqrMagnitude > 1f) moveDir.Normalize();
                 }
             }
 
-            // 3) Smooth tốc độ
+            // 3. smooth tốc độ
             Vector3 targetVelocity = moveDir * moveSpeed;
             float smoothTime = (targetVelocity.sqrMagnitude > 0.0001f) ? accelerationTime : decelerationTime;
-            _smoothedVelocity = Vector3.SmoothDamp(
-                _smoothedVelocity, targetVelocity, ref _velRef, Mathf.Max(0.0001f, smoothTime));
 
-            // 4) Di chuyển (SimpleMove có apply gravity)
+            _smoothedVelocity = Vector3.SmoothDamp(
+                _smoothedVelocity,
+                targetVelocity,
+                ref _velRef,
+                Mathf.Max(0.0001f, smoothTime)
+            );
+
+            // 4. di chuyển bằng SimpleMove (có gravity sẵn)
             _cc.SimpleMove(_smoothedVelocity);
 
-            // 5) Xoay theo hướng di chuyển
+            // 5. xoay theo hướng move
             Vector3 facing = _smoothedVelocity;
             facing.y = 0f;
+
             if (facing.sqrMagnitude > 0.0001f && rotationMaxDegree > 0f)
             {
                 Quaternion toRot = Quaternion.LookRotation(facing, Vector3.up);
                 transform.rotation = Quaternion.RotateTowards(
-                    transform.rotation, toRot, rotationMaxDegree * Time.deltaTime);
+                    transform.rotation,
+                    toRot,
+                    rotationMaxDegree * Time.deltaTime
+                );
             }
 
-            // 6) Animator speed
+            // 6. cập nhật animator
             if (animator)
             {
                 float targetSpeed = _smoothedVelocity.magnitude;
                 animator.SetFloat("Speed", targetSpeed, 0.1f, Time.deltaTime);
             }
 
-            // 7) Interact
+            // 7. tương tác simple
             if (_interaction && ReadInteractPressed())
             {
                 _interaction.TryInteract();
@@ -164,7 +183,10 @@ namespace IronIvy.Gameplay
                 return moveAction.action.ReadValue<Vector2>();
 #endif
 #if ENABLE_LEGACY_INPUT_MANAGER
-            return new Vector2(Input.GetAxisRaw(legacyHorizontal), Input.GetAxisRaw(legacyVertical));
+            return new Vector2(
+                Input.GetAxisRaw(legacyHorizontal),
+                Input.GetAxisRaw(legacyVertical)
+            );
 #else
             return Vector2.zero;
 #endif

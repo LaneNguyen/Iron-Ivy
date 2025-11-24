@@ -1,17 +1,15 @@
 ﻿using UnityEngine;
 using IronIvy.Gameplay.Rhythm;
 
-public class MinigameStarter : MonoBehaviour
+// script này chỉ để spawn minigame plant lên scene rồi start
+public class MiniggameStarter : MonoBehaviour
 {
-    public PlantRhythmMinigame plantMinigamePrefab;  // Prefab
-    public Transform spawnParent;  // optional
+    public PlantRhythmMinigame plantMinigamePrefab;
+    public Transform spawnParent;
 
     public void StartPlantMinigame()
     {
-        // Tạo instance real trong scene
         var instance = Instantiate(plantMinigamePrefab, spawnParent);
-
-        // Start game trên instance
         instance.StartGame();
     }
 }

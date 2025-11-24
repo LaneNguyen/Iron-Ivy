@@ -5,6 +5,9 @@ using Unity.Cinemachine;
 
 namespace IronIvy.Gameplay
 {
+    // controller third person cho player
+    // - dùng CharacterController
+    // - pivot camera riêng, vcam follow pivot
     [RequireComponent(typeof(CharacterController))]
     public class PlayerThirdPersonController : MonoBehaviour
     {
@@ -78,13 +81,16 @@ namespace IronIvy.Gameplay
         // state
         private float yaw, pitch;
         private CharacterController controller;
-        private Transform cam; // fallback Camera.main
-        private Vector3 currentVelocity; // XZ velocity
+        private Transform cam;             // fallback Camera.main nếu cần
+        private Vector3 currentVelocity;   // XZ velocity
         private Vector3 velocityRef;
         private float verticalVel;
         private bool wasMovingLastFrame;
 
-        // events
+        // flag nhỏ để tránh subscribe event nhiều lần
+        private bool hasCameraEventsHooked = false;
+
+        // events cho chỗ khác hook vào
         public event Action OnPlayerMoveStart;
         public event Action OnPlayerMoveStop;
 
@@ -92,21 +98,25 @@ namespace IronIvy.Gameplay
         {
             controller = GetComponent<CharacterController>();
 
+            // auto tìm animator quanh player
             if (!animator)
             {
                 animator = GetComponent<Animator>();
                 if (!animator) animator = GetComponentInChildren<Animator>();
             }
 
-            if (!cam && Camera.main) cam = Camera.main.transform;
+            if (!cam && Camera.main)
+                cam = Camera.main.transform;
 
-            // init yaw/pitch from pivot to avoid start snap
+            // init yaw/pitch từ pivot để tránh bị giật frame đầu
             if (cameraPivot)
             {
                 Vector3 e = cameraPivot.rotation.eulerAngles;
                 yaw = e.y;
+
                 float rawPitch = e.x;
                 if (rawPitch > 180f) rawPitch -= 360f;
+
                 pitch = Mathf.Clamp(rawPitch, minPitch, maxPitch);
                 cameraPivot.rotation = Quaternion.Euler(pitch, yaw, 0f);
             }
@@ -114,45 +124,57 @@ namespace IronIvy.Gameplay
 
         private void OnEnable()
         {
-            // stay enabled; just listen and gate
-            if (autoEnableByCamera && CameraManager.HasInstance && thirdPersonCamRef != null)
-            {
-                CameraManager.Instance.OnCameraChanged += HandleCameraChanged;
-            }
+            // reset state hook event
+            hasCameraEventsHooked = false;
 
-            // gate by current camera once at start
+            // thử hook nếu CameraManager đã có sẵn
+            EnsureCameraEventsHooked();
+
+            // sync gate theo camera hiện tại lúc start (nếu có)
             GateByCurrentCamera();
         }
 
         private void OnDisable()
         {
-            if (autoEnableByCamera && CameraManager.HasInstance)
+            // đảm bảo gỡ event cho sạch
+            if (autoEnableByCamera && hasCameraEventsHooked && CameraManager.HasInstance)
+            {
                 CameraManager.Instance.OnCameraChanged -= HandleCameraChanged;
+            }
+
+            hasCameraEventsHooked = false;
         }
 
         private void Update()
         {
             if (!isTPSActive)
             {
-                // inactive: iso controller handles movement thi only keep pivot follow in LateUpdate
+                // khi gate off thì iso controller xử lý move
+                // ở đây chỉ lo phần pivot follow trong LateUpdate
                 return;
             }
 
-            // STEP 1: read input
+            // step 1: đọc input move
             float h = Input.GetAxisRaw("Horizontal");
             float v = Input.GetAxisRaw("Vertical");
             Vector3 inputDir = new Vector3(h, 0f, v);
             if (inputDir.sqrMagnitude > 1f) inputDir.Normalize();
 
-            // run modifier
+            // chạy hay đi tùy theo shift
             float targetSpeed = (Input.GetKey(KeyCode.LeftShift) ? runSpeed : walkSpeed) * inputDir.magnitude;
 
-            // STEP 2: camera-relative move dir (flatten Y to avoid tilt issues)
+            // step 2: convert move theo hướng camera
             Vector3 moveDir;
             if (cameraPivot)
             {
-                Vector3 camForward = cameraPivot.forward; camForward.y = 0f; camForward.Normalize();
-                Vector3 camRight = cameraPivot.right; camRight.y = 0f; camRight.Normalize();
+                Vector3 camForward = cameraPivot.forward;
+                camForward.y = 0f;
+                camForward.Normalize();
+
+                Vector3 camRight = cameraPivot.right;
+                camRight.y = 0f;
+                camRight.Normalize();
+
                 moveDir = camForward * v + camRight * h;
             }
             else
@@ -161,18 +183,26 @@ namespace IronIvy.Gameplay
             }
             if (moveDir.sqrMagnitude > 1f) moveDir.Normalize();
 
-            // target velocity on XZ
             Vector3 targetVelocity = moveDir * targetSpeed;
 
-            // accel/decel smoothing
-            float smoothTime = (targetSpeed > 0.01f) ? Mathf.Max(0.0001f, acceleration)
-                                                     : Mathf.Max(0.0001f, deceleration);
-            currentVelocity = Vector3.SmoothDamp(currentVelocity, targetVelocity, ref velocityRef, smoothTime);
+            // step 3: smooth accel / decel
+            float smoothTime = (targetSpeed > 0.01f)
+                ? Mathf.Max(0.0001f, acceleration)
+                : Mathf.Max(0.0001f, deceleration);
 
-            // STEP 3: CharacterController.Move (with gravity)
+            currentVelocity = Vector3.SmoothDamp(
+                currentVelocity,
+                targetVelocity,
+                ref velocityRef,
+                smoothTime
+            );
+
+            // step 4: move controller + gravity
             if (controller.isGrounded)
             {
+                // giữ 1 ít negative để CharacterController báo grounded
                 verticalVel = -0.5f;
+
                 if (enableJump && Input.GetKeyDown(KeyCode.Space))
                     verticalVel = Mathf.Sqrt(2f * gravity * Mathf.Max(0.01f, jumpHeight));
             }
@@ -184,8 +214,10 @@ namespace IronIvy.Gameplay
             Vector3 frameMotion = new Vector3(currentVelocity.x, verticalVel, currentVelocity.z) * Time.deltaTime;
             controller.Move(frameMotion);
 
-            // STEP 5: rotate character toward move
-            Vector3 flatVel = currentVelocity; flatVel.y = 0f;
+            // step 5: rotate character theo hướng chạy
+            Vector3 flatVel = currentVelocity;
+            flatVel.y = 0f;
+
             bool isMovingNow = flatVel.sqrMagnitude > 0.0001f;
 
             if (isMovingNow)
@@ -197,7 +229,7 @@ namespace IronIvy.Gameplay
                     transform.rotation = targetRot;
             }
 
-            // Animator
+            // animator sync speed + flag
             if (animator)
             {
                 float speedParam = new Vector3(controller.velocity.x, 0f, controller.velocity.z).magnitude;
@@ -205,15 +237,21 @@ namespace IronIvy.Gameplay
                 animator.SetBool("IsMoving", isMovingNow);
             }
 
-            // events
-            if (isMovingNow && !wasMovingLastFrame) OnPlayerMoveStart?.Invoke();
-            else if (!isMovingNow && wasMovingLastFrame) OnPlayerMoveStop?.Invoke();
+            // fire event move start/stop
+            if (isMovingNow && !wasMovingLastFrame)
+                OnPlayerMoveStart?.Invoke();
+            else if (!isMovingNow && wasMovingLastFrame)
+                OnPlayerMoveStop?.Invoke();
+
             wasMovingLastFrame = isMovingNow;
         }
 
         private void LateUpdate()
         {
-            // PIVOT FOLLOW: always run (even when TPS gate is closed)
+            // đảm bảo mỗi frame đều thử hook nếu CameraManager spawn trễ
+            EnsureCameraEventsHooked();
+
+            // pivot follow player mọi lúc, dù tps active hay không
             if (cameraPivot)
             {
                 Vector3 targetPos = new Vector3(
@@ -222,15 +260,15 @@ namespace IronIvy.Gameplay
                     transform.position.z
                 );
 
-                // framerate independent damping (1 - exp(-k dt))
+                // dạng damping 1 - exp(-k * dt)
                 float t = 1f - Mathf.Exp(-pivotFollowDamping * Time.deltaTime);
                 cameraPivot.position = Vector3.Lerp(cameraPivot.position, targetPos, t);
             }
 
-            // RMB rotate only when TPS is active
+            // phần xoay camera chỉ chạy khi TPS đang active
             if (!isTPSActive) return;
 
-            // basic cursor lock
+            // xử lý lock/unlock cursor khi giữ chuột phải
             if (Input.GetMouseButtonDown(1))
             {
                 Cursor.lockState = CursorLockMode.Locked;
@@ -242,7 +280,7 @@ namespace IronIvy.Gameplay
                 Cursor.visible = true;
             }
 
-            // STEP 4: orbit yaw/pitch (after move)
+            // step 6: orbit yaw/pitch khi giữ RMB
             if (cameraPivot && Input.GetMouseButton(1))
             {
                 yaw += Input.GetAxis("Mouse X") * camSensitivityX;
@@ -252,13 +290,36 @@ namespace IronIvy.Gameplay
             }
         }
 
-        // ===== CameraManager auto gate (no enable/disable) =====
+        // auto hook event đổi camera khi cần
+        private void EnsureCameraEventsHooked()
+        {
+            if (!autoEnableByCamera) return;
+            if (hasCameraEventsHooked) return;
+            if (!CameraManager.HasInstance) return;
+            if (thirdPersonCamRef == null) return;
+
+            // đăng kí 1 lần thôi
+            CameraManager.Instance.OnCameraChanged += HandleCameraChanged;
+            hasCameraEventsHooked = true;
+
+            // vừa hook xong thì sync luôn theo camera hiện tại
+            GateByCurrentCamera();
+        }
+
+        // camera manager auto gate khu này
+        // - khi camera đổi thì bật/tắt tps bằng flag isTPSActive
         private void HandleCameraChanged(CinemachineCamera oldCam, CinemachineCamera newCam)
         {
             if (!autoEnableByCamera || thirdPersonCamRef == null) return;
 
             bool active = (newCam != null && newCam == thirdPersonCamRef);
-            SetTPSActive(active);              // gate only
+            SetTPSActive(active);
+
+#if UNITY_EDITOR
+            // log nhẹ cho dễ debug xem lúc nào tps được bật
+            // Debug.Log($"[TPS] CameraChanged -> active = {active}");
+#endif
+
             if (active) ResyncCameraAnglesFromPivot();
         }
 
@@ -266,31 +327,34 @@ namespace IronIvy.Gameplay
         {
             if (!autoEnableByCamera || thirdPersonCamRef == null || !CameraManager.HasInstance)
             {
-                // keep inspector value if we cannot decide
+                // nếu không quyết định được thì giữ lại giá trị inspector
                 SetTPSActive(isTPSActive);
                 return;
             }
 
             var current = CameraManager.Instance.CurrentCamera;
             bool active = (current != null && current == thirdPersonCamRef);
-            SetTPSActive(active);              // gate only
+            SetTPSActive(active);
             if (active) ResyncCameraAnglesFromPivot();
         }
 
-        // called by external switcher too
+        // public để switcher bên ngoài gọi
         public void SetTPSActive(bool value)
         {
-            isTPSActive = value;               // do not toggle this.enabled here
+            isTPSActive = value;    // chỉ gate logic, không đụng this.enabled
             if (isTPSActive) ResyncCameraAnglesFromPivot();
         }
 
         public void ResyncCameraAnglesFromPivot()
         {
             if (!cameraPivot) return;
+
             Vector3 e = cameraPivot.rotation.eulerAngles;
             yaw = e.y;
+
             float rawPitch = e.x;
             if (rawPitch > 180f) rawPitch -= 360f;
+
             pitch = Mathf.Clamp(rawPitch, minPitch, maxPitch);
             cameraPivot.rotation = Quaternion.Euler(pitch, yaw, 0f);
         }
@@ -298,7 +362,7 @@ namespace IronIvy.Gameplay
 #if UNITY_EDITOR
         private void OnValidate()
         {
-            // quick guards
+            // vài guard nhỏ cho giá trị
             minPitch = Mathf.Clamp(minPitch, -89f, 0f);
             maxPitch = Mathf.Clamp(maxPitch, 0f, 89f);
             walkSpeed = Mathf.Max(0f, walkSpeed);

@@ -19,5 +19,5 @@ MonoBehaviour:
   sequence:
   - type: 1
     beats: 1
-  - type: 0
+  - type: 1
     beats: 1

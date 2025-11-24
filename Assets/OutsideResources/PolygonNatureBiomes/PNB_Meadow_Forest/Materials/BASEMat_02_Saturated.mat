@@ -196,8 +196,8 @@ Material:
     - _GlossyReflections: 1
     - _GustAmount: 0.166
     - _GustFreq: 0.224
-    - _GustLargeFreq: 0.094
-    - _GustScale: 0.311
+    - _GustLargeFreq: 0
+    - _GustScale: 0
     - _GustSmallFreq: 0.468
     - _JitterAmount: 0.041
     - _JitterFreq: 0.19
@@ -240,7 +240,7 @@ Material:
     - _UVSec: 0
     - _WindAmount: 1
     - _WindBaseline: 0
-    - _WindDirection: 0.77
+    - _WindDirection: 0
     - _WindDirection1: 0
     - _WindNoiseScale: 1
     - _WindNoiseScale1: 14.76

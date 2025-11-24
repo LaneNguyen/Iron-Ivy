@@ -5,6 +5,8 @@ using IronIvy.Data;
 
 namespace IronIvy.Gameplay.Rhythm
 {
+    // minigame rhythm dành cho animal
+    // kế thừa RhythmMinigameBase v4
     public class AnimalRhythmMinigame : RhythmMinigameBase
     {
         [Header("Animal")]
@@ -14,30 +16,40 @@ namespace IronIvy.Gameplay.Rhythm
 
         public override void StartGame()
         {
-            if (!animal) { Debug.LogWarning("[AnimalRhythm] Missing AnimalDefinition."); return; }
-            MinigameCameraManager.Instance.ApplyAnimalProfile();
-            if (animal.loopSfx != null)
+            if (!animal)
             {
-                // Phát loop như BGM trong lúc chơi minigame
-                AudioManager.Instance.PlayBGM(animal.loopSfx.name);
+                Debug.LogWarning("AnimalRhythm missing AnimalDefinition");
+                return;
             }
+
+            MinigameCameraManager.Instance.ApplyAnimalProfile();
+
+            if (animal.loopSfx != null)
+                AudioManager.Instance.PlayBGM(animal.loopSfx.name);
+
             base.StartGame();
         }
 
         protected override void BuildPatternPlaylist(List<RhythmPattern> outList)
         {
-            if (animal?.patterns == null) return;
-            foreach (var p in animal.patterns) if (p) outList.Add(p);
+            if (animal == null || animal.patterns == null)
+                return;
+
+            foreach (var p in animal.patterns)
+                if (p) outList.Add(p);
 
             switch (animal.playbackMode)
             {
                 case RhythmPlaybackMode.Single:
-                    if (outList.Count > 1) outList.RemoveRange(1, outList.Count - 1);
+                    if (outList.Count > 1)
+                        outList.RemoveRange(1, outList.Count - 1);
                     break;
+
                 case RhythmPlaybackMode.Shuffle:
                     RhythmManager.Shuffle(outList);
                     break;
-                    // Sequential: giữ nguyên
+
+                    // Sequential để nguyên
             }
         }
 
@@ -45,15 +57,14 @@ namespace IronIvy.Gameplay.Rhythm
         {
             if (good)
             {
-                // Animal anim
                 if (animalAnimator && !string.IsNullOrEmpty(animal.goodAnim))
                     animalAnimator.Play(animal.goodAnim, 0, 0);
 
-                // IV-17 reactions: TÊN STATE trong Animator Controller của IV-17
                 if (iv17Animator && animal.iv17Reactions != null && animal.iv17Reactions.Length > 0)
                 {
                     string pick = animal.iv17Reactions[Random.Range(0, animal.iv17Reactions.Length)];
-                    if (!string.IsNullOrEmpty(pick)) iv17Animator.Play(pick, 0, 0);
+                    if (!string.IsNullOrEmpty(pick))
+                        iv17Animator.Play(pick, 0, 0);
                 }
 
                 trust += 12f;
@@ -62,19 +73,22 @@ namespace IronIvy.Gameplay.Rhythm
             {
                 if (animalAnimator && !string.IsNullOrEmpty(animal.badAnim))
                     animalAnimator.Play(animal.badAnim, 0, 0);
+
                 trust -= 5f;
             }
-            trust = Mathf.Clamp(trust, 0, 100);
+
+            trust = Mathf.Clamp(trust, 0f, 100f);
         }
 
         protected override void OnPlaylistComplete()
         {
-            // Kết playlist → chấm Trust = 100? → thưởng Archive theo Zone
+            // nếu trust max thì cho thưởng archive theo zone
             if (trust >= 100f)
             {
                 ArchiveManager.Instance.AddProgress(ZoneManager.Instance.GetArchiveReward());
                 EventBus.Instance.RaiseTrustSuccess();
             }
+
             StopGame();
         }
     }

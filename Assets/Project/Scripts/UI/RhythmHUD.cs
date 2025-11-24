@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -9,38 +8,37 @@ using IronIvy.Gameplay.Rhythm;
 namespace IronIvy.UI
 {
     /// <summary>
-    /// Rhythm HUD V3
+    /// HUD tối giản cho rhythm:
     /// - Title
-    /// - Key hints (Tap/Hold)
+    /// - Hint text (CLICK / HOLD)
     /// - Trust slider
     /// - Progress slider
-    /// - Beat circle (phase + inWindow)
-    /// - Hit/Miss counter
-    /// - PulseKey trên nhịp
+    /// - Status + Hit/Miss
+    /// 
+    /// API cũ như SetBeatWindow, SetBeatPhase, PulseKey giữ lại
+    /// nhưng làm rỗng cho khỏi vỡ code cũ.
     /// </summary>
     public class RhythmHUD : MonoBehaviour
     {
-        [Header("Root Panel")]
+        [Header("Root")]
         public GameObject hudRoot;
 
         [Header("Title")]
         public TextMeshProUGUI titleText;
 
-        [Header("Key Hint Slots")]
-        public List<TextMeshProUGUI> keySlots = new List<TextMeshProUGUI>();
+        [Header("Hint")]
+        [Tooltip("Text đơn giản để show hướng dẫn (CLICK / HOLD) nếu muốn.")]
+        public TextMeshProUGUI hintText;
 
-        [Header("Trust Slider")]
+        [Header("Trust & Progress")]
         public Slider trustSlider;
-
-        [Header("Progress Slider")]
         public Slider progressSlider;
 
-        [Header("Beat Circle")]
-        public Image beatCircle;
-        public Color beatNormalColor = Color.white;
-        public Color beatHotColor = new Color(1f, 0.8f, 0.4f);
+        [Header("Hold Visual (optional)")]
+        [Tooltip("Nếu gán thì SetHoldVisual sẽ fill 0..1.")]
+        public Image holdFillImage;
 
-        [Header("Status Text")]
+        [Header("Status")]
         public TextMeshProUGUI statusText;
         public Image statusIcon;
         public Color successColor = Color.green;
@@ -50,41 +48,21 @@ namespace IronIvy.UI
         public TextMeshProUGUI hitText;
         public TextMeshProUGUI missText;
 
-        [Header("Pulse Key Settings")]
-        public float pulseScale = 1.2f;
-        public float pulseDuration = 0.1f;
-        public Color pulseColor = new Color(1f, 0.85f, 0.4f);
-
+        // reference tới engine cũ (Animal / Plant V4) nếu còn dùng
         private RhythmMinigameBase current;
-        private Dictionary<int, Vector3> baseScale = new();
-        private Dictionary<int, Color> baseColor = new();
-        private Coroutine[] pulseCo;
 
-        private void Awake()
-        {
-            if (hudRoot != null)
-                hudRoot.SetActive(false);
-
-            // Cache scale + color
-            for (int i = 0; i < keySlots.Count; i++)
-            {
-                baseScale[i] = keySlots[i].transform.localScale;
-                baseColor[i] = keySlots[i].color;
-            }
-
-            if (beatCircle != null)
-            {
-                beatCircle.type = Image.Type.Filled;
-                beatCircle.fillMethod = Image.FillMethod.Radial360;
-                beatCircle.fillAmount = 0f;
-                beatCircle.color = beatNormalColor;
-            }
-        }
+        //=====================================================
+        //  Mono
+        //=====================================================
 
         private void OnEnable()
         {
-            EventBus.Instance.OnMinigameStarted += OnMinigameStarted;
-            EventBus.Instance.OnMinigameStopped += OnMinigameStopped;
+            // đăng ký lắng nghe minigame start/stop theo EventBus
+            if (EventBus.HasInstance)
+            {
+                EventBus.Instance.OnMinigameStarted += OnMinigameStarted;
+                EventBus.Instance.OnMinigameStopped += OnMinigameStopped;
+            }
         }
 
         private void OnDisable()
@@ -96,13 +74,20 @@ namespace IronIvy.UI
             }
         }
 
+        //=====================================================
+        //  EventBus callbacks
+        //=====================================================
+
         private void OnMinigameStarted()
         {
-            current = FindObjectOfType<RhythmMinigameBase>();
+            // tìm engine V4 nếu có (Animal / Plant cũ)
+            if (current == null)
+                current = FindObjectOfType<RhythmMinigameBase>();
 
             if (hudRoot != null)
                 hudRoot.SetActive(true);
 
+            // nếu current khác null thì dùng tên đó, còn không thì giữ lại title đã set sẵn
             if (titleText != null && current != null)
                 titleText.text = current.name;
         }
@@ -115,99 +100,120 @@ namespace IronIvy.UI
             current = null;
         }
 
-        public void BindMinigame(RhythmMinigameBase m)
+        //=====================================================
+        //  Public API (dùng được cho engine mới)
+        //=====================================================
+
+        /// <summary>
+        /// Cho phép gán minigame thủ công (nếu không muốn rely EventBus).
+        /// </summary>
+        public void BindMinigame(RhythmMinigameBase minigame)
         {
-            current = m;
+            current = minigame;
+
             if (hudRoot != null)
                 hudRoot.SetActive(true);
 
-            if (titleText != null)
-                titleText.text = m.name;
+            if (titleText != null && minigame != null)
+                titleText.text = minigame.name;
         }
 
-        // ---------- UPDATE HUD ELEMENTS ----------
-
+        /// <summary>
+        /// Set hint text đơn giản. Engine mới có thể truyền "CLICK (LMB)" / "HOLD (LMB)".
+        /// </summary>
         public void SetKeyHints(IList<string> hints)
         {
-            for (int i = 0; i < keySlots.Count; i++)
+            if (hintText == null) return;
+
+            if (hints == null || hints.Count == 0)
             {
-                if (keySlots[i] == null) continue;
-
-                if (hints != null && i < hints.Count)
-                    keySlots[i].text = hints[i];
-                else
-                    keySlots[i].text = "";
+                hintText.text = string.Empty;
+                return;
             }
+
+            // gộp mấy hint lại cho lẹ
+            hintText.text = string.Join(" / ", hints);
         }
 
-        public void SetTrust01(float v)
+        public void SetTrust01(float value01)
         {
-            if (trustSlider != null)
-                trustSlider.value = Mathf.Clamp01(v);
+            if (trustSlider == null) return;
+            trustSlider.value = Mathf.Clamp01(value01);
         }
 
-        public void SetProgress(float v)
+        public void SetProgress(float value01)
         {
-            if (progressSlider != null)
-                progressSlider.value = Mathf.Clamp01(v);
+            if (progressSlider == null) return;
+            progressSlider.value = Mathf.Clamp01(value01);
         }
 
-        public void SetStatus(string msg, bool good)
+        /// <summary>
+        /// Hiển thị phần đã hold trong window (0..1).
+        /// Engine mới có thể gọi để sync với UI riêng.
+        /// </summary>
+        public void SetHoldVisual(float value01)
+        {
+            if (holdFillImage == null)
+                return;
+
+            holdFillImage.type = Image.Type.Filled;
+            holdFillImage.fillMethod = Image.FillMethod.Radial360;
+            holdFillImage.fillAmount = Mathf.Clamp01(value01);
+        }
+
+        public void SetStatus(string message, bool isSuccess)
         {
             if (statusText != null)
-                statusText.text = msg;
+                statusText.text = message;
 
             if (statusIcon != null)
-                statusIcon.color = good ? successColor : failColor;
-        }
-
-        public void SetBeatPhase(float phase, bool inWindow)
-        {
-            if (beatCircle == null) return;
-
-            beatCircle.fillAmount = Mathf.Clamp01(phase);
-            beatCircle.color = inWindow ? beatHotColor : beatNormalColor;
+                statusIcon.color = isSuccess ? successColor : failColor;
         }
 
         public void SetHitMiss(int hit, int miss)
         {
-            if (hitText != null) hitText.text = "Hit: " + hit;
-            if (missText != null) missText.text = "Miss: " + miss;
+            if (hitText != null)
+                hitText.text = hit.ToString();
+
+            if (missText != null)
+                missText.text = miss.ToString();
         }
 
-        // ---------- PULSE KEY ----------
+        //=====================================================
+        //  API cũ cho engine V4 (giữ lại signature, làm rỗng)
+        //=====================================================
 
+        /// <summary>
+        /// Preview vùng hot window trên vòng (engine V4 dùng). Giờ bỏ visual.
+        /// </summary>
+        public void SetBeatWindow(float center01, float halfWidth01)
+        {
+            // bỏ trống, giờ không dùng vòng beat chung nữa
+        }
+
+        /// <summary>
+        /// Phase 0..1 + đang ở trong window. Trước dùng để quay BeatCursor trên HUD.
+        /// Giờ BeatCursor đã chuyển sang target riêng nên bỏ trống.
+        /// </summary>
+        public void SetBeatPhase(float phase, bool inWindow)
+        {
+            // no-op, giữ cho code cũ compile
+        }
+
+        /// <summary>
+        /// Highlight 1 key slot (engine cũ). Giờ không xài keySlots nên bỏ trống.
+        /// </summary>
         public void PulseKey(int index)
         {
-            if (keySlots == null || index < 0 || index >= keySlots.Count) return;
-
-            if (pulseCo == null || pulseCo.Length != keySlots.Count)
-                pulseCo = new Coroutine[keySlots.Count];
-
-            if (pulseCo[index] != null)
-                StopCoroutine(pulseCo[index]);
-
-            pulseCo[index] = StartCoroutine(PulseRoutine(index));
+            // no-op
         }
 
-        private IEnumerator PulseRoutine(int index)
+        /// <summary>
+        /// Clear highlight key.
+        /// </summary>
+        public void ClearPulseKey(int index)
         {
-            var slot = keySlots[index];
-            if (slot == null) yield break;
-
-            Vector3 s = baseScale[index];
-            Color c = baseColor[index];
-
-            // Pulse
-            slot.transform.localScale = s * pulseScale;
-            slot.color = pulseColor;
-
-            yield return new WaitForSeconds(pulseDuration);
-
-            slot.transform.localScale = s;
-            slot.color = c;
-
-            pulseCo[index] = null;
+            // no-op
         }
     }
 }

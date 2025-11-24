@@ -1,33 +1,37 @@
 ﻿using UnityEngine;
-using IronIvy.Gameplay;           
-using IronIvy.Gameplay.Rhythm;     
-using IronIvy.Core;    
+using IronIvy.Gameplay;
+using IronIvy.Gameplay.Rhythm;
+using IronIvy.Core;
 
+// script đơn giản để cho player bấm tương tác vào farm plot
 [RequireComponent(typeof(Collider))]
 public class FarmPlotInteractable : MonoBehaviour, IInteractable
 {
-    [Header("Hook to Plant Minigame runner in scene")]
+    [Header("PlantMinigame đang có trong scene")]
     public PlantRhythmMinigame plantMinigame;
 
-    [Header("Optional: Energy cost to start")]
+    [Header("Optional năng lượng để chơi")]
     public int energyCost = 1;
 
-    // IInteractable implementation
+    // prompt cho hệ interact
     public string Prompt => "Plant (RMB)";
+
+    // vị trí interact trong world
     public Vector3 WorldPosition => transform.position;
 
     public void Interact(GameObject interactor)
     {
         if (plantMinigame == null)
         {
-            Debug.LogWarning("[FarmPlotInteractable] Missing PlantRhythmMinigame reference.");
+            Debug.LogWarning("FarmPlotInteractable missing plantMinigame ref");
             return;
         }
 
+        // nếu minigame đang chạy thì không mở lại
         if (plantMinigame.IsRunning)
             return;
 
-        // Optional: trừ năng lượng
+        // optional: nếu có hệ năng lượng thì trừ ở đây
         // if (!EnergyManager.Instance.TrySpend(energyCost)) return;
 
         plantMinigame.StartGame();
@@ -35,7 +39,7 @@ public class FarmPlotInteractable : MonoBehaviour, IInteractable
 
     void Reset()
     {
-        // đảm bảo có collider để raycast trúng
+        // đảm bảo collider để raycast trúng
         var col = GetComponent<Collider>();
         if (col) col.isTrigger = false;
     }

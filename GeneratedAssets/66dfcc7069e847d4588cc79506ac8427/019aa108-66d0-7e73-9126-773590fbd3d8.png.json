@@ -1,0 +1,29 @@
+{
+    "asset": "66dfcc7069e847d4588cc79506ac8427",
+    "fileName": "019aa108-66d0-7e73-9126-773590fbd3d8.png",
+    "prompt": "Changing the color or display to hold",
+    "negativePrompt": "background",
+    "model": "924cb793-74f4-4368-aeb4-505a5b6e9f9a",
+    "modelName": "Pudgy Props",
+    "customSeed": -1,
+    "w3CTraceId": "e143ca87e5f473ef78d0c8d17c9a9fea",
+    "refinementMode": "Generation",
+    "pixelateTargetSize": 0,
+    "pixelateKeepImageSize": false,
+    "pixelatePixelBlockSize": 0,
+    "pixelateMode": 0,
+    "pixelateOutlineThickness": 0,
+    "doodles": {
+        "m_Items": [
+            {
+                "doodleReferenceType": 7,
+                "doodle": [],
+                "label": "Image",
+                "strength": 0.25,
+                "invertStrength": false,
+                "assetReferenceGuid": "66dfcc7069e847d4588cc79506ac8427"
+            }
+        ]
+    },
+    "upscaleFactor": 0
+}

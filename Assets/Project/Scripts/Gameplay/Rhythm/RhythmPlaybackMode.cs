@@ -2,8 +2,8 @@
 {
     public enum RhythmPlaybackMode
     {
-        Single,     // Chỉ chạy pattern[0]
-        Sequential, // 0..N-1
-        Shuffle     // Xáo thứ tự, chạy hết
+        Single,     // chỉ chơi pattern[0] cho gọn, kiểu demo
+        Sequential, // chơi lần lượt 0 -> N-1, kiểu playlist bình thường
+        Shuffle     // xào pattern lên cho random hơn
     }
 }

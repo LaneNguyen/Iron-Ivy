@@ -5,48 +5,67 @@ using IronIvy.Data;
 
 namespace IronIvy.Gameplay.Rhythm
 {
-    /// <summary>
-    /// Rhythm Engine V3
-    /// - Kết hợp Step engine cũ (OnStepJudged) + Beat engine mới
-    /// - Mỗi pattern gồm nhiều Step
-    /// - Mỗi Step có nhiều beats
-    /// - Scoring dựa theo BEAT (Hit/Miss)
-    /// - Step vẫn dùng để drive animation
-    /// - Biến trust dùng chung cho các minigame con (Plant/Animal...)
-    /// </summary>
+    // Rhythm Engine v4 base
+    // - Scoring theo từng beat, mỗi beat chỉ hit hoặc miss
+    // - Step dùng để config pattern (Tap / Hold / Rest + số beats)
+    // - Class con override mấy hook bên dưới để làm UI, anim, trust vvv
     public abstract class RhythmMinigameBase : MonoBehaviour, IMinigame
     {
-        [Tooltip("Pattern đang được chơi.")]
+        [Tooltip("Pattern hiện tại lấy từ playlist")]
         public RhythmPattern pattern;
 
-        /// <summary>
-        /// true khi minigame đang chạy.
-        /// </summary>
         public bool IsRunning { get; private set; }
 
-        // Timing
-        protected float beatInterval;
-        protected float lastBeatTime;
+        // timing cho beat
+        protected float beatInterval;          // thời gian 1 beat (seconds)
+        protected float lastBeatTime;          // thời điểm bắt đầu beat hiện tại
 
-        // Step engine (index trong pattern.sequence)
-        protected int seqIndex = 0;
+        // mapping step trong pattern
+        protected int currentStepIndex;        // index trong pattern.sequence
+        protected int beatsIntoCurrentStep;    // đã đi qua bao nhiêu beat trong step này
 
-        // Beat engine
-        protected int beatIndex;            // beat hiện tại trong cả pattern
-        protected int totalBeats;           // tổng beat của pattern
-        protected int beatsInCurrentStep;   // beat đã đi trong step hiện tại
-        protected int beatsHit;             // tổng beat hit tốt
-        protected int beatsMiss;            // tổng beat bỏ lỡ hoặc hit sai
+        // thông tin beat cho pattern hiện tại
+        protected int beatIndex;               // beat index trong pattern (0-based)
+        protected int totalBeats;              // tổng beat của pattern hiện tại
+        protected int beatsHit;                // số beat hit
+        protected int beatsMiss;               // số beat miss
 
-        // Điểm tin tưởng / score tổng cho minigame
+        // playlist multi pattern
+        protected int playlistTotalBeats;      // tổng beat của tất cả pattern trong playlist
+        protected int playlistBeatIndex;       // global beat index trong playlist
+
+        // flag: beat hiện tại đã được judge chưa
+        protected bool hasJudgedThisBeat;
+
+        // hit window theo phase 0..1
+        protected float targetCenter01;        // tâm window (0..1)
+        protected float targetHalfWidth01;     // nửa chiều rộng window (0..0.5)
+
+        // trust / score tổng
         protected float trust;
 
-        // Playlist pattern (nhiều phase)
+        // danh sách pattern đang chơi
         protected List<RhythmPattern> playlist = new List<RhythmPattern>();
         protected int playlistIndex = 0;
 
+        // hold settings
+        [Header("Hold Settings")]
+        [Tooltip("Thời gian tối thiểu phải giữ trong window để Hold được tính là HIT")]
+        public float holdRequiredSeconds = 0.25f;
+
+        protected float holdTimer = 0f;        // thời gian đã giữ trong window cho beat hiện tại
+
+        // life cycle basic, chỗ start/stop game
         public virtual void StartGame()
         {
+            // reset các biến global cho session này
+            beatsHit = 0;
+            beatsMiss = 0;
+            beatIndex = 0;
+            trust = 0f;
+            holdTimer = 0f;
+
+            // build playlist từ class con
             playlist.Clear();
             BuildPatternPlaylist(playlist);
 
@@ -56,6 +75,14 @@ namespace IronIvy.Gameplay.Rhythm
                 return;
             }
 
+            // tính tổng beat toàn playlist
+            playlistTotalBeats = 0;
+            for (int i = 0; i < playlist.Count; i++)
+                playlistTotalBeats += CountBeatsInPattern(playlist[i]);
+
+            playlistBeatIndex = 0;
+
+            // lấy pattern đầu tiên trong playlist
             playlistIndex = 0;
             pattern = playlist[0];
 
@@ -67,6 +94,7 @@ namespace IronIvy.Gameplay.Rhythm
 
         public virtual void StopGame()
         {
+            if (!IsRunning) return;
             IsRunning = false;
             IronIvy.Core.EventBus.Instance.RaiseMinigameStopped();
         }
@@ -77,118 +105,216 @@ namespace IronIvy.Gameplay.Rhythm
                 StopGame();
         }
 
-        /// <summary>
-        /// Chuẩn bị pattern hiện tại:
-        /// - Tính beatInterval từ BPM
-        /// - Reset seqIndex, beatIndex
-        /// - Tính tổng số beat
-        /// </summary>
+        // pattern / beat setup
+        // count tổng số beat trong 1 pattern dựa trên sequence
+        protected int CountBeatsInPattern(RhythmPattern p)
+        {
+            if (p == null || p.sequence == null)
+                return 0;
+
+            int total = 0;
+            foreach (var st in p.sequence)
+                total += Mathf.Max(1, st.beats);
+
+            return total;
+        }
+
+        // chuẩn bị pattern hiện tại
+        // - tính beatInterval từ BPM
+        // - reset step/beat index
+        // - set hit window cho beat đầu tiên
         protected virtual void PreparePattern()
         {
+            if (pattern == null || pattern.sequence == null || pattern.sequence.Length == 0)
+            {
+                Debug.LogWarning("[Rhythm] Pattern or sequence is missing.");
+                return;
+            }
+
             beatInterval = 60f / Mathf.Max(1, pattern.bpm);
             lastBeatTime = Time.time;
 
-            seqIndex = 0;
+            currentStepIndex = 0;
+            beatsIntoCurrentStep = 0;
 
-            ComputeTotalBeats();
-            beatsInCurrentStep = 0;
-        }
-
-        /// <summary>
-        /// Tính tổng số beat từ tất cả Step.
-        /// </summary>
-        protected void ComputeTotalBeats()
-        {
-            totalBeats = 0;
-            if (pattern.sequence != null)
-            {
-                foreach (var st in pattern.sequence)
-                    totalBeats += Mathf.Max(1, st.beats);
-            }
+            totalBeats = CountBeatsInPattern(pattern);
 
             beatIndex = 0;
-            beatsHit = 0;
-            beatsMiss = 0;
+            hasJudgedThisBeat = false;
+            holdTimer = 0f;
+
+            SetupBeatWindow();
+            OnBeat(); // hook cho beat đầu tiên
         }
 
+        // set hit window cho beat hiện tại, random nhẹ cho đỡ nhàm
+        protected virtual void SetupBeatWindow()
+        {
+            float baseWidth = pattern != null ? pattern.hitWindowSeconds : 0.2f;
+            float width01 = baseWidth / Mathf.Max(beatInterval, 0.0001f);
+
+            targetHalfWidth01 = Mathf.Clamp(width01, 0.05f, 0.45f);
+            targetCenter01 = Random.Range(0.2f, 0.8f);
+        }
+
+        // check xem phase có nằm trong khoảng window hay không
+        protected bool IsInHitWindow(float phase)
+        {
+            return Mathf.Abs(phase - targetCenter01) <= targetHalfWidth01;
+        }
+
+        protected RhythmPattern.Step GetCurrentStep()
+        {
+            if (pattern == null || pattern.sequence == null || pattern.sequence.Length == 0)
+                return default;
+
+            int idx = Mathf.Clamp(currentStepIndex, 0, pattern.sequence.Length - 1);
+            return pattern.sequence[idx];
+        }
+
+        // mỗi lần qua 1 beat thì tăng beatsIntoCurrentStep
+        // nếu đủ số beat trong step thì chuyển sang step kế
+        protected void AdvanceStepByBeat()
+        {
+            if (pattern == null || pattern.sequence == null || pattern.sequence.Length == 0)
+                return;
+
+            beatsIntoCurrentStep++;
+
+            RhythmPattern.Step step = pattern.sequence[currentStepIndex];
+            int stepBeats = Mathf.Max(1, step.beats);
+
+            if (beatsIntoCurrentStep >= stepBeats)
+            {
+                beatsIntoCurrentStep = 0;
+                currentStepIndex++;
+                if (currentStepIndex >= pattern.sequence.Length)
+                    currentStepIndex = pattern.sequence.Length - 1; // clamp ở step cuối, không out of range
+            }
+        }
+
+        // update loop chính, xử lý beat timing + input
         protected virtual void Update()
         {
             if (!IsRunning || pattern == null || pattern.sequence == null || pattern.sequence.Length == 0)
                 return;
 
-            float dtBeat = Time.time - lastBeatTime;
+            float now = Time.time;
+            float elapsed = now - lastBeatTime;
 
-            // Beat mới
-            if (dtBeat >= beatInterval)
+            // 1) xử lý kết thúc beat và chuyển sang beat mới nếu đủ thời gian
+            if (elapsed >= beatInterval)
             {
-                // Auto-miss: nếu vẫn còn beats trong step mà beat này chưa được hit
-                if (beatsInCurrentStep < pattern.sequence[seqIndex].beats)
+                RhythmPattern.Step stepAtEnd = GetCurrentStep();
+
+                // chưa judge thì auto xử lý miss/hit theo type
+                if (!hasJudgedThisBeat)
                 {
-                    beatsMiss++;
-                    OnBeatMissed();
-                }
-
-                beatsInCurrentStep++;
-                beatIndex++;
-
-                lastBeatTime = Time.time;
-                dtBeat = 0f;
-
-                // Hết beats trong step → chuyển step
-                if (beatsInCurrentStep >= pattern.sequence[seqIndex].beats)
-                {
-                    beatsInCurrentStep = 0;
-                    seqIndex++;
-
-                    if (seqIndex >= pattern.sequence.Length)
+                    if (stepAtEnd.type == RhythmPattern.StepType.Hold)
                     {
-                        // Hết pattern
-                        if (!NextPattern())
+                        // mode Hold: check theo holdTimer / holdRequiredSeconds
+                        float required = Mathf.Max(0.01f, holdRequiredSeconds);
+                        bool good = holdTimer >= required;
+                        hasJudgedThisBeat = true;
+
+                        if (good)
                         {
-                            OnPlaylistComplete();
-                            StopGame();
-                            return;
+                            beatsHit++;
+                            OnBeatHit();
                         }
+                        else
+                        {
+                            beatsMiss++;
+                            OnBeatMissed();
+                        }
+
+                        OnStepJudged(stepAtEnd, good);
+                    }
+                    else
+                    {
+                        // Tap / Rest mà không bấm gì thì tính là miss
+                        beatsMiss++;
+                        OnBeatMissed();
+                        // không gọi OnStepJudged ở đây để giữ giống logic cũ
                     }
                 }
 
-                OnBeat();
+                // tăng index cho pattern và playlist
+                beatIndex++;
+                playlistBeatIndex++;
+
+                if (beatIndex >= totalBeats)
+                {
+                    // hết pattern này, thử sang pattern tiếp theo trong playlist
+                    if (!NextPattern())
+                    {
+                        // hết playlist luôn
+                        OnPlaylistComplete();
+                        StopGame();
+                        return;
+                    }
+
+                    // reset lại thời gian cho pattern mới
+                    now = Time.time;
+                    elapsed = now - lastBeatTime;
+                }
+                else
+                {
+                    // sang beat mới trong cùng pattern
+                    lastBeatTime = now;
+                    elapsed = 0f;
+                    hasJudgedThisBeat = false;
+                    holdTimer = 0f;
+                    AdvanceStepByBeat();
+                    SetupBeatWindow();
+                    OnBeat();
+                }
             }
 
-            // Phase = 0..1 trong 1 beat
-            float safeInterval = Mathf.Max(beatInterval, 0.0001f);
-            float phase = Mathf.Clamp01(dtBeat / safeInterval);
-
-            // Cửa sổ an toàn để bấm (theo logic scoring)
-            bool inWindow = Mathf.Abs(dtBeat) <= pattern.hitWindowSeconds;
+            // 2) phase trong beat hiện tại 0..1
+            float phase = Mathf.Clamp01(elapsed / Mathf.Max(beatInterval, 0.0001f));
+            bool inWindow = IsInHitWindow(phase);
 
             OnBeatProgress(phase, inWindow);
 
-            // Input tap
-            if (Input.GetKeyDown(KeyCode.Space))
+            // 3) xử lý input theo Step hiện tại
+            RhythmPattern.Step currentStep = GetCurrentStep();
+
+            // TAP: bấm một lần đúng lúc
+            if (currentStep.type == RhythmPattern.StepType.Tap)
             {
-                JudgeTap();
+                if (Input.GetKeyDown(KeyCode.Space))
+                {
+                    TryJudgeCurrentBeat(phase);
+                }
             }
+            // HOLD: giữ phím khi đang trong window
+            else if (currentStep.type == RhythmPattern.StepType.Hold)
+            {
+                // chỉ tích lũy thời gian giữ khi đang ở trong window
+                if (inWindow && Input.GetKey(KeyCode.Space))
+                {
+                    holdTimer += Time.deltaTime;
+                }
+            }
+            // REST: không làm gì với input
         }
 
-        /// <summary>
-        /// Gọi khi người chơi bấm Space:
-        /// - Kiểm tra có trong hit window không
-        /// - Cập nhật beatsHit / beatsMiss
-        /// - Gọi OnBeatHit / OnBeatMissed
-        /// - Gọi OnStepJudged để con xử lý anim/trust theo step hiện tại
-        /// </summary>
-        protected void JudgeTap()
+        // thử chấm điểm beat hiện tại cho type Tap
+        // mỗi beat chỉ được judge 1 lần
+        protected void TryJudgeCurrentBeat(float phase)
         {
-            if (pattern == null || pattern.sequence == null || pattern.sequence.Length == 0)
+            if (hasJudgedThisBeat) return;
+
+            RhythmPattern.Step step = GetCurrentStep();
+            if (step.type == RhythmPattern.StepType.Hold)
+            {
+                // step này là Hold, không judge bằng 1 lần tap
                 return;
+            }
 
-            // Bảo vệ seqIndex
-            int safeIndex = Mathf.Clamp(seqIndex, 0, pattern.sequence.Length - 1);
-            var step = pattern.sequence[safeIndex];
-
-            float dt = Mathf.Abs(Time.time - lastBeatTime);
-            bool good = dt <= pattern.hitWindowSeconds;
+            bool good = IsInHitWindow(phase);
+            hasJudgedThisBeat = true;
 
             if (good)
             {
@@ -201,13 +327,11 @@ namespace IronIvy.Gameplay.Rhythm
                 OnBeatMissed();
             }
 
-            // Step judgement cho minigame con
+            // báo cho minigame con xử lý thêm (UI, anim)
             OnStepJudged(step, good);
         }
 
-        /// <summary>
-        /// Chuyển sang pattern tiếp theo trong playlist.
-        /// </summary>
+        // chuyển sang pattern tiếp theo trong playlist nếu còn
         protected bool NextPattern()
         {
             playlistIndex++;
@@ -219,44 +343,28 @@ namespace IronIvy.Gameplay.Rhythm
             return true;
         }
 
-        // ===== Hooks cho minigame con override =====
+        // các hook / abstract cho class con implement
 
-        /// <summary>
-        /// Gọi mỗi khi vào 1 beat mới.
-        /// </summary>
+        // gọi khi vừa chuyển sang beat mới
         protected virtual void OnBeat() { }
 
-        /// <summary>
-        /// Gọi mỗi frame giữa 2 beat.
-        /// phase: 0..1 trong 1 beat.
-        /// inWindow: true nếu đang trong khoảng an toàn để bấm.
-        /// </summary>
+        // gọi mỗi frame trong beat hiện tại
+        // phase 0..1, inWindow cho biết đang nằm trong vùng hit
         protected virtual void OnBeatProgress(float phase, bool inWindow) { }
 
-        /// <summary>
-        /// Gọi khi bấm đúng nhịp.
-        /// </summary>
+        // gọi khi beat được judge là HIT
         protected virtual void OnBeatHit() { }
 
-        /// <summary>
-        /// Gọi khi bấm sai hoặc bỏ lỡ beat.
-        /// </summary>
+        // gọi khi beat được judge là MISS
         protected virtual void OnBeatMissed() { }
 
-        /// <summary>
-        /// Xử lý theo từng Step (config trong ScriptableObject).
-        /// Minigame con dùng step.type, step.beats để quyết định anim/trust.
-        /// </summary>
+        // minigame con xử lý anim/trust theo step hiện tại
         protected abstract void OnStepJudged(RhythmPattern.Step step, bool good);
 
-        /// <summary>
-        /// Gọi khi playlist hoàn thành (tất cả pattern đã chơi xong).
-        /// </summary>
+        // gọi khi tất cả pattern trong playlist đã chơi xong
         protected abstract void OnPlaylistComplete();
 
-        /// <summary>
-        /// Minigame con build playlist tùy theo config (Single/Sequential/Shuffle).
-        /// </summary>
-        protected abstract void BuildPatternPlaylist(List<RhythmPattern> list);
+        // class con build playlist Single / Sequential / Shuffle
+        protected abstract void BuildPatternPlaylist(List<RhythmPattern> outList);
     }
 }
