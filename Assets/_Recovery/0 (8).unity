@@ -462,7 +462,6 @@ Transform:
   - {fileID: 267687634}
   - {fileID: 1502724627}
   - {fileID: 972034969}
-  - {fileID: 472087904}
   m_Father: {fileID: 1148650328}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &83347123
@@ -5516,52 +5515,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1424981992998854268, guid: 467eecb20cabbcd4eb0eb6d1c0e167a3, type: 3}
   m_PrefabInstance: {fileID: 469350383}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &472087902
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 472087904}
-  - component: {fileID: 472087903}
-  m_Layer: 0
-  m_Name: VisibilityController
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &472087903
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 472087902}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 86869e8eb2c07074ab2c3f7fadc9f6ec, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Gameplay.Animals.AnimalVisibilityController
-  renderers: []
-  fadeDuration: 0.6
---- !u!4 &472087904
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 472087902}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 72941691}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &474132844
 GameObject:
   m_ObjectHideFlags: 0
@@ -5641,6 +5594,107 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5204568910012182273, guid: 427231e9fa77a304abff2247a73abebb, type: 3}
   m_PrefabInstance: {fileID: 1506146528}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &500133791
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 177638, guid: 0abab5bb77339e4428787a870eb31bd3, type: 3}
+      propertyPath: m_Name
+      value: '[Graphy]'
+      objectReference: {fileID: 0}
+    - target: {fileID: 177638, guid: 0abab5bb77339e4428787a870eb31bd3, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 22451668, guid: 0abab5bb77339e4428787a870eb31bd3, type: 3}
+      propertyPath: m_Pivot.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 22451668, guid: 0abab5bb77339e4428787a870eb31bd3, type: 3}
+      propertyPath: m_Pivot.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 22451668, guid: 0abab5bb77339e4428787a870eb31bd3, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 22451668, guid: 0abab5bb77339e4428787a870eb31bd3, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 22451668, guid: 0abab5bb77339e4428787a870eb31bd3, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 22451668, guid: 0abab5bb77339e4428787a870eb31bd3, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 22451668, guid: 0abab5bb77339e4428787a870eb31bd3, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 22451668, guid: 0abab5bb77339e4428787a870eb31bd3, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 22451668, guid: 0abab5bb77339e4428787a870eb31bd3, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 22451668, guid: 0abab5bb77339e4428787a870eb31bd3, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 22451668, guid: 0abab5bb77339e4428787a870eb31bd3, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 22451668, guid: 0abab5bb77339e4428787a870eb31bd3, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 22451668, guid: 0abab5bb77339e4428787a870eb31bd3, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 22451668, guid: 0abab5bb77339e4428787a870eb31bd3, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 22451668, guid: 0abab5bb77339e4428787a870eb31bd3, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 22451668, guid: 0abab5bb77339e4428787a870eb31bd3, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 22451668, guid: 0abab5bb77339e4428787a870eb31bd3, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 22451668, guid: 0abab5bb77339e4428787a870eb31bd3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 22451668, guid: 0abab5bb77339e4428787a870eb31bd3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 22451668, guid: 0abab5bb77339e4428787a870eb31bd3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 0abab5bb77339e4428787a870eb31bd3, type: 3}
 --- !u!4 &508503793 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6774009297766024662, guid: 872d5d8c6cd685d46b16496c4ca5c3d5, type: 3}
@@ -5651,56 +5705,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8939172975259994909, guid: 8c8d8385f96bd054a88a3df780d77bcc, type: 3}
   m_PrefabInstance: {fileID: 148259677}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &514953496
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 514953497}
-  - component: {fileID: 514953498}
-  m_Layer: 0
-  m_Name: 3rdSpawn
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &514953497
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 514953496}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 12.8, y: 8.94, z: -76}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1037008342}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &514953498
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 514953496}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 10d4fad54746fc04c82eae193ce18b26, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Gameplay.Animals.AnimalSpawnZone
-  mode: 0
-  autoCollectChildZones: 1
-  childZones: []
-  radius: 10
-  spawnPoints: []
-  currentCount: 0
 --- !u!4 &526080820 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6800356293229332167, guid: 416274a0a63517c40b315a92856eef88, type: 3}
@@ -16183,66 +16187,6 @@ Transform:
   - {fileID: 1579575953}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1037008341
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1037008342}
-  - component: {fileID: 1037008343}
-  m_Layer: 0
-  m_Name: Zone1Spawn
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1037008342
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1037008341}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1627718842}
-  - {fileID: 1200771192}
-  - {fileID: 514953497}
-  - {fileID: 1946389014}
-  - {fileID: 1915818707}
-  m_Father: {fileID: 1092140266}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1037008343
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1037008341}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 10d4fad54746fc04c82eae193ce18b26, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Gameplay.Animals.AnimalSpawnZone
-  mode: 1
-  autoCollectChildZones: 1
-  childZones:
-  - {fileID: 1627718841}
-  - {fileID: 1200771193}
-  - {fileID: 514953498}
-  - {fileID: 1946389015}
-  - {fileID: 1915818708}
-  radius: 0
-  spawnPoints: []
-  currentCount: 0
 --- !u!1 &1038487975
 GameObject:
   m_ObjectHideFlags: 0
@@ -16433,6 +16377,79 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 9.9, y: 11.4, z: 33.6}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1001 &1042783356
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1927281333344068402, guid: 06df1bd5b21cc425ea5036f06eed5847, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2.07
+      objectReference: {fileID: 0}
+    - target: {fileID: 1927281333344068402, guid: 06df1bd5b21cc425ea5036f06eed5847, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 2.07
+      objectReference: {fileID: 0}
+    - target: {fileID: 1927281333344068402, guid: 06df1bd5b21cc425ea5036f06eed5847, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 2.07
+      objectReference: {fileID: 0}
+    - target: {fileID: 1927281333344068402, guid: 06df1bd5b21cc425ea5036f06eed5847, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 74.36087
+      objectReference: {fileID: 0}
+    - target: {fileID: 1927281333344068402, guid: 06df1bd5b21cc425ea5036f06eed5847, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 7.5353155
+      objectReference: {fileID: 0}
+    - target: {fileID: 1927281333344068402, guid: 06df1bd5b21cc425ea5036f06eed5847, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -99.3864
+      objectReference: {fileID: 0}
+    - target: {fileID: 1927281333344068402, guid: 06df1bd5b21cc425ea5036f06eed5847, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.28995073
+      objectReference: {fileID: 0}
+    - target: {fileID: 1927281333344068402, guid: 06df1bd5b21cc425ea5036f06eed5847, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1927281333344068402, guid: 06df1bd5b21cc425ea5036f06eed5847, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.9570416
+      objectReference: {fileID: 0}
+    - target: {fileID: 1927281333344068402, guid: 06df1bd5b21cc425ea5036f06eed5847, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1927281333344068402, guid: 06df1bd5b21cc425ea5036f06eed5847, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1927281333344068402, guid: 06df1bd5b21cc425ea5036f06eed5847, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -146.29
+      objectReference: {fileID: 0}
+    - target: {fileID: 1927281333344068402, guid: 06df1bd5b21cc425ea5036f06eed5847, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1927281333344068402, guid: 06df1bd5b21cc425ea5036f06eed5847, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2794869986892672252, guid: 06df1bd5b21cc425ea5036f06eed5847, type: 3}
+      propertyPath: m_Name
+      value: Agent-SquirrelA
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 06df1bd5b21cc425ea5036f06eed5847, type: 3}
 --- !u!4 &1050913176 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8939172975259994909, guid: 8c8d8385f96bd054a88a3df780d77bcc, type: 3}
@@ -16866,7 +16883,6 @@ Transform:
   m_Children:
   - {fileID: 776928707}
   - {fileID: 938001039}
-  - {fileID: 1037008342}
   m_Father: {fileID: 1156591468}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1095357663
@@ -17719,56 +17735,6 @@ Transform:
   - {fileID: 793178722}
   m_Father: {fileID: 1834403682}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1200771191
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1200771192}
-  - component: {fileID: 1200771193}
-  m_Layer: 0
-  m_Name: 2ndSpawn
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1200771192
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1200771191}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 11.46, y: 8.94, z: -97.68}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1037008342}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1200771193
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1200771191}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 10d4fad54746fc04c82eae193ce18b26, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Gameplay.Animals.AnimalSpawnZone
-  mode: 0
-  autoCollectChildZones: 1
-  childZones: []
-  radius: 10
-  spawnPoints: []
-  currentCount: 0
 --- !u!4 &1204231059 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2546736939327218311, guid: 231991aabb568a143b480c4e6638d511, type: 3}
@@ -19456,70 +19422,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7143384299085680147, guid: f7cd85f6f9fc0a84d82d852b4a8bf50e, type: 3}
   m_PrefabInstance: {fileID: 1320087727}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1329273002
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1329273004}
-  - component: {fileID: 1329273003}
-  m_Layer: 0
-  m_Name: NavMesh Surface
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1329273003
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1329273002}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7a5ac11cc976e418e8d13136b07e1f52, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshSurface
-  m_SerializedVersion: 0
-  m_AgentTypeID: -1372625422
-  m_CollectObjects: 0
-  m_Size: {x: 10, y: 10, z: 10}
-  m_Center: {x: 0, y: 2, z: 0}
-  m_LayerMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_UseGeometry: 0
-  m_DefaultArea: 0
-  m_GenerateLinks: 0
-  m_IgnoreNavMeshAgent: 1
-  m_IgnoreNavMeshObstacle: 1
-  m_OverrideTileSize: 0
-  m_TileSize: 256
-  m_OverrideVoxelSize: 0
-  m_VoxelSize: 0.05666667
-  m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 23800000, guid: e331e4dc5a0aec8408e414711a23f012, type: 2}
-  m_BuildHeightMesh: 0
---- !u!4 &1329273004
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1329273002}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 24.69961, y: 7.64574, z: -100.58134}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1330785109
 GameObject:
   m_ObjectHideFlags: 0
@@ -20780,23 +20682,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Core.AnimalManager
   zone1Animals: []
   zone2Animals: []
-  allDefinitions:
-  - {fileID: 11400000, guid: 6127fc5269e7dc248a33beb85acd8d93, type: 2}
-  zoneConfigs:
-  - zone: {fileID: 1037008343}
-    maxAnimalsInZone: 3
-    animals:
-    - definition: {fileID: 11400000, guid: 6127fc5269e7dc248a33beb85acd8d93, type: 2}
-      weight: 50
-  - zone: {fileID: 1200771193}
-    maxAnimalsInZone: 3
-    animals:
-    - definition: {fileID: 11400000, guid: 6127fc5269e7dc248a33beb85acd8d93, type: 2}
-      weight: 50
-  maxTotalAnimals: 4
+  allDefinitions: []
+  zoneConfigs: []
+  maxTotalAnimals: 40
   initialPoolPerAnimal: 3
-  playerTransform: {fileID: 1289728601}
-  spawnCheckRadius: 45.4
+  playerTransform: {fileID: 0}
+  spawnCheckRadius: 30
   despawnRadius: 40
   spawnCheckInterval: 2
 --- !u!4 &1449176857 stripped
@@ -23673,56 +23564,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1614500978}
   m_CullTransparentMesh: 1
---- !u!1 &1627718840
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1627718842}
-  - component: {fileID: 1627718841}
-  m_Layer: 0
-  m_Name: 1stSpawn
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1627718841
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1627718840}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 10d4fad54746fc04c82eae193ce18b26, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Gameplay.Animals.AnimalSpawnZone
-  mode: 0
-  autoCollectChildZones: 1
-  childZones: []
-  radius: 10
-  spawnPoints: []
-  currentCount: 0
---- !u!4 &1627718842
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1627718840}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 24.57, y: 8.94, z: -101.36}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1037008342}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1642820156
 GameObject:
   m_ObjectHideFlags: 0
@@ -31340,56 +31181,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8939172975259994909, guid: 8c8d8385f96bd054a88a3df780d77bcc, type: 3}
   m_PrefabInstance: {fileID: 1781938516}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1915818706
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1915818707}
-  - component: {fileID: 1915818708}
-  m_Layer: 0
-  m_Name: '5thSpawn '
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1915818707
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1915818706}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 28.76, y: 8.94, z: -60.33}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1037008342}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1915818708
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1915818706}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 10d4fad54746fc04c82eae193ce18b26, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Gameplay.Animals.AnimalSpawnZone
-  mode: 0
-  autoCollectChildZones: 1
-  childZones: []
-  radius: 8.28
-  spawnPoints: []
-  currentCount: 0
 --- !u!1001 &1936587604
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -31579,56 +31370,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.7798826, y: 0.9999999, z: 0.33}
   m_Center: {x: 0.110881045, y: 0.5000002, z: -0.61}
---- !u!1 &1946389013
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1946389014}
-  - component: {fileID: 1946389015}
-  m_Layer: 0
-  m_Name: 4thSpawn
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1946389014
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1946389013}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 9.68, y: 8.94, z: -54.05}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1037008342}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1946389015
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1946389013}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 10d4fad54746fc04c82eae193ce18b26, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Gameplay.Animals.AnimalSpawnZone
-  mode: 0
-  autoCollectChildZones: 1
-  childZones: []
-  radius: 7.04
-  spawnPoints: []
-  currentCount: 0
 --- !u!1001 &1964343513
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -36838,5 +36579,6 @@ SceneRoots:
   - {fileID: 565489608}
   - {fileID: 1364288606}
   - {fileID: 1772204570}
+  - {fileID: 500133791}
   - {fileID: 1660676077}
-  - {fileID: 1329273004}
+  - {fileID: 1042783356}

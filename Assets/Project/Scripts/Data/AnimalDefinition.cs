@@ -6,11 +6,51 @@ namespace IronIvy.Data
     [CreateAssetMenu(menuName = "IronIvy/Animal Definition")]
     public class AnimalDefinition : ScriptableObject
     {
+        [Header("Basic")]
         public string id;
         public string displayName;
 
+        [Tooltip("Prefab con thu ngoai world, co gan AnimalController tren do.")]
+        public GameObject prefab;
+
+        [Header("Spawn (world animals)")]
+        [Tooltip("Tong so con toi da cua loai nay tren toan map (0 hoac <0 = ko gioi han).")]
+        public int maxCountGlobal = 10;
+
+        [Tooltip("Weight mac dinh khi spawn, dung lam tham khao neu can.")]
+        public float spawnWeight = 1f;
+
+        [Tooltip("FX khi con thu spawn xuat hien.")]
+        public GameObject spawnVfxPrefab;
+
+        [Tooltip("FX khi con thu despawn / bien mat.")]
+        public GameObject despawnVfxPrefab;
+
+        [Header("Movement")]
+        [Tooltip("Toc do di bo chinh.")]
+        public float walkSpeed = 1.5f;
+
+        [Tooltip("Toc do chay neu sau nay can (chua dung).")]
+        public float runSpeed = 3f;
+
+        [Tooltip("Ban kinh di dao quanh anchor (zone).")]
+        public float wanderRadius = 6f;
+
+        [Tooltip("Idle thap nhat giua cac lan wander.")]
+        public float minIdleTime = 1f;
+
+        [Tooltip("Idle cao nhat giua cac lan wander.")]
+        public float maxIdleTime = 3f;
+
+        [Header("Flags")]
+        [Tooltip("De sau nay co day phase thi dung (hien tai chua dung).")]
+        public bool isNocturnal = false;
+
+        // PHAN DUOI LA HE RHYTHM HIEN CO 
+
         [Header("Rhythm (multi-pattern)")]
-        public RhythmPattern[] patterns;    //nhiều pattern
+        // nhieu pattern cho minigame giao tiep
+        public RhythmPattern[] patterns;
         public RhythmPlaybackMode playbackMode = RhythmPlaybackMode.Sequential;
 
         [Header("Animation names (Animal)")]
@@ -18,10 +58,10 @@ namespace IronIvy.Data
         public string badAnim = "Bad";
 
         [Header("IV-17 Reactions")]
-        // Các tên state trong Animator của IV-17 sẽ được play khi bấm dc “GOOD”
+        // ten state trong Animator cua IV-17 se duoc play khi GOOD
         public string[] iv17Reactions;
 
-        [Header("Audio/FX")]
+        [Header("Audio/FX (minigame)")]
         public AudioClip loopSfx;
         public GameObject successVFX;
     }
