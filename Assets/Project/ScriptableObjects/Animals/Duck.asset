@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c53fbbe08d2db6e46a3f2ccc74647187, type: 3}
+  m_Name: Duck
+  m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Data.AnimalDefinition
+  id: duck_a
+  displayName: Duck
+  prefab: {fileID: 1600231042716339702, guid: f69e75671ffd4c143ac67920d4afdfc6, type: 3}
+  maxCountGlobal: 10
+  spawnWeight: 1
+  spawnVfxPrefab: {fileID: 0}
+  despawnVfxPrefab: {fileID: 0}
+  walkSpeed: 1
+  runSpeed: 2
+  wanderRadius: 6
+  minIdleTime: 2
+  maxIdleTime: 4
+  isNocturnal: 0
+  patterns: []
+  playbackMode: 1
+  goodAnim: Good
+  badAnim: Bad
+  iv17Reactions: []
+  loopSfx: {fileID: 0}
+  successVFX: {fileID: 0}

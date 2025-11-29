@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c53fbbe08d2db6e46a3f2ccc74647187, type: 3}
   m_Name: Squirrel
   m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Data.AnimalDefinition
-  id: squir_a
-  displayName: Squir
+  id: squirrel_a
+  displayName: Squirrel
   prefab: {fileID: 870669309828721424, guid: b4c6ac88d9c75ef4f8863377c10ad6b9, type: 3}
   maxCountGlobal: 10
   spawnWeight: 1

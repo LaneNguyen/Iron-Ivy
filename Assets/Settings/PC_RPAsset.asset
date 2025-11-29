@@ -54,14 +54,14 @@ MonoBehaviour:
   m_ReflectionProbeBlending: 1
   m_ReflectionProbeBoxProjection: 1
   m_ReflectionProbeAtlas: 1
-  m_ShadowDistance: 500
+  m_ShadowDistance: 1000
   m_ShadowCascadeCount: 4
   m_Cascade2Split: 0.25
   m_Cascade3Split: {x: 0.1, y: 0.3}
-  m_Cascade4Split: {x: 0.045067795, y: 0.3364406, z: 0.776271}
+  m_Cascade4Split: {x: 0.0050000004, y: 0.02560658, z: 0.19922163}
   m_CascadeBorder: 0.107758604
-  m_ShadowDepthBias: 0.1
-  m_ShadowNormalBias: 0.5
+  m_ShadowDepthBias: 0
+  m_ShadowNormalBias: 2.6
   m_AnyShadowsSupported: 1
   m_SoftShadowsSupported: 1
   m_ConservativeEnclosingSphere: 1
