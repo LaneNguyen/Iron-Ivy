@@ -106,25 +106,14 @@ namespace IronIvy.Core
 
             foreach (var def in allDefinitions)
             {
-                if (def == null || def.prefab == null) continue;
+                if (def == null) continue;
 
-                var queue = new Queue<AnimalController>();
-                _pools[def] = queue;
+                // chi tao queue rong, khong Instantiate o day
+                _pools[def] = new Queue<Gameplay.Animals.AnimalController>();
                 _activeCountPerDefinition[def] = 0;
-
-                for (int i = 0; i < initialPoolPerAnimal; i++)
-                {
-                    var obj = Object.Instantiate(def.prefab);
-                    obj.SetActive(false);
-
-                    var ctrl = obj.GetComponent<AnimalController>();
-                    if (ctrl == null)
-                        ctrl = obj.AddComponent<AnimalController>();
-
-                    queue.Enqueue(ctrl);
-                }
             }
         }
+
 
         private void Update()
         {
@@ -188,6 +177,7 @@ namespace IronIvy.Core
             }
 
             var controller = GetFromPool(chosenDef, spawnPos, spawnZone, rootZone);
+
             if (controller == null) return;
 
             rootZone.currentCount++;
@@ -245,49 +235,65 @@ namespace IronIvy.Core
             return candidates[Random.Range(0, candidates.Count)].definition;
         }
 
-        private AnimalController GetFromPool(
-            AnimalDefinition def,
-            Vector3 position,
-            AnimalSpawnZone spawnZone,
-            AnimalSpawnZone rootZone)
+        private Gameplay.Animals.AnimalController GetFromPool(
+    AnimalDefinition def,
+    Vector3 position,
+    Gameplay.Animals.AnimalSpawnZone spawnZone,
+    Gameplay.Animals.AnimalSpawnZone rootZone)
         {
             if (def == null) return null;
 
-            Queue<AnimalController> queue;
-            if (!_pools.TryGetValue(def, out queue))
+            // lay queue cho loai nay
+            if (!_pools.TryGetValue(def, out var queue))
             {
-                queue = new Queue<AnimalController>();
+                queue = new Queue<Gameplay.Animals.AnimalController>();
                 _pools[def] = queue;
                 _activeCountPerDefinition[def] = 0;
             }
 
-            AnimalController ctrl = null;
+            Gameplay.Animals.AnimalController ctrl = null;
 
             if (queue.Count > 0)
             {
+                // lay tu pool co san
                 ctrl = queue.Dequeue();
             }
             else
             {
+                // LAN ĐẦU TIÊN: tao object NGAY TAI spawn position
                 if (def.prefab == null)
                 {
                     Debug.LogWarning($"AnimalManager: prefab null tren AnimalDefinition {def.id}");
                     return null;
                 }
 
-                var obj = Object.Instantiate(def.prefab);
-                ctrl = obj.GetComponent<AnimalController>();
+                var obj = Instantiate(def.prefab, position, Quaternion.identity);
+                ctrl = obj.GetComponent<Gameplay.Animals.AnimalController>();
                 if (ctrl == null)
-                    ctrl = obj.AddComponent<AnimalController>();
+                {
+                    ctrl = obj.AddComponent<Gameplay.Animals.AnimalController>();
+                }
             }
 
             var go = ctrl.gameObject;
+
+            // set pos truoc, cho chac
             go.transform.position = position;
             go.transform.rotation = Quaternion.identity;
             go.SetActive(true);
 
+            // init zone + wander
             ctrl.Init(def, spawnZone, rootZone);
 
+            // EP agent warp ve dung vi tri spawn (de no nap len NavMesh ngay tai day)
+            var agent = go.GetComponent<UnityEngine.AI.NavMeshAgent>();
+            if (agent != null)
+            {
+                // Warp se co gang tim NavMesh gan nhat quanh "position"
+                agent.Warp(position);
+            }
+
+            // vfx spawn neu co
             var visibility = ctrl.Visibility;
             if (visibility != null)
             {
@@ -296,6 +302,7 @@ namespace IronIvy.Core
 
             return ctrl;
         }
+
 
         public void DespawnZone(AnimalSpawnZone zone)
         {

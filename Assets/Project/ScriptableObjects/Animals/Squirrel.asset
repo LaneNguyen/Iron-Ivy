@@ -25,6 +25,17 @@ MonoBehaviour:
   minIdleTime: 1
   maxIdleTime: 4.32
   isNocturnal: 0
+  ambientClips:
+  - {fileID: 8300000, guid: 9c64b9a1cbb9279408205179e9bf587d, type: 3}
+  ambientMinInterval: 3
+  ambientMaxInterval: 15
+  ambientSoundRadius: 10
+  curiousRadius: 10
+  curiousChancePerCheck: 0.994
+  curiousMinDuration: 3
+  curiousMaxDuration: 6
+  curiousCheckInterval: 10
+  curiousAnimTrigger: 
   patterns: []
   playbackMode: 1
   goodAnim: Good

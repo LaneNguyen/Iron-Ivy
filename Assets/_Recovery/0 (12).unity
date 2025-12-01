@@ -175,7 +175,7 @@ MonoBehaviour:
   m_Center: {x: 0, y: 2, z: 0}
   m_LayerMask:
     serializedVersion: 2
-    m_Bits: 7975
+    m_Bits: 4294967295
   m_UseGeometry: 0
   m_DefaultArea: 0
   m_GenerateLinks: 0
@@ -250,10 +250,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1828462272}
     m_Modifications:
-    - target: {fileID: 2809979137612107705, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
     - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.8429326
@@ -309,18 +305,6 @@ PrefabInstance:
     - target: {fileID: 4189448818000646636, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
       propertyPath: m_Name
       value: _Sp_Rock02
-      objectReference: {fileID: 0}
-    - target: {fileID: 4189448818000646636, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 6108767303542824052, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 6403186462680033172, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -503,7 +487,7 @@ MonoBehaviour:
   m_Center: {x: 0, y: 2, z: 0}
   m_LayerMask:
     serializedVersion: 2
-    m_Bits: 7975
+    m_Bits: 4294967295
   m_UseGeometry: 0
   m_DefaultArea: 0
   m_GenerateLinks: 0
@@ -1773,10 +1757,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1828462272}
     m_Modifications:
-    - target: {fileID: 2809979137612107705, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
     - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.47
@@ -1836,18 +1816,6 @@ PrefabInstance:
     - target: {fileID: 4189448818000646636, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
       propertyPath: m_Name
       value: _Sp_Rock02 (2)
-      objectReference: {fileID: 0}
-    - target: {fileID: 4189448818000646636, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 6108767303542824052, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 6403186462680033172, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2122,65 +2090,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ce83ef17faa67e84cb0bd12dc4c61f71, type: 3}
---- !u!1 &191503036
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 191503037}
-  - component: {fileID: 191503038}
-  m_Layer: 0
-  m_Name: SpawnZone (5)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &191503037
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 191503036}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -30.22, y: 8.22, z: -29.52}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1238723312}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &191503038
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 191503036}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 10d4fad54746fc04c82eae193ce18b26, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Gameplay.Animals.AnimalSpawnZone
-  mode: 0
-  autoCollectChildZones: 1
-  childZones: []
-  radius: 4.67
-  spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
-  currentCount: 0
 --- !u!1 &205455816
 GameObject:
   m_ObjectHideFlags: 0
@@ -2689,7 +2598,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 0
   m_VoxelSize: 0.33333334
   m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 23800000, guid: c4e59180bfa6e354eb01f17fdb1cc2c0, type: 2}
+  m_NavMeshData: {fileID: 23800000, guid: 92ac2071d2a474d48b2c96482e714dbf, type: 2}
   m_BuildHeightMesh: 0
 --- !u!1001 &246350701
 PrefabInstance:
@@ -2970,15 +2879,6 @@ MonoBehaviour:
   childZones: []
   radius: 8.47
   spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
   currentCount: 0
 --- !u!1001 &262808926
 PrefabInstance:
@@ -3779,25 +3679,9 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: -2550543478551763325, guid: 2c5fe446668d34147ac86478e7985ddb, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: -1251283469443729237, guid: 2c5fe446668d34147ac86478e7985ddb, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 2c5fe446668d34147ac86478e7985ddb, type: 3}
       propertyPath: m_Name
       value: _Sp_Rock01
-      objectReference: {fileID: 0}
-    - target: {fileID: 919132149155446097, guid: 2c5fe446668d34147ac86478e7985ddb, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 9005902513473021022, guid: 2c5fe446668d34147ac86478e7985ddb, type: 3}
-      propertyPath: m_Layer
-      value: 9
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4120,10 +4004,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 684468929}
     m_Modifications:
-    - target: {fileID: 156402033557335166, guid: 35348ac853f10584a9e52b978af197f9, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
     - target: {fileID: 1920158762507531025, guid: 35348ac853f10584a9e52b978af197f9, type: 3}
       propertyPath: m_LocalScale.x
       value: 1.7678324
@@ -4179,22 +4059,6 @@ PrefabInstance:
     - target: {fileID: 3242204568188846338, guid: 35348ac853f10584a9e52b978af197f9, type: 3}
       propertyPath: m_Name
       value: _Sp_PW_Stone_01
-      objectReference: {fileID: 0}
-    - target: {fileID: 3242204568188846338, guid: 35348ac853f10584a9e52b978af197f9, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 4195447602797839849, guid: 35348ac853f10584a9e52b978af197f9, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 4911884997711246410, guid: 35348ac853f10584a9e52b978af197f9, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 8017363593285785391, guid: 35348ac853f10584a9e52b978af197f9, type: 3}
-      propertyPath: m_Layer
-      value: 9
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4276,10 +4140,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 684468929}
     m_Modifications:
-    - target: {fileID: 156402033557335166, guid: 35348ac853f10584a9e52b978af197f9, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
     - target: {fileID: 1920158762507531025, guid: 35348ac853f10584a9e52b978af197f9, type: 3}
       propertyPath: m_LocalScale.x
       value: 1.4566127
@@ -4335,22 +4195,6 @@ PrefabInstance:
     - target: {fileID: 3242204568188846338, guid: 35348ac853f10584a9e52b978af197f9, type: 3}
       propertyPath: m_Name
       value: _Sp_PW_Stone_01
-      objectReference: {fileID: 0}
-    - target: {fileID: 3242204568188846338, guid: 35348ac853f10584a9e52b978af197f9, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 4195447602797839849, guid: 35348ac853f10584a9e52b978af197f9, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 4911884997711246410, guid: 35348ac853f10584a9e52b978af197f9, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 8017363593285785391, guid: 35348ac853f10584a9e52b978af197f9, type: 3}
-      propertyPath: m_Layer
-      value: 9
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -5148,65 +4992,6 @@ Transform:
   - {fileID: 1505873379}
   m_Father: {fileID: 849473465}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &393206090
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 393206091}
-  - component: {fileID: 393206092}
-  m_Layer: 0
-  m_Name: SpawnZone (5)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &393206091
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 393206090}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.97, y: -1.13, z: -24.61}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 758357182}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &393206092
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 393206090}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 10d4fad54746fc04c82eae193ce18b26, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Gameplay.Animals.AnimalSpawnZone
-  mode: 0
-  autoCollectChildZones: 1
-  childZones: []
-  radius: 2.92
-  spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
-  currentCount: 0
 --- !u!1 &399153350
 GameObject:
   m_ObjectHideFlags: 0
@@ -5367,15 +5152,6 @@ MonoBehaviour:
   childZones: []
   radius: 7.61
   spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
   currentCount: 0
 --- !u!1001 &422804719
 PrefabInstance:
@@ -5550,65 +5326,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8c8d8385f96bd054a88a3df780d77bcc, type: 3}
---- !u!1 &423797679
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 423797680}
-  - component: {fileID: 423797681}
-  m_Layer: 0
-  m_Name: SpawnZone
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &423797680
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 423797679}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1905177964}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &423797681
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 423797679}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 10d4fad54746fc04c82eae193ce18b26, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Gameplay.Animals.AnimalSpawnZone
-  mode: 0
-  autoCollectChildZones: 1
-  childZones: []
-  radius: 10
-  spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
-  currentCount: 0
 --- !u!1001 &428292271
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6031,65 +5748,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 16, y: 11.4, z: 8.5}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!1 &452873752
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 452873753}
-  - component: {fileID: 452873754}
-  m_Layer: 0
-  m_Name: SpawnZone (3)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &452873753
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 452873752}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -22.68, y: 1, z: -10.02}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1238723312}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &452873754
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 452873752}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 10d4fad54746fc04c82eae193ce18b26, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Gameplay.Animals.AnimalSpawnZone
-  mode: 0
-  autoCollectChildZones: 1
-  childZones: []
-  radius: 4.67
-  spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
-  currentCount: 0
 --- !u!1 &457610057
 GameObject:
   m_ObjectHideFlags: 0
@@ -6139,15 +5797,6 @@ MonoBehaviour:
   childZones: []
   radius: 7.9
   spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
   currentCount: 0
 --- !u!1001 &459608987
 PrefabInstance:
@@ -6404,15 +6053,6 @@ MonoBehaviour:
   childZones: []
   radius: 4.1
   spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
   currentCount: 0
 --- !u!1 &493223562
 GameObject:
@@ -6517,15 +6157,6 @@ MonoBehaviour:
   childZones: []
   radius: 10
   spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
   currentCount: 0
 --- !u!4 &526080820 stripped
 Transform:
@@ -6675,10 +6306,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 684468929}
     m_Modifications:
-    - target: {fileID: 156402033557335166, guid: 35348ac853f10584a9e52b978af197f9, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
     - target: {fileID: 1920158762507531025, guid: 35348ac853f10584a9e52b978af197f9, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.5971972
@@ -6734,22 +6361,6 @@ PrefabInstance:
     - target: {fileID: 3242204568188846338, guid: 35348ac853f10584a9e52b978af197f9, type: 3}
       propertyPath: m_Name
       value: _Sp_PW_Stone_01
-      objectReference: {fileID: 0}
-    - target: {fileID: 3242204568188846338, guid: 35348ac853f10584a9e52b978af197f9, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 4195447602797839849, guid: 35348ac853f10584a9e52b978af197f9, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 4911884997711246410, guid: 35348ac853f10584a9e52b978af197f9, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 8017363593285785391, guid: 35348ac853f10584a9e52b978af197f9, type: 3}
-      propertyPath: m_Layer
-      value: 9
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -6810,15 +6421,6 @@ MonoBehaviour:
   childZones: []
   radius: 5.63
   spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
   currentCount: 0
 --- !u!1001 &545284896
 PrefabInstance:
@@ -7037,15 +6639,6 @@ MonoBehaviour:
   childZones: []
   radius: 4.18
   spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
   currentCount: 0
 --- !u!1 &556154792
 GameObject:
@@ -7176,65 +6769,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1374361984}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &565407311
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 565407312}
-  - component: {fileID: 565407313}
-  m_Layer: 0
-  m_Name: SpawnZone
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &565407312
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 565407311}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5.95, y: -1.66, z: 4.49}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1238723312}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &565407313
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 565407311}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 10d4fad54746fc04c82eae193ce18b26, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Gameplay.Animals.AnimalSpawnZone
-  mode: 0
-  autoCollectChildZones: 1
-  childZones: []
-  radius: 4.67
-  spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
-  currentCount: 0
 --- !u!1 &565489607
 GameObject:
   m_ObjectHideFlags: 0
@@ -7612,15 +7146,6 @@ MonoBehaviour:
   childZones: []
   radius: 2.69
   spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
   currentCount: 0
 --- !u!4 &605582347 stripped
 Transform:
@@ -7701,7 +7226,7 @@ GameObject:
   - component: {fileID: 625140418}
   - component: {fileID: 625140417}
   - component: {fileID: 625140416}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: Terrain_0_0-20251024 - 160935
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7802,124 +7327,6 @@ Terrain:
   m_EnableHeightmapRayTracing: 1
   m_EnableTreesAndDetailsRayTracing: 0
   m_TreeMotionVectorModeOverride: 3
---- !u!1 &626952235
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 626952236}
-  - component: {fileID: 626952237}
-  m_Layer: 0
-  m_Name: SpawnZone (4)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &626952236
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 626952235}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -31.63, y: 5.54, z: -18.93}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1238723312}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &626952237
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 626952235}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 10d4fad54746fc04c82eae193ce18b26, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Gameplay.Animals.AnimalSpawnZone
-  mode: 0
-  autoCollectChildZones: 1
-  childZones: []
-  radius: 4.67
-  spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
-  currentCount: 0
---- !u!1 &631360787
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 631360788}
-  - component: {fileID: 631360789}
-  m_Layer: 0
-  m_Name: SpawnZone (6)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &631360788
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 631360787}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 19.25, y: -1.13, z: 36.83}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 758357182}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &631360789
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 631360787}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 10d4fad54746fc04c82eae193ce18b26, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Gameplay.Animals.AnimalSpawnZone
-  mode: 0
-  autoCollectChildZones: 1
-  childZones: []
-  radius: 2.92
-  spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
-  currentCount: 0
 --- !u!1001 &639427295
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7982,65 +7389,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6490110167800170313, guid: cea180d7bdaf3ac48a20137accbbb4af, type: 3}
   m_PrefabInstance: {fileID: 639427295}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &647041395
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 647041396}
-  - component: {fileID: 647041397}
-  m_Layer: 0
-  m_Name: SpawnZone (1)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &647041396
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 647041395}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5.96, y: -1.13, z: 6.07}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 758357182}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &647041397
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 647041395}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 10d4fad54746fc04c82eae193ce18b26, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Gameplay.Animals.AnimalSpawnZone
-  mode: 0
-  autoCollectChildZones: 1
-  childZones: []
-  radius: 4.23
-  spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
-  currentCount: 0
 --- !u!1 &647876710
 GameObject:
   m_ObjectHideFlags: 0
@@ -8178,10 +7526,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1828462272}
     m_Modifications:
-    - target: {fileID: 2809979137612107705, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
     - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.5588007
@@ -8237,18 +7581,6 @@ PrefabInstance:
     - target: {fileID: 4189448818000646636, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
       propertyPath: m_Name
       value: _Sp_Rock02
-      objectReference: {fileID: 0}
-    - target: {fileID: 4189448818000646636, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 6108767303542824052, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 6403186462680033172, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -8392,10 +7724,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1828462272}
     m_Modifications:
-    - target: {fileID: 2809979137612107705, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
     - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.74089074
@@ -8452,18 +7780,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: _Sp_Rock02
       objectReference: {fileID: 0}
-    - target: {fileID: 4189448818000646636, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 6108767303542824052, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 6403186462680033172, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -8493,13 +7809,12 @@ GameObject:
   - component: {fileID: 681155381}
   - component: {fileID: 681155384}
   - component: {fileID: 681155385}
-  - component: {fileID: 681155386}
-  m_Layer: 4
+  m_Layer: 0
   m_Name: Low-Water URP
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 2147483647
+  m_StaticEditorFlags: 126
   m_IsActive: 1
 --- !u!4 &681155380
 Transform:
@@ -8627,26 +7942,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 10, y: 2.220446e-16, z: 10}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &681155386
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 681155379}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1e3fdca004f2d45fe8abbed571a8abd5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshModifier
-  m_SerializedVersion: 0
-  m_OverrideArea: 0
-  m_Area: 0
-  m_OverrideGenerateLinks: 0
-  m_GenerateLinks: 0
-  m_IgnoreFromBuild: 0
-  m_ApplyToChildren: 1
-  m_AffectedAgents: ffffffff
 --- !u!1 &681282605
 GameObject:
   m_ObjectHideFlags: 0
@@ -8657,7 +7952,7 @@ GameObject:
   m_Component:
   - component: {fileID: 681282606}
   - component: {fileID: 681282607}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: ' Game Object Spawns'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8762,7 +8057,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 684468929}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: PW_Stone_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9001,10 +8296,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1828462272}
     m_Modifications:
-    - target: {fileID: 2809979137612107705, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
     - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.92784005
@@ -9060,18 +8351,6 @@ PrefabInstance:
     - target: {fileID: 4189448818000646636, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
       propertyPath: m_Name
       value: _Sp_Rock02
-      objectReference: {fileID: 0}
-    - target: {fileID: 4189448818000646636, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 6108767303542824052, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 6403186462680033172, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -9164,15 +8443,6 @@ MonoBehaviour:
   childZones: []
   radius: 6.84
   spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
   currentCount: 0
 --- !u!1001 &721409385
 PrefabInstance:
@@ -9450,65 +8720,6 @@ Transform:
   - {fileID: 155178445}
   m_Father: {fileID: 1965713394}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &731508622
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 731508623}
-  - component: {fileID: 731508624}
-  m_Layer: 0
-  m_Name: SpawnZone (2)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &731508623
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 731508622}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -9.89, y: -1.66, z: -1.38}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1238723312}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &731508624
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 731508622}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 10d4fad54746fc04c82eae193ce18b26, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Gameplay.Animals.AnimalSpawnZone
-  mode: 0
-  autoCollectChildZones: 1
-  childZones: []
-  radius: 4.67
-  spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
-  currentCount: 0
 --- !u!1001 &733079126
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9967,15 +9178,6 @@ MonoBehaviour:
   childZones: []
   radius: 8.47
   spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
   currentCount: 0
 --- !u!1001 &753644242
 PrefabInstance:
@@ -10253,142 +9455,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 546957975}
   m_LocalEulerAnglesHint: {x: 24.13, y: -31.499, z: -0.028}
---- !u!1 &757592742
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 757592743}
-  - component: {fileID: 757592744}
-  m_Layer: 0
-  m_Name: SpawnZone (4)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &757592743
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 757592742}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -13.82, y: -1.13, z: -15.73}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 758357182}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &757592744
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 757592742}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 10d4fad54746fc04c82eae193ce18b26, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Gameplay.Animals.AnimalSpawnZone
-  mode: 0
-  autoCollectChildZones: 1
-  childZones: []
-  radius: 2.92
-  spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
-  currentCount: 0
---- !u!1 &758357181
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 758357182}
-  - component: {fileID: 758357183}
-  m_Layer: 0
-  m_Name: FinalZoneSpawnOnTop
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &758357182
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 758357181}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -78.82, y: 40, z: 18.81}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 875656646}
-  - {fileID: 647041396}
-  - {fileID: 1331504220}
-  - {fileID: 1681896603}
-  - {fileID: 757592743}
-  - {fileID: 393206091}
-  - {fileID: 631360788}
-  - {fileID: 1665483403}
-  - {fileID: 2116586331}
-  m_Father: {fileID: 1174442711}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &758357183
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 758357181}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 10d4fad54746fc04c82eae193ce18b26, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Gameplay.Animals.AnimalSpawnZone
-  mode: 1
-  autoCollectChildZones: 1
-  childZones:
-  - {fileID: 875656647}
-  - {fileID: 647041397}
-  - {fileID: 1331504221}
-  - {fileID: 1681896604}
-  - {fileID: 757592744}
-  - {fileID: 393206092}
-  - {fileID: 631360789}
-  - {fileID: 1665483404}
-  - {fileID: 2116586332}
-  radius: 0
-  spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 4096
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
-  currentCount: 0
 --- !u!4 &760245550 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8939172975259994909, guid: 8c8d8385f96bd054a88a3df780d77bcc, type: 3}
@@ -10402,10 +9468,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1828462272}
     m_Modifications:
-    - target: {fileID: 2809979137612107705, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
     - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.78
@@ -10465,18 +9527,6 @@ PrefabInstance:
     - target: {fileID: 4189448818000646636, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
       propertyPath: m_Name
       value: _Sp_Rock02 (1)
-      objectReference: {fileID: 0}
-    - target: {fileID: 4189448818000646636, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 6108767303542824052, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 6403186462680033172, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -10922,15 +9972,6 @@ MonoBehaviour:
   childZones: []
   radius: 8.9
   spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
   currentCount: 0
 --- !u!1001 &819909784
 PrefabInstance:
@@ -11131,15 +10172,6 @@ MonoBehaviour:
   childZones: []
   radius: 6.91
   spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
   currentCount: 0
 --- !u!1 &838025855
 GameObject:
@@ -11548,25 +10580,9 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: -2550543478551763325, guid: 2c5fe446668d34147ac86478e7985ddb, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: -1251283469443729237, guid: 2c5fe446668d34147ac86478e7985ddb, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 2c5fe446668d34147ac86478e7985ddb, type: 3}
       propertyPath: m_Name
       value: _Sp_Rock01
-      objectReference: {fileID: 0}
-    - target: {fileID: 919132149155446097, guid: 2c5fe446668d34147ac86478e7985ddb, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 9005902513473021022, guid: 2c5fe446668d34147ac86478e7985ddb, type: 3}
-      propertyPath: m_Layer
-      value: 9
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -11578,65 +10594,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 2c5fe446668d34147ac86478e7985ddb, type: 3}
   m_PrefabInstance: {fileID: 866167086}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &875656645
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 875656646}
-  - component: {fileID: 875656647}
-  m_Layer: 0
-  m_Name: SpawnZone
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &875656646
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 875656645}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.83, y: 3.23, z: -11.21}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 758357182}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &875656647
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 875656645}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 10d4fad54746fc04c82eae193ce18b26, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Gameplay.Animals.AnimalSpawnZone
-  mode: 0
-  autoCollectChildZones: 1
-  childZones: []
-  radius: 10
-  spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
-  currentCount: 0
 --- !u!1001 &875690051
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11743,15 +10700,6 @@ MonoBehaviour:
   childZones: []
   radius: 5.67
   spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
   currentCount: 0
 --- !u!1001 &885781819
 PrefabInstance:
@@ -17159,65 +16107,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6293543376095447884, guid: e3e443748686859419fbb6a34a53ee16, type: 3}
   m_PrefabInstance: {fileID: 947222196}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &947527598
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 947527599}
-  - component: {fileID: 947527600}
-  m_Layer: 0
-  m_Name: SpawnZone (1)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &947527599
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 947527598}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.49, y: -2.6, z: 22.98}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1905177964}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &947527600
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 947527598}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 10d4fad54746fc04c82eae193ce18b26, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Gameplay.Animals.AnimalSpawnZone
-  mode: 0
-  autoCollectChildZones: 1
-  childZones: []
-  radius: 10
-  spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
-  currentCount: 0
 --- !u!1 &949440758
 GameObject:
   m_ObjectHideFlags: 0
@@ -17277,15 +16166,6 @@ MonoBehaviour:
   - {fileID: 1067336217}
   radius: 0
   spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 4096
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
   currentCount: 0
 --- !u!1 &960361414
 GameObject:
@@ -17370,10 +16250,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1828462272}
     m_Modifications:
-    - target: {fileID: 2809979137612107705, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
     - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.57
@@ -17433,18 +16309,6 @@ PrefabInstance:
     - target: {fileID: 4189448818000646636, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
       propertyPath: m_Name
       value: _Sp_Rock02 (3)
-      objectReference: {fileID: 0}
-    - target: {fileID: 4189448818000646636, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 6108767303542824052, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 6403186462680033172, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -17691,10 +16555,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1828462272}
     m_Modifications:
-    - target: {fileID: 2809979137612107705, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
     - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.92992514
@@ -17750,18 +16610,6 @@ PrefabInstance:
     - target: {fileID: 4189448818000646636, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
       propertyPath: m_Name
       value: _Sp_Rock02
-      objectReference: {fileID: 0}
-    - target: {fileID: 4189448818000646636, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 6108767303542824052, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 6403186462680033172, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -18214,15 +17062,6 @@ MonoBehaviour:
   childZones: []
   radius: 15.06
   spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
   currentCount: 0
 --- !u!1001 &1020386680
 PrefabInstance:
@@ -18504,15 +17343,6 @@ MonoBehaviour:
   - {fileID: 1915818708}
   radius: 0
   spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 4096
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
   currentCount: 0
 --- !u!1 &1038487975
 GameObject:
@@ -18858,80 +17688,7 @@ MonoBehaviour:
   childZones: []
   radius: 7.56
   spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
   currentCount: 0
---- !u!1 &1070648739
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1070648740}
-  - component: {fileID: 1070648741}
-  m_Layer: 0
-  m_Name: OwlHighSurface
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1070648740
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1070648739}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 24.69961, y: 7.64574, z: -100.58134}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2043583269}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1070648741
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1070648739}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7a5ac11cc976e418e8d13136b07e1f52, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshSurface
-  m_SerializedVersion: 0
-  m_AgentTypeID: -749502095
-  m_CollectObjects: 0
-  m_Size: {x: 10, y: 10, z: 10}
-  m_Center: {x: 0, y: 2, z: 0}
-  m_LayerMask:
-    serializedVersion: 2
-    m_Bits: 7975
-  m_UseGeometry: 0
-  m_DefaultArea: 0
-  m_GenerateLinks: 0
-  m_IgnoreNavMeshAgent: 1
-  m_IgnoreNavMeshObstacle: 1
-  m_OverrideTileSize: 0
-  m_TileSize: 256
-  m_OverrideVoxelSize: 0
-  m_VoxelSize: 0.16666667
-  m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 23800000, guid: c398984c12626584b9fe98ff9b071d15, type: 2}
-  m_BuildHeightMesh: 0
 --- !u!1 &1076020098
 GameObject:
   m_ObjectHideFlags: 0
@@ -19142,15 +17899,6 @@ MonoBehaviour:
   childZones: []
   radius: 8.9
   spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
   currentCount: 0
 --- !u!1001 &1078320885
 PrefabInstance:
@@ -19212,25 +17960,9 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: -2550543478551763325, guid: 2c5fe446668d34147ac86478e7985ddb, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: -1251283469443729237, guid: 2c5fe446668d34147ac86478e7985ddb, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 2c5fe446668d34147ac86478e7985ddb, type: 3}
       propertyPath: m_Name
       value: _Sp_Rock01
-      objectReference: {fileID: 0}
-    - target: {fileID: 919132149155446097, guid: 2c5fe446668d34147ac86478e7985ddb, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 9005902513473021022, guid: 2c5fe446668d34147ac86478e7985ddb, type: 3}
-      propertyPath: m_Layer
-      value: 9
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -19599,25 +18331,9 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: -2550543478551763325, guid: 2c5fe446668d34147ac86478e7985ddb, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: -1251283469443729237, guid: 2c5fe446668d34147ac86478e7985ddb, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 2c5fe446668d34147ac86478e7985ddb, type: 3}
       propertyPath: m_Name
       value: _Sp_Rock01
-      objectReference: {fileID: 0}
-    - target: {fileID: 919132149155446097, guid: 2c5fe446668d34147ac86478e7985ddb, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 9005902513473021022, guid: 2c5fe446668d34147ac86478e7985ddb, type: 3}
-      propertyPath: m_Layer
-      value: 9
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -19858,10 +18574,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1828462272}
     m_Modifications:
-    - target: {fileID: 2809979137612107705, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
     - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.76673925
@@ -19917,18 +18629,6 @@ PrefabInstance:
     - target: {fileID: 4189448818000646636, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
       propertyPath: m_Name
       value: _Sp_Rock02
-      objectReference: {fileID: 0}
-    - target: {fileID: 4189448818000646636, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 6108767303542824052, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 6403186462680033172, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -20034,8 +18734,6 @@ Transform:
   - {fileID: 240545179}
   - {fileID: 1218275917}
   - {fileID: 1893782856}
-  - {fileID: 1238723312}
-  - {fileID: 758357182}
   m_Father: {fileID: 1156591468}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1185875138
@@ -20103,10 +18801,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1828462272}
     m_Modifications:
-    - target: {fileID: 2809979137612107705, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
     - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.33
@@ -20166,18 +18860,6 @@ PrefabInstance:
     - target: {fileID: 4189448818000646636, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
       propertyPath: m_Name
       value: _Sp_Rock02
-      objectReference: {fileID: 0}
-    - target: {fileID: 4189448818000646636, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 6108767303542824052, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 6403186462680033172, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -20351,15 +19033,6 @@ MonoBehaviour:
   childZones: []
   radius: 10
   spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
   currentCount: 0
 --- !u!4 &1204231059 stripped
 Transform:
@@ -20764,86 +19437,6 @@ MonoBehaviour:
   childZones: []
   radius: 5.63
   spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
-  currentCount: 0
---- !u!1 &1238723311
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1238723312}
-  - component: {fileID: 1238723313}
-  m_Layer: 0
-  m_Name: FinalZoneSpawnSlope
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1238723312
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1238723311}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -49.14, y: 22.7, z: 87.27}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 565407312}
-  - {fileID: 1887289276}
-  - {fileID: 731508623}
-  - {fileID: 452873753}
-  - {fileID: 626952236}
-  - {fileID: 191503037}
-  m_Father: {fileID: 1174442711}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1238723313
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1238723311}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 10d4fad54746fc04c82eae193ce18b26, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Gameplay.Animals.AnimalSpawnZone
-  mode: 1
-  autoCollectChildZones: 1
-  childZones:
-  - {fileID: 565407313}
-  - {fileID: 1887289277}
-  - {fileID: 731508624}
-  - {fileID: 452873754}
-  - {fileID: 626952237}
-  - {fileID: 191503038}
-  radius: 0
-  spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 4096
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
   currentCount: 0
 --- !u!1 &1242797069
 GameObject:
@@ -20971,15 +19564,6 @@ MonoBehaviour:
   childZones: []
   radius: 16.1
   spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
   currentCount: 0
 --- !u!1 &1243620548
 GameObject:
@@ -21776,7 +20360,6 @@ Transform:
   - {fileID: 449373162}
   - {fileID: 986374173}
   - {fileID: 850855958}
-  - {fileID: 1905177964}
   m_Father: {fileID: 1156591468}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1301828640
@@ -22274,7 +20857,7 @@ MonoBehaviour:
   m_Center: {x: 0, y: 2, z: 0}
   m_LayerMask:
     serializedVersion: 2
-    m_Bits: 7975
+    m_Bits: 4294967295
   m_UseGeometry: 0
   m_DefaultArea: 0
   m_GenerateLinks: 0
@@ -22285,7 +20868,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 0
   m_VoxelSize: 0.05666667
   m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 23800000, guid: 114bc9d823df78f46b49b001df7269ec, type: 2}
+  m_NavMeshData: {fileID: 23800000, guid: e331e4dc5a0aec8408e414711a23f012, type: 2}
   m_BuildHeightMesh: 0
 --- !u!4 &1329273004
 Transform:
@@ -22346,65 +20929,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 557d1458759033c459de987b6cfa305e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Core.SaveLoadManager
---- !u!1 &1331504219
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1331504220}
-  - component: {fileID: 1331504221}
-  m_Layer: 0
-  m_Name: SpawnZone (2)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1331504220
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1331504219}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5.49, y: -1.13, z: 7.71}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 758357182}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1331504221
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1331504219}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 10d4fad54746fc04c82eae193ce18b26, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Gameplay.Animals.AnimalSpawnZone
-  mode: 0
-  autoCollectChildZones: 1
-  childZones: []
-  radius: 3.39
-  spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
-  currentCount: 0
 --- !u!1 &1332896910
 GameObject:
   m_ObjectHideFlags: 0
@@ -22454,15 +20978,6 @@ MonoBehaviour:
   childZones: []
   radius: 9.1
   spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
   currentCount: 0
 --- !u!1 &1334116799
 GameObject:
@@ -22513,15 +21028,6 @@ MonoBehaviour:
   childZones: []
   radius: 13.4
   spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
   currentCount: 0
 --- !u!1 &1341631381
 GameObject:
@@ -23175,7 +21681,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AudioManager
   AttachBGMSource: {fileID: 1792285517}
   AttachSESource: {fileID: 556154793}
-  defaultBGMName: ForestWhispersSerenade
 --- !u!4 &1374361984
 Transform:
   m_ObjectHideFlags: 0
@@ -23201,10 +21706,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1828462272}
     m_Modifications:
-    - target: {fileID: 2809979137612107705, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
     - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.7767221
@@ -23260,18 +21761,6 @@ PrefabInstance:
     - target: {fileID: 4189448818000646636, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
       propertyPath: m_Name
       value: _Sp_Rock02
-      objectReference: {fileID: 0}
-    - target: {fileID: 4189448818000646636, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 6108767303542824052, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 6403186462680033172, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -23503,15 +21992,6 @@ MonoBehaviour:
   childZones: []
   radius: 5.43
   spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
   currentCount: 0
 --- !u!1001 &1402592752
 PrefabInstance:
@@ -23625,15 +22105,6 @@ MonoBehaviour:
   childZones: []
   radius: 13.5
   spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
   currentCount: 0
 --- !u!1 &1406690636
 GameObject:
@@ -23698,15 +22169,6 @@ MonoBehaviour:
   - {fileID: 457610059}
   radius: 0
   spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 4096
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
   currentCount: 0
 --- !u!4 &1410383333 stripped
 Transform:
@@ -23917,25 +22379,9 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: -2550543478551763325, guid: 2c5fe446668d34147ac86478e7985ddb, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: -1251283469443729237, guid: 2c5fe446668d34147ac86478e7985ddb, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 2c5fe446668d34147ac86478e7985ddb, type: 3}
       propertyPath: m_Name
       value: _Sp_Rock01
-      objectReference: {fileID: 0}
-    - target: {fileID: 919132149155446097, guid: 2c5fe446668d34147ac86478e7985ddb, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 9005902513473021022, guid: 2c5fe446668d34147ac86478e7985ddb, type: 3}
-      propertyPath: m_Layer
-      value: 9
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -24033,28 +22479,28 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 6127fc5269e7dc248a33beb85acd8d93, type: 2}
   zoneConfigs:
   - zone: {fileID: 1037008343}
-    maxAnimalsInZone: 5
+    maxAnimalsInZone: 3
     animals:
     - definition: {fileID: 11400000, guid: 6127fc5269e7dc248a33beb85acd8d93, type: 2}
-      weight: 70
+      weight: 50
   - zone: {fileID: 1581189101}
-    maxAnimalsInZone: 5
+    maxAnimalsInZone: 3
     animals:
     - definition: {fileID: 11400000, guid: 6127fc5269e7dc248a33beb85acd8d93, type: 2}
       weight: 20
     - definition: {fileID: 11400000, guid: 23ebe2714a792124ba346dcca4781e61, type: 2}
-      weight: 50
+      weight: 40
     - definition: {fileID: 11400000, guid: e0add75fab7dc0d499d21014f7e2cd0e, type: 2}
-      weight: 50
+      weight: 40
   - zone: {fileID: 1406690638}
-    maxAnimalsInZone: 7
+    maxAnimalsInZone: 5
     animals:
     - definition: {fileID: 11400000, guid: 6127fc5269e7dc248a33beb85acd8d93, type: 2}
       weight: 15
     - definition: {fileID: 11400000, guid: 23ebe2714a792124ba346dcca4781e61, type: 2}
-      weight: 30
+      weight: 20
     - definition: {fileID: 11400000, guid: 0aa55fdd2aeee9545b1e06a92abdce4d, type: 2}
-      weight: 30
+      weight: 25
     - definition: {fileID: 11400000, guid: e0add75fab7dc0d499d21014f7e2cd0e, type: 2}
       weight: 40
   - zone: {fileID: 949440760}
@@ -24064,54 +22510,19 @@ MonoBehaviour:
       weight: 25
     - definition: {fileID: 11400000, guid: e0add75fab7dc0d499d21014f7e2cd0e, type: 2}
       weight: 40
-  - zone: {fileID: 1859780889}
+  - zone: {fileID: 949440760}
     maxAnimalsInZone: 3
     animals:
     - definition: {fileID: 11400000, guid: f2d412dc624a5d64c9b28433ef77a5d5, type: 2}
-      weight: 70
+      weight: 50
     - definition: {fileID: 11400000, guid: e0add75fab7dc0d499d21014f7e2cd0e, type: 2}
       weight: 40
-  - zone: {fileID: 1238723313}
-    maxAnimalsInZone: 3
-    animals:
-    - definition: {fileID: 11400000, guid: a525d7521970160489957c752c62d704, type: 2}
-      weight: 30
-    - definition: {fileID: 11400000, guid: 2dbd576f9ac5e264190f1baf807a0274, type: 2}
-      weight: 70
-  - zone: {fileID: 758357183}
-    maxAnimalsInZone: 5
-    animals:
-    - definition: {fileID: 11400000, guid: a525d7521970160489957c752c62d704, type: 2}
-      weight: 25
-    - definition: {fileID: 11400000, guid: f23e6d99b7b5d2948b6acd537e4985a9, type: 2}
-      weight: 40
-    - definition: {fileID: 11400000, guid: 2dbd576f9ac5e264190f1baf807a0274, type: 2}
-      weight: 40
-    - definition: {fileID: 11400000, guid: 6127fc5269e7dc248a33beb85acd8d93, type: 2}
-      weight: 10
-    - definition: {fileID: 11400000, guid: e0add75fab7dc0d499d21014f7e2cd0e, type: 2}
-      weight: 10
-  - zone: {fileID: 1905177965}
-    maxAnimalsInZone: 4
-    animals:
-    - definition: {fileID: 11400000, guid: a525d7521970160489957c752c62d704, type: 2}
-      weight: 5
-    - definition: {fileID: 11400000, guid: f23e6d99b7b5d2948b6acd537e4985a9, type: 2}
-      weight: 20
-    - definition: {fileID: 11400000, guid: 2dbd576f9ac5e264190f1baf807a0274, type: 2}
-      weight: 20
-    - definition: {fileID: 11400000, guid: 6127fc5269e7dc248a33beb85acd8d93, type: 2}
-      weight: 20
-    - definition: {fileID: 11400000, guid: e0add75fab7dc0d499d21014f7e2cd0e, type: 2}
-      weight: 20
-    - definition: {fileID: 11400000, guid: 23ebe2714a792124ba346dcca4781e61, type: 2}
-      weight: 20
-  maxTotalAnimals: 15
-  initialPoolPerAnimal: 4
+  maxTotalAnimals: 4
+  initialPoolPerAnimal: 3
   playerTransform: {fileID: 1289728601}
-  spawnCheckRadius: 35
-  despawnRadius: 30
-  spawnCheckInterval: 1
+  spawnCheckRadius: 45.4
+  despawnRadius: 40
+  spawnCheckInterval: 2
 --- !u!4 &1449176857 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 672665338861842471, guid: 5c0c42afc24d6304ab9de90d08ec11f6, type: 3}
@@ -25870,10 +24281,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1828462272}
     m_Modifications:
-    - target: {fileID: 2809979137612107705, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
     - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.7609227
@@ -25929,18 +24336,6 @@ PrefabInstance:
     - target: {fileID: 4189448818000646636, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
       propertyPath: m_Name
       value: _Sp_Rock02
-      objectReference: {fileID: 0}
-    - target: {fileID: 4189448818000646636, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 6108767303542824052, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 6403186462680033172, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -26526,7 +24921,7 @@ Transform:
   m_GameObject: {fileID: 1581189099}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 70.64, y: 11.45, z: -13.55}
+  m_LocalPosition: {x: 70.64, y: 9.32, z: -13.55}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -26559,15 +24954,6 @@ MonoBehaviour:
   - {fileID: 876023411}
   radius: 0
   spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 4096
-  raycastHeight: 30
-  raycastDownDistance: 50
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
   currentCount: 0
 --- !u!1001 &1581708051
 PrefabInstance:
@@ -27008,15 +25394,6 @@ MonoBehaviour:
   childZones: []
   radius: 10.2
   spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
   currentCount: 0
 --- !u!1 &1607333217
 GameObject:
@@ -27228,15 +25605,6 @@ MonoBehaviour:
   childZones: []
   radius: 10
   spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
   currentCount: 0
 --- !u!4 &1627718842
 Transform:
@@ -27448,65 +25816,6 @@ Transform:
   - {fileID: 1758588449}
   m_Father: {fileID: 648888298}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1665483402
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1665483403}
-  - component: {fileID: 1665483404}
-  m_Layer: 0
-  m_Name: SpawnZone (7)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1665483403
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1665483402}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 23.19, y: -1.13, z: 29.4}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 758357182}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1665483404
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1665483402}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 10d4fad54746fc04c82eae193ce18b26, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Gameplay.Animals.AnimalSpawnZone
-  mode: 0
-  autoCollectChildZones: 1
-  childZones: []
-  radius: 3.62
-  spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
-  currentCount: 0
 --- !u!1001 &1666593112
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -27949,10 +26258,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1828462272}
     m_Modifications:
-    - target: {fileID: 2809979137612107705, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
     - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.6030824
@@ -28009,18 +26314,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: _Sp_Rock02
       objectReference: {fileID: 0}
-    - target: {fileID: 4189448818000646636, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 6108767303542824052, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 6403186462680033172, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -28031,65 +26324,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
   m_PrefabInstance: {fileID: 1679450941}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1681896602
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1681896603}
-  - component: {fileID: 1681896604}
-  m_Layer: 0
-  m_Name: SpawnZone (3)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1681896603
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1681896602}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -10.43, y: -1.13, z: -5.15}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 758357182}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1681896604
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1681896602}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 10d4fad54746fc04c82eae193ce18b26, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Gameplay.Animals.AnimalSpawnZone
-  mode: 0
-  autoCollectChildZones: 1
-  childZones: []
-  radius: 4.48
-  spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
-  currentCount: 0
 --- !u!1 &1683976205
 GameObject:
   m_ObjectHideFlags: 0
@@ -28746,15 +26980,6 @@ MonoBehaviour:
   childZones: []
   radius: 12.6
   spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
   currentCount: 0
 --- !u!1 &1698852226
 GameObject:
@@ -29019,25 +27244,9 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: -2550543478551763325, guid: 2c5fe446668d34147ac86478e7985ddb, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: -1251283469443729237, guid: 2c5fe446668d34147ac86478e7985ddb, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 2c5fe446668d34147ac86478e7985ddb, type: 3}
       propertyPath: m_Name
       value: _Sp_Rock01
-      objectReference: {fileID: 0}
-    - target: {fileID: 919132149155446097, guid: 2c5fe446668d34147ac86478e7985ddb, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 9005902513473021022, guid: 2c5fe446668d34147ac86478e7985ddb, type: 3}
-      propertyPath: m_Layer
-      value: 9
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -32136,15 +30345,6 @@ MonoBehaviour:
   childZones: []
   radius: 4.1
   spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
   currentCount: 0
 --- !u!1 &1768650335
 GameObject:
@@ -34082,15 +32282,6 @@ MonoBehaviour:
   childZones: []
   radius: 6.01
   spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
   currentCount: 0
 --- !u!1 &1814186770
 GameObject:
@@ -34297,7 +32488,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1828462272}
-  m_Layer: 9
+  m_Layer: 0
   m_Name: New Game Object 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -34808,15 +32999,6 @@ MonoBehaviour:
   childZones: []
   radius: 11.03
   spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
   currentCount: 0
 --- !u!1001 &1858829332
 PrefabInstance:
@@ -34950,15 +33132,6 @@ MonoBehaviour:
   - {fileID: 1232869432}
   radius: 0
   spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 4096
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
   currentCount: 0
 --- !u!1 &1868829766
 GameObject:
@@ -35315,65 +33488,6 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
---- !u!1 &1887289275
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1887289276}
-  - component: {fileID: 1887289277}
-  m_Layer: 0
-  m_Name: SpawnZone (1)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1887289276
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1887289275}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.69, y: -1.66, z: 1.25}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1238723312}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1887289277
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1887289275}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 10d4fad54746fc04c82eae193ce18b26, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Gameplay.Animals.AnimalSpawnZone
-  mode: 0
-  autoCollectChildZones: 1
-  childZones: []
-  radius: 4.67
-  spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
-  currentCount: 0
 --- !u!1 &1888987245
 GameObject:
   m_ObjectHideFlags: 0
@@ -35505,25 +33619,9 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: -2550543478551763325, guid: 2c5fe446668d34147ac86478e7985ddb, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: -1251283469443729237, guid: 2c5fe446668d34147ac86478e7985ddb, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 2c5fe446668d34147ac86478e7985ddb, type: 3}
       propertyPath: m_Name
       value: _Sp_Rock01
-      objectReference: {fileID: 0}
-    - target: {fileID: 919132149155446097, guid: 2c5fe446668d34147ac86478e7985ddb, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 9005902513473021022, guid: 2c5fe446668d34147ac86478e7985ddb, type: 3}
-      propertyPath: m_Layer
-      value: 9
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -35545,69 +33643,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8939172975259994909, guid: 8c8d8385f96bd054a88a3df780d77bcc, type: 3}
   m_PrefabInstance: {fileID: 1781938516}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1905177963
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1905177964}
-  - component: {fileID: 1905177965}
-  m_Layer: 0
-  m_Name: HiddenZoneSpawn
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1905177964
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1905177963}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3.61, y: 0, z: -17.48}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 423797680}
-  - {fileID: 947527599}
-  m_Father: {fileID: 1300680851}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1905177965
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1905177963}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 10d4fad54746fc04c82eae193ce18b26, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Gameplay.Animals.AnimalSpawnZone
-  mode: 1
-  autoCollectChildZones: 1
-  childZones:
-  - {fileID: 423797681}
-  - {fileID: 947527600}
-  radius: 1
-  spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
-  currentCount: 0
 --- !u!1 &1915818706
 GameObject:
   m_ObjectHideFlags: 0
@@ -35657,15 +33692,6 @@ MonoBehaviour:
   childZones: []
   radius: 8.28
   spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
   currentCount: 0
 --- !u!1001 &1936587604
 PrefabInstance:
@@ -35675,10 +33701,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1828462272}
     m_Modifications:
-    - target: {fileID: 2809979137612107705, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
     - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.79733026
@@ -35734,18 +33756,6 @@ PrefabInstance:
     - target: {fileID: 4189448818000646636, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
       propertyPath: m_Name
       value: _Sp_Rock02
-      objectReference: {fileID: 0}
-    - target: {fileID: 4189448818000646636, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 6108767303542824052, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 6403186462680033172, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -35921,15 +33931,6 @@ MonoBehaviour:
   childZones: []
   radius: 7.04
   spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
   currentCount: 0
 --- !u!1001 &1964343513
 PrefabInstance:
@@ -36001,10 +34002,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1828462272}
     m_Modifications:
-    - target: {fileID: 2809979137612107705, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
     - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.47
@@ -36061,18 +34058,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: _Sp_Rock02
       objectReference: {fileID: 0}
-    - target: {fileID: 4189448818000646636, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 6108767303542824052, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 6403186462680033172, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -36126,10 +34111,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1828462272}
     m_Modifications:
-    - target: {fileID: 2809979137612107705, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
     - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
       propertyPath: m_LocalScale.x
       value: 1.34
@@ -36189,18 +34170,6 @@ PrefabInstance:
     - target: {fileID: 4189448818000646636, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
       propertyPath: m_Name
       value: _Sp_Rock02
-      objectReference: {fileID: 0}
-    - target: {fileID: 4189448818000646636, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 6108767303542824052, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 6403186462680033172, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -36759,10 +34728,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1828462272}
     m_Modifications:
-    - target: {fileID: 2809979137612107705, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
     - target: {fileID: 3560158367704648534, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.7434841
@@ -36819,18 +34784,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: _Sp_Rock02
       objectReference: {fileID: 0}
-    - target: {fileID: 4189448818000646636, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 6108767303542824052, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 6403186462680033172, guid: 6f2d6d8548dbc9042a8d8e45da4332ff, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -36849,10 +34802,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 684468929}
     m_Modifications:
-    - target: {fileID: 156402033557335166, guid: 35348ac853f10584a9e52b978af197f9, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
     - target: {fileID: 1920158762507531025, guid: 35348ac853f10584a9e52b978af197f9, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.99662566
@@ -36909,22 +34858,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: _Sp_PW_Stone_01
       objectReference: {fileID: 0}
-    - target: {fileID: 3242204568188846338, guid: 35348ac853f10584a9e52b978af197f9, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 4195447602797839849, guid: 35348ac853f10584a9e52b978af197f9, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 4911884997711246410, guid: 35348ac853f10584a9e52b978af197f9, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 8017363593285785391, guid: 35348ac853f10584a9e52b978af197f9, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -36979,7 +34912,6 @@ Transform:
   - {fileID: 65367641}
   - {fileID: 1197575770}
   - {fileID: 13045528}
-  - {fileID: 1070648740}
   - {fileID: 1368701862}
   - {fileID: 1516633206}
   - {fileID: 245552836}
@@ -36999,7 +34931,7 @@ GameObject:
   - component: {fileID: 2053479255}
   - component: {fileID: 2053479254}
   - component: {fileID: 2053479253}
-  m_Layer: 4
+  m_Layer: 0
   m_Name: High-Water
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -37530,15 +35462,6 @@ MonoBehaviour:
   childZones: []
   radius: 13.6
   spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
   currentCount: 0
 --- !u!1 &2086396050
 GameObject:
@@ -37589,15 +35512,6 @@ MonoBehaviour:
   childZones: []
   radius: 7.48
   spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
   currentCount: 0
 --- !u!1 &2091786979
 GameObject:
@@ -37648,15 +35562,6 @@ MonoBehaviour:
   childZones: []
   radius: 10
   spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
   currentCount: 0
 --- !u!1001 &2097402986
 PrefabInstance:
@@ -37666,10 +35571,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 684468929}
     m_Modifications:
-    - target: {fileID: 156402033557335166, guid: 35348ac853f10584a9e52b978af197f9, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
     - target: {fileID: 1920158762507531025, guid: 35348ac853f10584a9e52b978af197f9, type: 3}
       propertyPath: m_LocalScale.x
       value: 1.0282393
@@ -37725,22 +35626,6 @@ PrefabInstance:
     - target: {fileID: 3242204568188846338, guid: 35348ac853f10584a9e52b978af197f9, type: 3}
       propertyPath: m_Name
       value: _Sp_PW_Stone_01
-      objectReference: {fileID: 0}
-    - target: {fileID: 3242204568188846338, guid: 35348ac853f10584a9e52b978af197f9, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 4195447602797839849, guid: 35348ac853f10584a9e52b978af197f9, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 4911884997711246410, guid: 35348ac853f10584a9e52b978af197f9, type: 3}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 8017363593285785391, guid: 35348ac853f10584a9e52b978af197f9, type: 3}
-      propertyPath: m_Layer
-      value: 9
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -38005,65 +35890,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2115122352}
   m_CullTransparentMesh: 1
---- !u!1 &2116586330
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2116586331}
-  - component: {fileID: 2116586332}
-  m_Layer: 0
-  m_Name: SpawnZone (8)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2116586331
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2116586330}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 34.03, y: 1.63, z: 36.48}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 758357182}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2116586332
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2116586330}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 10d4fad54746fc04c82eae193ce18b26, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Gameplay.Animals.AnimalSpawnZone
-  mode: 0
-  autoCollectChildZones: 1
-  childZones: []
-  radius: 3.62
-  spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
-  currentCount: 0
 --- !u!4 &2125630418 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5947873048596732306, guid: c5dc2cb2eda0d7946b9c6754360d61ed, type: 3}
@@ -38184,15 +36010,6 @@ MonoBehaviour:
   childZones: []
   radius: 5.67
   spawnPoints: []
-  useGroundRaycast: 1
-  groundLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastHeight: 30
-  raycastDownDistance: 80
-  snapToNavMesh: 1
-  navMeshSampleDistance: 3
-  groundYOffset: 0.05
   currentCount: 0
 --- !u!1001 &2128355694
 PrefabInstance:

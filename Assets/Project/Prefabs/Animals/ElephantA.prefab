@@ -478,6 +478,7 @@ GameObject:
   - component: {fileID: 7330995011784829662}
   - component: {fileID: 1519576419055424330}
   - component: {fileID: 4074918854796990030}
+  - component: {fileID: -5304576870506798092}
   m_Layer: 0
   m_Name: ElephantA
   m_TagString: Untagged
@@ -508,7 +509,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4942274240292134304}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: af26684c86eb84a9eac05f9536526459, type: 3}
   m_Name: 
@@ -539,7 +540,7 @@ NavMeshAgent:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4942274240292134304}
   m_Enabled: 1
-  m_AgentTypeID: 0
+  m_AgentTypeID: -629701670
   m_Radius: 1
   m_Speed: 6
   m_Acceleration: 12
@@ -574,6 +575,26 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 2, y: 2, z: 2.54}
   m_Center: {x: 0, y: 1, z: 0.41}
+--- !u!114 &-5304576870506798092
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4942274240292134304}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f3d7107a6baae5848b4b58ccc515360f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Gameplay.Animals.AnimalController
+  definition: {fileID: 11400000, guid: f23e6d99b7b5d2948b6acd537e4985a9, type: 2}
+  agent: {fileID: 1519576419055424330}
+  animator: {fileID: 8011998223776482726}
+  visibility: {fileID: 0}
+  speedParam: speed
+  idleStateName: idle
+  eatTrigger: eat
+  jumpTrigger: jump
 --- !u!1 &5110289907539152240
 GameObject:
   m_ObjectHideFlags: 0

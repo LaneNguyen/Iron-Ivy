@@ -46,6 +46,46 @@ namespace IronIvy.Data
         [Tooltip("De sau nay co day phase thi dung (hien tai chua dung).")]
         public bool isNocturnal = false;
 
+        // ---------------------------------------
+        // Ambient audio config (ngoai world)
+        // ---------------------------------------
+
+        [Header("Ambient audio (world)")]
+        [Tooltip("Tieng keu nho nho cua con nay ngoai world.")]
+        public AudioClip[] ambientClips;
+
+        [Tooltip("Min time giua cac lan keu (giay).")]
+        public float ambientMinInterval = 5f;
+
+        [Tooltip("Max time giua cac lan keu (giay).")]
+        public float ambientMaxInterval = 15f;
+
+        [Tooltip("Chi keu neu player nam trong ban kinh nay (0 hoac <0 = tat).")]
+        public float ambientSoundRadius = 15f;
+
+        // ---------------------------------------
+        // Curious behaviour config
+        // ---------------------------------------
+
+        [Header("Curious behaviour (look at player)")]
+        [Tooltip("Ban kinh de con thu co the vao trang thai curious (0 hoac <0 = tat).")]
+        public float curiousRadius = 10f;
+
+        [Tooltip("Xac suat trigger curious moi lan check (0-1).")]
+        [Range(0f, 1f)] public float curiousChancePerCheck = 0.2f;
+
+        [Tooltip("Thoi gian min dung nhin player (giay).")]
+        public float curiousMinDuration = 2f;
+
+        [Tooltip("Thoi gian max dung nhin player (giay).")]
+        public float curiousMaxDuration = 4f;
+
+        [Tooltip("Khoang thoi gian giua cac lan check curious (giay).")]
+        public float curiousCheckInterval = 5f;
+
+        [Tooltip("Trigger animation neu muon play anim dac biet khi curious (co the de trong).")]
+        public string curiousAnimTrigger = "";
+
         // PHAN DUOI LA HE RHYTHM HIEN CO 
 
         [Header("Rhythm (multi-pattern)")]

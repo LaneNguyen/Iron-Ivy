@@ -19,7 +19,7 @@ MonoBehaviour:
   spawnWeight: 1
   spawnVfxPrefab: {fileID: 0}
   despawnVfxPrefab: {fileID: 0}
-  walkSpeed: 0.2
+  walkSpeed: 0.5
   runSpeed: 1
   wanderRadius: 10
   minIdleTime: 2
