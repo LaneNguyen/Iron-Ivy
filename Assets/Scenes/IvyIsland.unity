@@ -3276,8 +3276,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Core.MinigameCameraManager
   plantProfile:
-    id: 
-    lookAt: {fileID: 0}
+    id: plantcamera
+    lookAt: {fileID: 1688535811}
     follow: {fileID: 0}
     fov: 40
   animalProfile:
@@ -7268,6 +7268,7 @@ Transform:
   - {fileID: 1158714222}
   - {fileID: 1838184218}
   - {fileID: 1020386681}
+  - {fileID: 1688535811}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: -15.62, z: 1.4}
 --- !u!1 &566568387
@@ -28572,6 +28573,37 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3483488183205125332, guid: 85d4b66433595d840b0ef5a47fa79d10, type: 3}
   m_PrefabInstance: {fileID: 1688510618}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1688535810
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1688535811}
+  m_Layer: 0
+  m_Name: CameraFarmLook
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1688535811
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1688535810}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.28, y: 0, z: 0.39}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 565489608}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1694329021
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -35244,7 +35276,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1887080230
 RectTransform:
   m_ObjectHideFlags: 0
