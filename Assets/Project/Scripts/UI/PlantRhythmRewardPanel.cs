@@ -2,117 +2,112 @@
 using UnityEngine.UI;
 using TMPro;
 using IronIvy.Data;
+using System.Collections.Generic;
+using IronIvy.Gameplay.Rhythm;
 
 namespace IronIvy.UI
 {
     /// <summary>
     /// Panel thu hoạch sau khi chơi xong plant rhythm.
+    /// Đã nâng cấp để hiển thị danh sách item (Dictionary) thay vì 1 item lẻ.
     /// </summary>
     public class PlantRhythmRewardPanel : MonoBehaviour
     {
         [Header("Root")]
-        [Tooltip("Panel gốc cần bật/tắt. Nếu để trống sẽ dùng chính gameObject này.")]
         public GameObject root;
 
         [Header("Texts")]
         public TextMeshProUGUI titleText;
-        public TextMeshProUGUI plantNameText;
         public TextMeshProUGUI trustText;
         public TextMeshProUGUI hitMissText;
-        public TextMeshProUGUI rewardText;
 
-        [Header("Visual (optional)")]
-        public Image rewardIcon;
+        [Header("Rewards List (Setup Mới)")]
+        [Tooltip("Container chứa các slot item (Gắn Horizontal Layout Group)")]
+        public Transform rewardContainer; 
+        
+        [Tooltip("Prefab UI_ItemSlot (Dùng chung với Inventory)")]
+        public GameObject itemSlotPrefab;
+
+        // Biến cũ (Không dùng nữa nhưng giữ lại để đỡ lỗi Inspector nếu lỡ quên xóa)
+        [HideInInspector] public TextMeshProUGUI plantNameText;
+        [HideInInspector] public TextMeshProUGUI rewardText;
+        [HideInInspector] public Image rewardIcon;
 
         private void Awake()
         {
-            // Nếu object start active thì Awake sẽ chạy và ẩn panel lúc đầu.
-            // Nếu object start inactive thì Awake sẽ chạy lần đầu khi GameObject được SetActive(true).
-            if (root == null)
-                root = gameObject;
-
+            if (root == null) root = gameObject;
             root.SetActive(false);
         }
 
         /// <summary>
-        /// Show kết quả harvest.
+        /// Show kết quả harvest với danh sách quà.
         /// </summary>
-        public void Show(PlantDefinition plant, int hit, int miss, float trust,
-                         int yieldCount, string yieldItemName = null, Sprite yieldSprite = null)
+        public void Show(Dictionary<FoodItem, int> rewards, int hit, int miss, float trust)
         {
-            // fallback nếu root chưa gán (trong trường hợp Awake chưa chạy do object đang inactive)
-            if (root == null)
-                root = gameObject;
+            if (root == null) root = gameObject;
+            gameObject.SetActive(true);
+            root.SetActive(true);
 
-            // nếu GameObject chứa script đang tắt sẵn trong editor -> bật lên
-            if (!gameObject.activeSelf)
-                gameObject.SetActive(true);
+            // 1. Update thông tin chung
+            if (titleText) titleText.text = "Harvest Complete!";
+            if (trustText) trustText.text = $"Trust: {Mathf.RoundToInt(trust)}%";
+            if (hitMissText) hitMissText.text = $"Perfect: {hit} | Miss: {miss}";
 
-            // bật panel root
-            if (!root.activeSelf)
-                root.SetActive(true);
-
-            // Debug nho nhỏ để chắc chắn Show thực sự chạy
-            Debug.Log("[PlantRhythmRewardPanel] Show called -> activating reward panel");
-
-            // ==== Fill UI ====
-
-            if (titleText != null)
-                titleText.text = "Harvest complete";
-
-            if (plantNameText != null)
-                plantNameText.text = plant != null ? plant.name : "Plant";
-
-            if (trustText != null)
-                trustText.text = $"Trust: {Mathf.RoundToInt(trust)}";
-
-            if (hitMissText != null)
-                hitMissText.text = $"Hit {hit} / Miss {miss}";
-
-            if (rewardText != null)
+            // 2. Spawn Item Slots vào Container
+            if (rewardContainer && itemSlotPrefab)
             {
-                if (yieldCount > 0)
-                {
-                    string itemName = yieldItemName;
-                    if (string.IsNullOrEmpty(itemName) && plant != null && plant.yieldItem != null)
-                        itemName = plant.yieldItem.name;
+                // Xóa slot cũ
+                foreach (Transform child in rewardContainer) Destroy(child.gameObject);
 
-                    rewardText.text = $"{yieldCount} x {itemName}";
+                if (rewards != null && rewards.Count > 0)
+                {
+                    foreach (var kvp in rewards)
+                    {
+                        FoodItem item = kvp.Key;
+                        int count = kvp.Value;
+
+                        if (count <= 0) continue;
+
+                        GameObject slotObj = Instantiate(itemSlotPrefab, rewardContainer);
+                        slotObj.SetActive(true);
+                        slotObj.transform.localScale = Vector3.one;
+
+                        // Dùng script UI_ItemSlot để setup visual (Icon + Text)
+                        var slotScript = slotObj.GetComponent<UIItemSlot>();
+                        if (slotScript)
+                        {
+                            slotScript.Setup(item.icon, count);
+                        }
+                    }
                 }
                 else
                 {
-                    rewardText.text = "No reward this time";
-                }
-            }
-
-            if (rewardIcon != null)
-            {
-                if (yieldSprite != null)
-                {
-                    rewardIcon.sprite = yieldSprite;
-                    rewardIcon.enabled = true;
-                }
-                else
-                {
-                    rewardIcon.enabled = false;
+                    // Nếu không có quà (Trust thấp hoặc lỗi)
+                    // Có thể instantiate một text báo "No Reward" ở đây nếu muốn
                 }
             }
         }
 
         public void Hide()
         {
-            if (root == null)
-                root = gameObject;
-
+            if (root == null) root = gameObject;
             root.SetActive(false);
         }
 
-        /// <summary>
-        /// Gán hàm này cho nút Close/OK trong Inspector.
-        /// </summary>
-        public void OnConfirmButton()
+        public void OnClickClose()
         {
             Hide();
+            
+            // Ép Main UI cập nhật lại kho đồ lần cuối để đồng bộ visual
+            var mainUI = FindObjectOfType<MainGameUIPanel>(true);
+            if (mainUI != null)
+            {
+                mainUI.gameObject.SetActive(true);
+                if (mainUI.foodInventoryPanel != null)
+                {
+                    mainUI.foodInventoryPanel.UpdateUI();
+                }
+            }
         }
     }
 }

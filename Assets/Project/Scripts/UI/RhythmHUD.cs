@@ -14,9 +14,7 @@ namespace IronIvy.UI
     /// - Trust slider
     /// - Progress slider
     /// - Status + Hit/Miss
-    /// 
-    /// API cũ như SetBeatWindow, SetBeatPhase, PulseKey giữ lại
-    /// nhưng làm rỗng cho khỏi vỡ code cũ.
+    /// - Beat window preview cho engine cũ (giờ bỏ dùng)
     /// </summary>
     public class RhythmHUD : MonoBehaviour
     {
@@ -34,48 +32,41 @@ namespace IronIvy.UI
         public Slider trustSlider;
         public Slider progressSlider;
 
-        [Header("Hold Visual (optional)")]
-        [Tooltip("Nếu gán thì SetHoldVisual sẽ fill 0..1.")]
-        public Image holdFillImage;
-
         [Header("Status")]
         public TextMeshProUGUI statusText;
         public Image statusIcon;
         public Color successColor = Color.green;
         public Color failColor = Color.red;
 
-        [Header("Hit / Miss Counter")]
+        [Header("Hit / Miss")]
         public TextMeshProUGUI hitText;
         public TextMeshProUGUI missText;
 
-        // reference tới engine cũ (Animal / Plant V4) nếu còn dùng
+        // Giữ reference của engine cũ (V3/V4) để Bind nếu cần
         private RhythmMinigameBase current;
-
-        //=====================================================
-        //  Mono
-        //=====================================================
 
         private void OnEnable()
         {
-            // đăng ký lắng nghe minigame start/stop theo EventBus
-            if (EventBus.HasInstance)
+            // Đã đổi EventBus -> ListenManager
+            if (ListenManager.HasInstance)
             {
-                EventBus.Instance.OnMinigameStarted += OnMinigameStarted;
-                EventBus.Instance.OnMinigameStopped += OnMinigameStopped;
+                ListenManager.Instance.OnMinigameStarted += OnMinigameStarted;
+                ListenManager.Instance.OnMinigameStopped += OnMinigameStopped;
             }
         }
 
         private void OnDisable()
         {
-            if (EventBus.HasInstance)
+            // Đã đổi EventBus -> ListenManager
+            if (ListenManager.HasInstance)
             {
-                EventBus.Instance.OnMinigameStarted -= OnMinigameStarted;
-                EventBus.Instance.OnMinigameStopped -= OnMinigameStopped;
+                ListenManager.Instance.OnMinigameStarted -= OnMinigameStarted;
+                ListenManager.Instance.OnMinigameStopped -= OnMinigameStopped;
             }
         }
 
         //=====================================================
-        //  EventBus callbacks
+        //  ListenManager callbacks
         //=====================================================
 
         private void OnMinigameStarted()
@@ -94,18 +85,14 @@ namespace IronIvy.UI
 
         private void OnMinigameStopped()
         {
-            if (hudRoot != null)
-                hudRoot.SetActive(false);
-
-            current = null;
+            // không auto tắt HUD, để engine mới tự quyết
+            // nếu muốn tắt thì uncomment:
+            // if (hudRoot != null)
+            //     hudRoot.SetActive(false);
         }
 
-        //=====================================================
-        //  Public API (dùng được cho engine mới)
-        //=====================================================
-
         /// <summary>
-        /// Cho phép gán minigame thủ công (nếu không muốn rely EventBus).
+        /// Cho phép gán minigame thủ công (nếu không muốn rely ListenManager).
         /// </summary>
         public void BindMinigame(RhythmMinigameBase minigame)
         {
@@ -147,18 +134,9 @@ namespace IronIvy.UI
             progressSlider.value = Mathf.Clamp01(value01);
         }
 
-        /// <summary>
-        /// Hiển thị phần đã hold trong window (0..1).
-        /// Engine mới có thể gọi để sync với UI riêng.
-        /// </summary>
         public void SetHoldVisual(float value01)
         {
-            if (holdFillImage == null)
-                return;
-
-            holdFillImage.type = Image.Type.Filled;
-            holdFillImage.fillMethod = Image.FillMethod.Radial360;
-            holdFillImage.fillAmount = Mathf.Clamp01(value01);
+            // chỗ này trước là fill amount của vòng hold, giờ bỏ visual nên để trống
         }
 
         public void SetStatus(string message, bool isSuccess)
@@ -178,10 +156,6 @@ namespace IronIvy.UI
             if (missText != null)
                 missText.text = miss.ToString();
         }
-
-        //=====================================================
-        //  API cũ cho engine V4 (giữ lại signature, làm rỗng)
-        //=====================================================
 
         /// <summary>
         /// Preview vùng hot window trên vòng (engine V4 dùng). Giờ bỏ visual.
@@ -214,6 +188,42 @@ namespace IronIvy.UI
         public void ClearPulseKey(int index)
         {
             // no-op
+        }
+
+        //=====================================================
+        //  Convenience helpers cho engine mới
+        //=====================================================
+
+        // set title tay cho minigame, dung cho Click-based rhythm moi
+        public void SetMinigameTitle(string title)
+        {
+            if (titleText == null) return;
+            titleText.text = title;
+        }
+
+        // wrapper cho progress, giu ten de code moi doc de hon
+        public void UpdateProgress(float value01)
+        {
+            SetProgress(value01);
+        }
+
+        // wrapper cho hit/miss
+        public void UpdateHitMiss(int hit, int miss)
+        {
+            SetHitMiss(hit, miss);
+        }
+
+        // reset nhanh HUD ve trang thai mac dinh
+        public void ResetHUD()
+        {
+            if (hudRoot != null)
+                hudRoot.SetActive(false);
+
+            SetKeyHints(null);
+            SetTrust01(0f);
+            SetProgress(0f);
+            SetStatus(string.Empty, true);
+            SetHitMiss(0, 0);
         }
     }
 }

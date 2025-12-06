@@ -4,179 +4,156 @@ using TMPro;
 using System.Collections.Generic;
 using IronIvy.Data;
 using IronIvy.Gameplay.Rhythm;
+using IronIvy.Gameplay;
 using IronIvy.Core;
 
 namespace IronIvy.UI
 {
-    /// <summary>
-    /// Panel chọn cây để start ClickPlantRhythmMinigame.
-    /// Hỗ trợ trường hợp GameObject chứa script bị tắt sẵn trong editor.
-    /// </summary>
     public class PlantRhythmStartPanel : MonoBehaviour
     {
         [Header("Root")]
-        [Tooltip("Panel gốc cần bật/tắt. Nếu để trống sẽ dùng chính gameObject này.")]
         public GameObject root;
 
-        [Header("Energy UI")]
-        public TextMeshProUGUI energyText;
-        [Tooltip("Mặc định tốn bao nhiêu energy cho 1 lần chơi.")]
-        public int baseEnergyCost = 1;
+        [Header("UI - Plot Slots")]
+        public Transform plotSlotContainer;
+        public Button plotSlotPrefab; 
 
-        [Header("Plant List UI")]
-        public Transform plantButtonContainer;
-        public Button plantButtonPrefab;
+        [Header("UI - Seed List")]
+        public Transform seedListContainer;
+        public Button seedButtonPrefab;
 
-        [Header("Data")]
-        public List<PlantDefinition> availablePlants = new List<PlantDefinition>();
+        [Header("UI - Actions")]
+        public Button startButton;
+        public TextMeshProUGUI energyCostText;
 
-        [Header("Minigame")]
-        public ClickPlantRhythmMinigame minigame;
+        [Header("Config")]
+        public int energyPerPlant = 1;
 
-        //=====================================================
-        //  Unity Events
-        //=====================================================
+        // === [FIX COMPATIBILITY] Code tương thích ngược ===
+        // Mapping biến cũ sang biến mới để MainGameUIPanel không lỗi
+        public int baseEnergyCost => energyPerPlant; 
 
-        // Lưu ý: nếu GameObject start inactive thì Awake/OnEnable
-        // sẽ chỉ chạy sau lần đầu SetActive(true).
-        private void Awake()
+        // Hàm Show cũ
+        public void Show() 
         {
-            // KHÔNG setActive(false) ở đây,
-            // vì nếu object đang tắt trong editor thì Awake không chạy.
-            // Để logic ẩn/hiện dùng Show/Hide lo.
+            if (root) root.SetActive(true);
+            Debug.LogWarning("Old Show() called. Please update caller to use ShowForArea().");
+        }
+        // ==================================================
+        
+        // --- Runtime State ---
+        private PlantArea _currentArea;
+        private List<PlantDefinition> _selectedPlants = new List<PlantDefinition>(); 
+        private int _currentSelectedSlotIndex = -1; 
+
+        private void Start()
+        {
+            if (startButton) startButton.onClick.AddListener(OnStartClicked);
         }
 
-        private void OnEnable()
+        public void ShowForArea(PlantArea area)
         {
-            if (EventBus.HasInstance)
+            _currentArea = area;
+            _selectedPlants.Clear();
+            if (area != null)
             {
-                EventBus.Instance.OnEnergyChanged += OnEnergyChanged;
+                for (int i = 0; i < area.plots.Count; i++) _selectedPlants.Add(null);
             }
-        }
 
-        private void OnDisable()
-        {
-            if (EventBus.HasInstance)
-            {
-                EventBus.Instance.OnEnergyChanged -= OnEnergyChanged;
-            }
-        }
-
-        private void OnEnergyChanged(int current)
-        {
-            RefreshEnergyText();
-        }
-
-        //=====================================================
-        //  Public API
-        //=====================================================
-
-        /// <summary>
-        /// Gọi từ button "Play plant rhythm".
-        /// Hỗ trợ cả trường hợp GameObject đang tắt từ trước.
-        /// </summary>
-        public void Show()
-        {
-            // nếu root chưa gán thì dùng luôn gameObject hiện tại
-            if (root == null)
-                root = gameObject;
-
-            // nếu GameObject đang inactive (bị tắt từ editor) -> bật nó lên
-            if (!gameObject.activeSelf)
-                gameObject.SetActive(true);
-
-            // bật panel root lên
-            if (!root.activeSelf)
-                root.SetActive(true);
-
-            RefreshEnergyText();
-            BuildPlantButtons();
+            if (root) root.SetActive(true);
+            _currentSelectedSlotIndex = 0;
+            RefreshUI();
         }
 
         public void Hide()
         {
-            if (root == null)
-                root = gameObject;
-
-            root.SetActive(false);
+            if (root) root.SetActive(false);
+            _currentArea = null;
         }
 
-        //=====================================================
-        //  Energy helpers
-        //=====================================================
-
-        private int GetCurrentEnergy()
+        private void RefreshUI()
         {
-            if (EnergyManager.HasInstance)
-                return EnergyManager.Instance.Current;
-            return 0;
+            RenderPlotSlots();
+            RenderSeedList();
+            UpdateStatus();
         }
 
-        private void RefreshEnergyText()
+        private void RenderPlotSlots()
         {
-            if (energyText == null) return;
+            if (!plotSlotContainer || !plotSlotPrefab || _currentArea == null) return;
+            foreach (Transform child in plotSlotContainer) Destroy(child.gameObject);
 
-            int cur = GetCurrentEnergy();
-            energyText.text = $"Energy: {cur} (-{baseEnergyCost} per run)";
-        }
-
-        //=====================================================
-        //  Plant buttons
-        //=====================================================
-
-        private void BuildPlantButtons()
-        {
-            if (plantButtonContainer == null || plantButtonPrefab == null)
-                return;
-
-            // clear cũ
-            for (int i = plantButtonContainer.childCount - 1; i >= 0; i--)
+            for (int i = 0; i < _currentArea.plots.Count; i++)
             {
-                Destroy(plantButtonContainer.GetChild(i).gameObject);
-            }
-
-            foreach (var plant in availablePlants)
-            {
-                if (plant == null) continue;
-
-                Button btn = Instantiate(plantButtonPrefab, plantButtonContainer);
-                var label = btn.GetComponentInChildren<TextMeshProUGUI>();
-                if (label != null)
-                    label.text = plant.name;
-
-                var captured = plant;
-                btn.onClick.AddListener(() => OnPlantSelected(captured));
+                int index = i;
+                Button btn = Instantiate(plotSlotPrefab, plotSlotContainer);
+                var txt = btn.GetComponentInChildren<TextMeshProUGUI>();
+                if (txt)
+                {
+                    string plantName = _selectedPlants[index] != null ? _selectedPlants[index].displayName : "Empty";
+                    txt.text = $"Plot {index + 1}\n<size=80%>{plantName}</size>";
+                }
+                var img = btn.GetComponent<Image>();
+                if (img) img.color = (index == _currentSelectedSlotIndex) ? Color.yellow : Color.white;
+                btn.onClick.AddListener(() => { _currentSelectedSlotIndex = index; RefreshUI(); });
             }
         }
 
-        private void OnPlantSelected(PlantDefinition plant)
+        private void RenderSeedList()
         {
-            if (minigame == null)
+            if (!seedListContainer || !seedButtonPrefab) return;
+            foreach (Transform child in seedListContainer) Destroy(child.gameObject);
+
+            var minigame = FindObjectOfType<ClickPlantRhythmMinigame>();
+            var availableSeeds = minigame ? minigame.debugAvailablePlants : new List<PlantDefinition>();
+
+            // Button None
+            Button clearBtn = Instantiate(seedButtonPrefab, seedListContainer);
+            if(clearBtn.GetComponentInChildren<TextMeshProUGUI>()) clearBtn.GetComponentInChildren<TextMeshProUGUI>().text = "None";
+            clearBtn.onClick.AddListener(() => SelectPlantForCurrentSlot(null));
+
+            foreach (var plant in availableSeeds)
             {
-                Debug.LogWarning("[PlantRhythmStartPanel] Missing ClickPlantRhythmMinigame reference.");
-                return;
+                Button btn = Instantiate(seedButtonPrefab, seedListContainer);
+                if(btn.GetComponentInChildren<TextMeshProUGUI>()) btn.GetComponentInChildren<TextMeshProUGUI>().text = plant.displayName;
+                var p = plant;
+                btn.onClick.AddListener(() => SelectPlantForCurrentSlot(p));
             }
+        }
 
-            if (!EnergyManager.HasInstance)
+        private void SelectPlantForCurrentSlot(PlantDefinition plant)
+        {
+            if (_currentSelectedSlotIndex >= 0 && _currentSelectedSlotIndex < _selectedPlants.Count)
             {
-                Debug.LogWarning("[PlantRhythmStartPanel] No EnergyManager instance in scene.");
-                return;
+                _selectedPlants[_currentSelectedSlotIndex] = plant;
+                if (_currentSelectedSlotIndex < _selectedPlants.Count - 1) _currentSelectedSlotIndex++;
+                RefreshUI();
             }
+        }
 
-            // thử trừ energy
-            if (!EnergyManager.Instance.TrySpend(baseEnergyCost))
+        private void UpdateStatus()
+        {
+            int plantCount = 0;
+            foreach (var p in _selectedPlants) if (p != null) plantCount++;
+            int totalEnergy = plantCount * energyPerPlant;
+            if (energyCostText) energyCostText.text = $"Energy Cost: {totalEnergy}";
+            if (startButton) startButton.interactable = plantCount > 0;
+        }
+
+        private void OnStartClicked()
+        {
+            int plantCount = 0;
+            foreach (var p in _selectedPlants) if (p != null) plantCount++;
+            if (plantCount == 0) return;
+
+            int cost = plantCount * energyPerPlant;
+            if (EnergyManager.HasInstance && !EnergyManager.Instance.TrySpend(cost)) return;
+
+            var minigame = FindObjectOfType<ClickPlantRhythmMinigame>();
+            if (minigame && _currentArea != null)
             {
-                Debug.Log("[PlantRhythmStartPanel] Not enough energy.");
-                RefreshEnergyText();
-                return;
+                minigame.StartSequence(_currentArea.plots, _selectedPlants);
             }
-
-            RefreshEnergyText();
-
-            // gán plant rồi start
-            minigame.plant = plant;
-            minigame.StartGame();
-
             Hide();
         }
     }

@@ -101,6 +101,11 @@ namespace IronIvy.Data
         // ten state trong Animator cua IV-17 se duoc play khi GOOD
         public string[] iv17Reactions;
 
+
+        [Header("Archive / Progress")]
+        [Tooltip("So % archive cong them khi hoan thanh minigame (100% success).")]
+        [Range(0f, 100f)] public float archiveReward = 5f;
+
         [Header("Audio/FX (minigame)")]
         public AudioClip loopSfx;
         public GameObject successVFX;

@@ -16,9 +16,10 @@ namespace IronIvy.Core
             // o day co the lam them chuyen reset task, luu data, etc...
 
             // ban event cho he thong khac (AnimalManager se nghe)
-            if (EventBus.HasInstance)
+            // Đã đổi EventBus -> ListenManager
+            if (ListenManager.HasInstance)
             {
-                EventBus.Instance.RaiseDayEnded();
+                ListenManager.Instance.RaiseDayEnded();
             }
         }
     }

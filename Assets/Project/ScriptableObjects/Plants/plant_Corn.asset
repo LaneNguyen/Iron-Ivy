@@ -14,14 +14,29 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Data.PlantDefinition
   id: cornplant
   displayName: Corn
+  stages:
+  - stageName: Seed
+    prefab: {fileID: 5497211735150880983, guid: e4d6cf5dfac217e4aa57b954b8cc1105, type: 3}
+    patterns:
+    - {fileID: 11400000, guid: bb2637d1521d97844a123dd9bded3b8b, type: 2}
+  - stageName: Grown
+    prefab: {fileID: 5962430241588196273, guid: ff4ed0f60d4a5a54b9b1a0b2fad77c78, type: 3}
+    patterns:
+    - {fileID: 11400000, guid: bb2637d1521d97844a123dd9bded3b8b, type: 2}
+    - {fileID: 11400000, guid: edd23bf8b315d7e4bb892ac3d144d659, type: 2}
+  - stageName: Full-grown
+    prefab: {fileID: 2658104347403863969, guid: 530671a6dcce5b84992a7417b0d91c86, type: 3}
+    patterns:
+    - {fileID: 11400000, guid: edd23bf8b315d7e4bb892ac3d144d659, type: 2}
+    - {fileID: 11400000, guid: edd23bf8b315d7e4bb892ac3d144d659, type: 2}
+  yieldItem: {fileID: 11400000, guid: 00e9e275c37774f4abe494bf5a3f27d9, type: 2}
+  musicLoop: {fileID: 8300000, guid: d083399decc8bbe4c949a6bf68d1a092, type: 3}
   patterns:
   - {fileID: 11400000, guid: edd23bf8b315d7e4bb892ac3d144d659, type: 2}
   - {fileID: 11400000, guid: bb2637d1521d97844a123dd9bded3b8b, type: 2}
   - {fileID: 11400000, guid: edd23bf8b315d7e4bb892ac3d144d659, type: 2}
-  playbackMode: 1
+  - {fileID: 11400000, guid: edd23bf8b315d7e4bb892ac3d144d659, type: 2}
   prefabStage1: {fileID: 5497211735150880983, guid: e4d6cf5dfac217e4aa57b954b8cc1105, type: 3}
   prefabStage2: {fileID: 5962430241588196273, guid: ff4ed0f60d4a5a54b9b1a0b2fad77c78, type: 3}
   prefabStage3: {fileID: 2658104347403863969, guid: 530671a6dcce5b84992a7417b0d91c86, type: 3}
-  yieldItem: {fileID: 0}
-  successVFX: {fileID: 100006, guid: 1e0ba1d4aac548a499e953dfc6a8b951, type: 3}
-  musicLoop: {fileID: 8300000, guid: d083399decc8bbe4c949a6bf68d1a092, type: 3}
+  playbackMode: 1

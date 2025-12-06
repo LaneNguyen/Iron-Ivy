@@ -70,9 +70,10 @@ namespace IronIvy.Core
         {
             InitIfNeeded();
 
-            if (EventBus.HasInstance)
+            // Đã đổi EventBus -> ListenManager
+            if (ListenManager.HasInstance)
             {
-                EventBus.Instance.OnDayEnded += HandleDayEnded;
+                ListenManager.Instance.OnDayEnded += HandleDayEnded;
             }
         }
 
@@ -83,9 +84,10 @@ namespace IronIvy.Core
 
         private void OnDisable()
         {
-            if (EventBus.HasInstance)
+            // Đã đổi EventBus -> ListenManager
+            if (ListenManager.HasInstance)
             {
-                EventBus.Instance.OnDayEnded -= HandleDayEnded;
+                ListenManager.Instance.OnDayEnded -= HandleDayEnded;
             }
         }
 
@@ -303,7 +305,6 @@ namespace IronIvy.Core
             return ctrl;
         }
 
-
         public void DespawnZone(AnimalSpawnZone zone)
         {
             if (zone == null) return;
@@ -318,6 +319,8 @@ namespace IronIvy.Core
             }
         }
 
+        // Despawn 1 con animal:
+        // - dùng khi: ra khỏi zone, hết ngày, HOẶC kết thúc minigame one-shot (AnimalController.DespawnAfterMinigame gọi qua)
         public void DespawnAnimalWithFade(AnimalController controller)
         {
             if (controller == null) return;
@@ -325,6 +328,7 @@ namespace IronIvy.Core
             var visibility = controller.Visibility;
             if (visibility != null)
             {
+                // cho visibility lo VFX + fade, xong mới thật sự disable + trả về pool
                 visibility.PlayDespawnVFXAndFadeOut(() =>
                 {
                     InternalDespawn(controller);
@@ -332,6 +336,7 @@ namespace IronIvy.Core
             }
             else
             {
+                // fallback: không có visibility thì despawn thẳng
                 InternalDespawn(controller);
             }
         }
@@ -343,16 +348,22 @@ namespace IronIvy.Core
             var def = controller.Definition;
             var rootZone = controller.RootZone;
 
+            // cho con thú tự clear state (wander, anim, v.v.)
             controller.OnDespawn();
+
+            // tắt object, để AnimalManager & pool quản lý
             controller.gameObject.SetActive(false);
 
+            // bỏ khỏi list đang active
             _activeAnimals.Remove(controller);
 
+            // trừ count trong zone (để sau này spawn con khác được)
             if (rootZone != null)
             {
                 rootZone.currentCount = Mathf.Max(0, rootZone.currentCount - 1);
             }
 
+            // trừ count theo definition + trả về pool
             if (def != null)
             {
                 int count;

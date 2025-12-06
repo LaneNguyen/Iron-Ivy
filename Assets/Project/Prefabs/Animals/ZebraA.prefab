@@ -782,7 +782,7 @@ GameObject:
   - component: {fileID: 7842868060361060115}
   m_Layer: 0
   m_Name: ZebraA
-  m_TagString: Untagged
+  m_TagString: Animal
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -870,7 +870,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -896,6 +896,11 @@ MonoBehaviour:
   idleStateName: idle
   eatTrigger: eat
   jumpTrigger: jump
+  enableRhythmMinigame: 1
+  interactionPanel: {fileID: 0}
+  animalMinigame: {fileID: 0}
+  playerTag: Player
+  oneShotMinigame: 1
 --- !u!1 &4287317537799901478
 GameObject:
   m_ObjectHideFlags: 0

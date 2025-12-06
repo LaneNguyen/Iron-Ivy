@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Data.AnimalDefinition
   id: squirrel_a
   displayName: Squirrel
-  prefab: {fileID: 870669309828721424, guid: b4c6ac88d9c75ef4f8863377c10ad6b9, type: 3}
+  prefab: {fileID: 1261419133072088562, guid: b4c6ac88d9c75ef4f8863377c10ad6b9, type: 3}
   maxCountGlobal: 10
   spawnWeight: 1
   spawnVfxPrefab: {fileID: 0}
@@ -36,10 +36,14 @@ MonoBehaviour:
   curiousMaxDuration: 6
   curiousCheckInterval: 10
   curiousAnimTrigger: 
-  patterns: []
+  patterns:
+  - {fileID: 11400000, guid: bb2637d1521d97844a123dd9bded3b8b, type: 2}
+  - {fileID: 11400000, guid: edd23bf8b315d7e4bb892ac3d144d659, type: 2}
+  - {fileID: 11400000, guid: bb2637d1521d97844a123dd9bded3b8b, type: 2}
   playbackMode: 1
   goodAnim: Good
   badAnim: Bad
   iv17Reactions: []
+  archiveReward: 5
   loopSfx: {fileID: 0}
   successVFX: {fileID: 0}

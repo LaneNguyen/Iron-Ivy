@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using IronIvy.Interfaces;
 using IronIvy.Data;
+using IronIvy.Core; // Ensure Core namespace is used for ListenManager
 
 namespace IronIvy.Gameplay.Rhythm
 {
@@ -89,14 +90,24 @@ namespace IronIvy.Gameplay.Rhythm
             PreparePattern();
 
             IsRunning = true;
-            IronIvy.Core.EventBus.Instance.RaiseMinigameStarted();
+
+            // Đã đổi EventBus -> ListenManager
+            if (ListenManager.HasInstance)
+            {
+                ListenManager.Instance.RaiseMinigameStarted();
+            }
         }
 
         public virtual void StopGame()
         {
             if (!IsRunning) return;
             IsRunning = false;
-            IronIvy.Core.EventBus.Instance.RaiseMinigameStopped();
+
+            // Đã đổi EventBus -> ListenManager
+            if (ListenManager.HasInstance)
+            {
+                ListenManager.Instance.RaiseMinigameStopped();
+            }
         }
 
         protected virtual void OnDisable()

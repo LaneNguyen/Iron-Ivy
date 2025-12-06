@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5419b40d973fa44dbc4bda235d43a45, type: 3}
+  m_Name: plant_Cauliflower
+  m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Data.PlantDefinition
+  id: cauliflowerplant
+  displayName: Cauliflower
+  stages:
+  - stageName: Seed
+    prefab: {fileID: 3177982295653799335, guid: d8449dba764bea44ab90269de06a50d0, type: 3}
+    patterns:
+    - {fileID: 11400000, guid: bb2637d1521d97844a123dd9bded3b8b, type: 2}
+  - stageName: Grown
+    prefab: {fileID: 6421724360372590781, guid: 37774da3967f68340b832156ac4a51c8, type: 3}
+    patterns:
+    - {fileID: 11400000, guid: bb2637d1521d97844a123dd9bded3b8b, type: 2}
+    - {fileID: 11400000, guid: edd23bf8b315d7e4bb892ac3d144d659, type: 2}
+  - stageName: Full-grown
+    prefab: {fileID: 2515096759070014954, guid: 8208b668c3b954947be70fc9690eeb2a, type: 3}
+    patterns:
+    - {fileID: 11400000, guid: edd23bf8b315d7e4bb892ac3d144d659, type: 2}
+    - {fileID: 11400000, guid: edd23bf8b315d7e4bb892ac3d144d659, type: 2}
+  yieldItem: {fileID: 11400000, guid: 7dd2cd018801fe04faf983f4df6dc903, type: 2}
+  musicLoop: {fileID: 8300000, guid: d083399decc8bbe4c949a6bf68d1a092, type: 3}
+  patterns:
+  - {fileID: 11400000, guid: edd23bf8b315d7e4bb892ac3d144d659, type: 2}
+  - {fileID: 11400000, guid: bb2637d1521d97844a123dd9bded3b8b, type: 2}
+  - {fileID: 11400000, guid: edd23bf8b315d7e4bb892ac3d144d659, type: 2}
+  - {fileID: 11400000, guid: edd23bf8b315d7e4bb892ac3d144d659, type: 2}
+  prefabStage1: {fileID: 5497211735150880983, guid: e4d6cf5dfac217e4aa57b954b8cc1105, type: 3}
+  prefabStage2: {fileID: 5962430241588196273, guid: ff4ed0f60d4a5a54b9b1a0b2fad77c78, type: 3}
+  prefabStage3: {fileID: 2658104347403863969, guid: 530671a6dcce5b84992a7417b0d91c86, type: 3}
+  playbackMode: 1
