@@ -442,9 +442,9 @@ MonoBehaviour:
         subkeywordEntriesEnum: []
         subkeywordEntriesToggle: []
   profiles:
-  - id: d435ae47-04c1-47dc-87bb-19ae844bf4aa
-    profileName: Squireel
-    shaderGUID: 
+  - id: e8b93621-871b-4a12-89dd-d737be08675e
+    profileName: AllIn13DShader - Baked Effects_Squireel
+    shaderGUID: c855a1e269126da4a9e81b42fa6f105c
     groups:
     - effectGroupConfig: {fileID: 11400000, guid: 05a6bce58cfc83a4293b054fcfc62a81, type: 2}
       entries:

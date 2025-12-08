@@ -17,7 +17,6 @@ namespace IronIvy.Gameplay.World
         public void OnInteract()
         {
             if (isResting) return;
-
             Debug.Log("[ArchiveTree] IV-17 bat dau ket noi...");
             StartCoroutine(RestRoutine());
         }
@@ -26,27 +25,22 @@ namespace IronIvy.Gameplay.World
         {
             isResting = true;
             
-            // TODO: Bao cho InteractionTrigger giau UI "Press F" di neu can
-            // hoac PlayerController khoa input
-            
-            // 1. VFX & Animation
+            // 1. Hiệu ứng hồi phục
             if (healEffect != null) healEffect.Play();
-            
-            // 2. Cho dien hoat canh
             yield return new WaitForSeconds(animDuration);
 
-            // 3. Logic Gameplay
-            if (EnergyManager.HasInstance)
-            {
-                EnergyManager.Instance.RestoreFullEnergy();
-            }
-
-            if (SaveLoadManager.HasInstance)
-            {
-                SaveLoadManager.Instance.SaveGame();
-            }
+            // 2. Logic Backend (Hồi máu + Save)
+            if (EnergyManager.HasInstance) EnergyManager.Instance.RestoreFullEnergy();
+            if (SaveLoadManager.HasInstance) SaveLoadManager.Instance.SaveGame();
 
             Debug.Log("[ArchiveTree] Da hoi phuc & Save game!");
+
+            // 3. [NEW] Gọi UIManager để chuyển cảnh sang Archive Panel
+            if (UIManager.HasInstance)
+            {
+                UIManager.Instance.OpenArchiveUI();
+            }
+
             isResting = false;
         }
     }
