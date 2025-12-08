@@ -30,9 +30,7 @@ namespace IronIvy.Data
         [Header("Audio")]
         public AudioClip musicLoop;
 
-        // =========================================================
         // LEGACY FIELDS (Giữ lại để không bị lỗi code cũ, nhưng không dùng cho logic mới)
-        // =========================================================
         [HideInInspector] public RhythmPattern[] patterns; 
         [HideInInspector] public GameObject prefabStage1;
         [HideInInspector] public GameObject prefabStage2;

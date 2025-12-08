@@ -7,11 +7,6 @@ using IronIvy.Gameplay.Rhythm;
 
 namespace IronIvy.Gameplay.Animals
 {
-    // controller chính cho animal
-    // - wander trong zone
-    // - ambient sound khi player lại gần
-    // - curious nhìn player 1 lúc
-    // - optional: hook vào animal rhythm minigame
     public class AnimalController : MonoBehaviour
     {
         private enum AnimalState
@@ -26,11 +21,23 @@ namespace IronIvy.Gameplay.Animals
         [SerializeField] private Animator animator;
         [SerializeField] private AnimalVisibilityController visibility;
 
+        [Header("Highlight (Unity Toon Shader)")]
+        [SerializeField] private AnimalHighlightController highlightController;
+
+        [Header("Minigame Integration")]
+        [SerializeField] private bool enableRhythmMinigame = false;
+        [SerializeField] private ClickAnimalRhythmMinigame animalMinigame;
+        [SerializeField] private MinigameInteractionPanel interactionPanel;
+        [SerializeField] private bool oneShotMinigame = false;
+        
+
         [Header("Animator params")]
         public string speedParam = "speed";
         public string idleStateName = "idle";
         public string eatTrigger = "eat";
         public string jumpTrigger = "jump";
+
+        private bool _hasPlayedMinigame;
 
         // zone con thực tế (spawn)
         public AnimalSpawnZone CurrentZone { get; private set; }
@@ -45,41 +52,20 @@ namespace IronIvy.Gameplay.Animals
         private Coroutine _wanderRoutine;
         private int _speedParamHash = -1;
 
-        // player ref dùng cho ambient sound, curious, minigame
+        // player ref
         private Transform _player;
 
-        // ambient sound state
+        // ambient & curious vars
         private bool _hasAmbientConfig;
         private bool _playerIsNearForAmbient;
         private float _ambientNextTime;
         private float _ambientSoundRadiusSqr;
-
-        // curious state
         private AnimalState _state = AnimalState.Wandering;
         private bool _isCurious;
         private float _curiousRadiusSqr;
         private float _nextCuriousCheckTime;
         private float _curiousEndTime;
-
-        // --------------------------------------------------
-        // Minigame (Animal Rhythm)
-        // --------------------------------------------------
-
-        [Header("Minigame")]
-        [SerializeField] private bool enableRhythmMinigame = false;
-
-        [SerializeField] private MinigameInteractionPanel interactionPanel;
-        [SerializeField] private ClickAnimalRhythmMinigame animalMinigame;
-
-        [Header("Interaction / Minigame")]
-        [SerializeField] private float interactionRadius = 3f;
-        [SerializeField] private string playerTag = "Player";
-
-        [SerializeField] private bool oneShotMinigame = false;
-
-        private bool _hasPlayedMinigame;
         private bool _playerInRangeForMinigame;
-
         private float _interactionRadiusSqr;
 
         private void Reset()
@@ -87,16 +73,21 @@ namespace IronIvy.Gameplay.Animals
             agent = GetComponent<NavMeshAgent>();
             animator = GetComponentInChildren<Animator>();
             visibility = GetComponentInChildren<AnimalVisibilityController>();
+            highlightController = GetComponentInChildren<AnimalHighlightController>();
         }
 
         private void Awake()
         {
             SetupAnimatorParamHashes();
+
+            // auto lấy highlight controller nếu quên gán
+            if (highlightController == null)
+                highlightController = GetComponentInChildren<AnimalHighlightController>();
         }
 
         private void OnEnable()
         {
-            // trường hợp drop thú vào scene test tay, không đi qua AnimalManager
+            // Case thả tay prefab vào scene
             if (definition != null && CurrentZone == null && RootZone == null)
             {
                 _anchorPosition = transform.position;
@@ -108,7 +99,6 @@ namespace IronIvy.Gameplay.Animals
                 if (_wanderRoutine != null)
                     StopCoroutine(_wanderRoutine);
 
-                ResolvePlayerTransform();
                 SetupAmbientState();
                 SetupCuriousState();
                 SetupMinigameRefs();
@@ -118,12 +108,14 @@ namespace IronIvy.Gameplay.Animals
             }
             else
             {
-                // nếu spawn qua manager thì Init đã lo phần setup chính
-                ResolvePlayerTransform();
+                // Case spawn qua AnimalManager
                 SetupAmbientState();
                 SetupCuriousState();
                 SetupMinigameRefs();
             }
+
+            // đảm bảo vào lại scene thì không bị sáng outline
+            SetHighlighted(false);
         }
 
         private void OnDisable()
@@ -137,32 +129,24 @@ namespace IronIvy.Gameplay.Animals
             _isCurious = false;
             _state = AnimalState.Wandering;
 
-            // neu animal bi disable thi nho tat luon panel interaction neu dang refer den no
             if (interactionPanel != null)
-            {
                 interactionPanel.HideIfCurrentAnimal(this);
-            }
+
+            // tắt highlight khi disable
+            SetHighlighted(false);
         }
 
         private void Update()
         {
             // update speed param cho anim
             if (animator != null && agent != null && _speedParamHash != -1)
-            {
                 animator.SetFloat(_speedParamHash, agent.velocity.magnitude);
-            }
 
-            // ambient sound
             HandleAmbientSound();
-
-            // minigame proximity (ở đây thay cho OnTrigger)
-            HandleMinigameProximity();
-
-            // curious nhìn player
+            // HandleMinigameProximity();   // check khoảng cách + bật/tắt outline + panel
             HandleCuriousBehaviour();
         }
 
-        // gọi bởi AnimalManager mỗi lần spawn
         public void Init(AnimalDefinition def, AnimalSpawnZone zone, AnimalSpawnZone rootZone)
         {
             if (def != null)
@@ -170,7 +154,6 @@ namespace IronIvy.Gameplay.Animals
 
             CurrentZone = zone;
             RootZone = rootZone != null ? rootZone : zone;
-
             _anchorPosition = (zone != null) ? zone.transform.position : transform.position;
 
             SetupAgentFromDefinition();
@@ -181,13 +164,16 @@ namespace IronIvy.Gameplay.Animals
             if (_wanderRoutine != null)
                 StopCoroutine(_wanderRoutine);
 
-            ResolvePlayerTransform();
+
             SetupAmbientState();
             SetupCuriousState();
             SetupMinigameRefs();
 
             _state = AnimalState.Wandering;
             _wanderRoutine = StartCoroutine(WanderRoutine());
+
+            // khi spawn mới thì tắt highlight
+            SetHighlighted(false);
         }
 
         public void OnDespawn()
@@ -203,17 +189,64 @@ namespace IronIvy.Gameplay.Animals
 
             _isCurious = false;
             _state = AnimalState.Wandering;
+
+            // tắt highlight khi despawn
+            SetHighlighted(false);
         }
 
-        // --------------------------------------------------
+        // Public API cho highlight (Toon shader)
+
+        public void SetHighlighted(bool on)
+        {
+            if (highlightController != null)
+                highlightController.SetHighlight(on);
+        }
+
+        // Feeding Logic (sync với InventoryManager / FoodItem)
+
+        public bool TryFeed(FoodItem food)
+        {
+            if (food == null)
+                return false;
+
+            if (!InventoryManager.HasInstance)
+            {
+                Debug.LogWarning("[AnimalController] Missing InventoryManager!");
+                return false;
+            }
+
+            // Consume 1 unit, InventoryManager.Consume tự check số lượng
+            bool consumed = InventoryManager.Instance.Consume(food, 1);
+
+            if (consumed)
+            {
+                // play anim ăn
+                if (animator != null && !string.IsNullOrEmpty(eatTrigger))
+                    animator.SetTrigger(eatTrigger);
+
+                // TODO: sau này có hệ thống trust/mood thì hook vào đây
+                Debug.Log($"[AnimalController] Feed success: {food.displayName}");
+
+                // TODO: spawn VFX trái tim / particle nếu cần
+
+                return true;
+            }
+            else
+            {
+                Debug.Log("[AnimalController] Not enough food in inventory!");
+                // TODO: show UI feedback "Need more food"
+                return false;
+            }
+        }
+
         // Setup helpers
-        // --------------------------------------------------
 
         private void SetupAnimatorParamHashes()
         {
-            if (animator == null) return;
+            if (animator == null)
+                return;
 
-            // auto tìm param speed nếu để trống
+            // tìm param speed nếu chưa set, hơi thủ công tí cho hợp vibe newbie
             if (string.IsNullOrEmpty(speedParam))
             {
                 foreach (var p in animator.parameters)
@@ -244,7 +277,8 @@ namespace IronIvy.Gameplay.Animals
 
         private void SetupAgentFromDefinition()
         {
-            if (agent == null || definition == null) return;
+            if (agent == null || definition == null)
+                return;
 
             agent.speed = Mathf.Max(0.1f, definition.walkSpeed);
             agent.angularSpeed = 120f;
@@ -252,23 +286,6 @@ namespace IronIvy.Gameplay.Animals
             agent.stoppingDistance = 0.25f;
         }
 
-        private void ResolvePlayerTransform()
-        {
-            // nếu có AnimalManager thì ưu tiên playerRef trên đó
-            if (AnimalManager.HasInstance && AnimalManager.Instance.playerTransform != null)
-            {
-                _player = AnimalManager.Instance.playerTransform;
-                return;
-            }
-
-            // fallback test tay, tìm theo tag
-            if (_player == null)
-            {
-                var go = GameObject.FindGameObjectWithTag(playerTag);
-                if (go != null)
-                    _player = go.transform;
-            }
-        }
 
         private void SetupAmbientState()
         {
@@ -277,9 +294,11 @@ namespace IronIvy.Gameplay.Animals
             _ambientNextTime = 0f;
             _ambientSoundRadiusSqr = 0f;
 
-            if (definition == null) return;
-            if (definition.ambientClips == null || definition.ambientClips.Length == 0) return;
-            if (definition.ambientSoundRadius <= 0f) return;
+            if (definition == null ||
+                definition.ambientClips == null ||
+                definition.ambientClips.Length == 0 ||
+                definition.ambientSoundRadius <= 0f)
+                return;
 
             _hasAmbientConfig = true;
             _ambientSoundRadiusSqr = definition.ambientSoundRadius * definition.ambientSoundRadius;
@@ -293,10 +312,11 @@ namespace IronIvy.Gameplay.Animals
             _nextCuriousCheckTime = 0f;
             _curiousEndTime = 0f;
 
-            if (definition == null) return;
-            if (definition.curiousRadius <= 0f) return;
-            if (definition.curiousChancePerCheck <= 0f) return;
-            if (definition.curiousCheckInterval <= 0f) return;
+            if (definition == null ||
+                definition.curiousRadius <= 0f ||
+                definition.curiousChancePerCheck <= 0f ||
+                definition.curiousCheckInterval <= 0f)
+                return;
 
             _curiousRadiusSqr = definition.curiousRadius * definition.curiousRadius;
             _nextCuriousCheckTime = Time.time + Random.Range(0.5f, definition.curiousCheckInterval);
@@ -304,23 +324,24 @@ namespace IronIvy.Gameplay.Animals
 
         private void SetupMinigameRefs()
         {
-            if (!enableRhythmMinigame) return;
+            if (!enableRhythmMinigame)
+                return;
 
-            _interactionRadiusSqr = interactionRadius * interactionRadius;
 
-            // auto find interaction panel
+
             if (interactionPanel == null)
+            {
                 interactionPanel = MinigameInteractionPanel.Instance ??
                                    GameObject.FindObjectOfType<MinigameInteractionPanel>(true);
+            }
 
-            // auto find click animal minigame controller trong scene
             if (animalMinigame == null)
+            {
                 animalMinigame = GameObject.FindObjectOfType<ClickAnimalRhythmMinigame>(true);
+            }
         }
 
-        // --------------------------------------------------
-        // Wander behaviour
-        // --------------------------------------------------
+        // Wander & Ambient
 
         private System.Collections.IEnumerator WanderRoutine()
         {
@@ -339,14 +360,13 @@ namespace IronIvy.Gameplay.Animals
                         agent.SetDestination(target);
                 }
 
-                // đợi tới khi tới nơi hoặc path pending xong
-                while (agent != null && agent.isOnNavMesh &&
+                while (agent != null &&
+                       agent.isOnNavMesh &&
                        (agent.pathPending || agent.remainingDistance > agent.stoppingDistance + 0.1f))
                 {
                     yield return null;
                 }
 
-                // tới nơi thì idle anim random
                 PlayRandomIdleVariant();
 
                 float wait = Random.Range(definition.minIdleTime, definition.maxIdleTime);
@@ -378,10 +398,10 @@ namespace IronIvy.Gameplay.Animals
 
         private void PlayRandomIdleVariant()
         {
-            if (animator == null) return;
+            if (animator == null)
+                return;
 
-            int roll = Random.Range(0, 3); // 0 idle, 1 eat, 2 jump
-
+            int roll = Random.Range(0, 3);
             if (roll == 1 && !string.IsNullOrEmpty(eatTrigger))
             {
                 animator.SetTrigger(eatTrigger);
@@ -396,31 +416,23 @@ namespace IronIvy.Gameplay.Animals
             }
         }
 
-        // --------------------------------------------------
-        // Ambient sound behaviour
-        // --------------------------------------------------
-
         private void HandleAmbientSound()
         {
-            if (!_hasAmbientConfig) return;
-            if (_player == null) return;
-            if (definition == null) return;
+            if (!_hasAmbientConfig || _player == null || definition == null)
+                return;
 
             Vector3 diff = _player.position - transform.position;
             float sqrDist = diff.sqrMagnitude;
-
             bool isNear = sqrDist <= _ambientSoundRadiusSqr;
 
             if (!isNear)
             {
-                // player ra khỏi vùng âm thanh, reset flag
                 _playerIsNearForAmbient = false;
                 return;
             }
 
             if (!_playerIsNearForAmbient)
             {
-                // lần đầu player vào vùng, random thời gian kêu
                 float min = Mathf.Max(0.1f, definition.ambientMinInterval);
                 float max = Mathf.Max(min, definition.ambientMaxInterval);
                 _ambientNextTime = Time.time + Random.Range(min, max);
@@ -430,10 +442,8 @@ namespace IronIvy.Gameplay.Animals
             if (Time.time < _ambientNextTime)
                 return;
 
-            // tới giờ kêu 1 phát
             PlayAmbientClip();
 
-            // schedule lần sau
             {
                 float min = Mathf.Max(0.1f, definition.ambientMinInterval);
                 float max = Mathf.Max(min, definition.ambientMaxInterval);
@@ -443,44 +453,31 @@ namespace IronIvy.Gameplay.Animals
 
         private void PlayAmbientClip()
         {
-            if (definition == null) return;
-            if (definition.ambientClips == null || definition.ambientClips.Length == 0) return;
+            if (definition == null || definition.ambientClips == null || definition.ambientClips.Length == 0)
+                return;
 
             var clips = definition.ambientClips;
-            int idx = Random.Range(0, clips.Length);
-            AudioClip clip = clips[idx];
-            if (clip == null) return;
-
-            // gọi qua AudioManager để giữ setting volume, mute, v.v.
-            if (AudioManager.HasInstance)
+            AudioClip clip = clips[Random.Range(0, clips.Length)];
+            if (clip && AudioManager.HasInstance)
                 AudioManager.Instance.PlaySEAtPosition(clip, transform.position);
         }
 
-        // --------------------------------------------------
-        // Curious look at player
-        // --------------------------------------------------
+        // Curious
 
         private void HandleCuriousBehaviour()
         {
-            if (definition == null) return;
-            if (_player == null) return;
-            if (_curiousRadiusSqr <= 0f) return;
-            if (definition.curiousChancePerCheck <= 0f) return;
+            if (definition == null || _player == null || _curiousRadiusSqr <= 0f)
+                return;
 
             if (_isCurious)
             {
-                // đang curious thì quay mặt dần về phía player
                 Vector3 dir = _player.position - transform.position;
                 dir.y = 0f;
 
                 if (dir.sqrMagnitude > 0.0001f)
                 {
                     Quaternion targetRot = Quaternion.LookRotation(dir);
-                    transform.rotation = Quaternion.Slerp(
-                        transform.rotation,
-                        targetRot,
-                        Time.deltaTime * 3f
-                    );
+                    transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, Time.deltaTime * 3f);
                 }
 
                 if (Time.time >= _curiousEndTime)
@@ -489,27 +486,24 @@ namespace IronIvy.Gameplay.Animals
                 return;
             }
 
-            // chỉ check theo interval, tránh random mỗi frame
             if (Time.time < _nextCuriousCheckTime)
                 return;
 
             float interval = Mathf.Max(0.5f, definition.curiousCheckInterval);
             _nextCuriousCheckTime = Time.time + interval;
 
-            // quá xa thì bỏ qua
             Vector3 diffCur = _player.position - transform.position;
-            float sqrDistCur = diffCur.sqrMagnitude;
-            if (sqrDistCur > _curiousRadiusSqr)
+            if (diffCur.sqrMagnitude > _curiousRadiusSqr)
                 return;
 
-            // random xác suất nhỏ
             if (Random.value <= definition.curiousChancePerCheck)
                 StartCurious();
         }
 
         private void StartCurious()
         {
-            if (_isCurious) return;
+            if (_isCurious)
+                return;
 
             _isCurious = true;
             _state = AnimalState.Curious;
@@ -526,15 +520,12 @@ namespace IronIvy.Gameplay.Animals
                 _wanderRoutine = null;
             }
 
-            // random thời gian đứng nhìn player
             float min = Mathf.Max(0.5f, definition.curiousMinDuration);
             float max = Mathf.Max(min, definition.curiousMaxDuration);
             _curiousEndTime = Time.time + Random.Range(min, max);
 
             if (animator != null && !string.IsNullOrEmpty(definition.curiousAnimTrigger))
-            {
                 animator.SetTrigger(definition.curiousAnimTrigger);
-            }
         }
 
         private void EndCurious()
@@ -542,107 +533,73 @@ namespace IronIvy.Gameplay.Animals
             _isCurious = false;
             _state = AnimalState.Wandering;
 
-            // hết curious thì quay lại wander
             if (_wanderRoutine == null && definition != null && agent != null)
                 _wanderRoutine = StartCoroutine(WanderRoutine());
         }
 
-        // --------------------------------------------------
-        // Minigame: Animal Rhythm proximity
-        // --------------------------------------------------
-
-        private void HandleMinigameProximity()
+        public void OnInteractPressed()
         {
             if (!enableRhythmMinigame) return;
             if (_hasPlayedMinigame && oneShotMinigame) return;
-            if (_player == null || interactionPanel == null || animalMinigame == null) return;
 
-            float sqrDist = (_player.position - transform.position).sqrMagnitude;
+            // Tìm panel trong scene ngay tại thời điểm bấm nút
+            var panel = FindObjectOfType<MinigameInteractionPanel>(true); // true để tìm cả object đang ẩn
 
-            if (sqrDist <= _interactionRadiusSqr)
+            if (panel != null)
             {
-                if (!_playerInRangeForMinigame)
-                {
-                    _playerInRangeForMinigame = true;
-                    // show panel hỏi có chơi minigame không
-                    interactionPanel.ShowForAnimal(this, animalMinigame);
-                }
+                // Fallback tìm minigame system nếu chưa gán
+                if (animalMinigame == null) animalMinigame = FindObjectOfType<ClickAnimalRhythmMinigame>();
+                
+                panel.ShowForAnimal(this, animalMinigame);
             }
             else
             {
-                if (_playerInRangeForMinigame)
-                {
-                    _playerInRangeForMinigame = false;
-                    interactionPanel.HideIfCurrentAnimal(this);
-                }
+                Debug.LogWarning("Không tìm thấy MinigameInteractionPanel trong Scene");
             }
         }
 
-        private void UpdateMinigameInteraction()
+        // Hàm này gắn vào Event "On Toggle Highlight" của InteractionTrigger
+        public void SetHighlightState(bool state)
         {
-            // neu khong bat minigame thi bo qua
-            if (!enableRhythmMinigame || interactionPanel == null || animalMinigame == null)
-                return;
-
-            // neu one-shot va da choi roi thi thoi
-            if (_hasPlayedMinigame && oneShotMinigame)
-                return;
-
-            // chua tim duoc player
-            if (_player == null)
-                return;
-
-            // check khoang cach giua player va animal
-            float distSqr = (transform.position - _player.position).sqrMagnitude;
-            bool inRangeNow = distSqr <= _interactionRadiusSqr;
-
-            if (inRangeNow != _playerInRangeForMinigame)
+            if (_hasPlayedMinigame && oneShotMinigame) 
             {
-                _playerInRangeForMinigame = inRangeNow;
-
-                if (_playerInRangeForMinigame)
-                {
-                    // player vua buoc vao vung => show panel
-                    interactionPanel.ShowForAnimal(this, animalMinigame);
-                }
-                else
-                {
-                    // player ra khoi vung => hide neu dang la con nay
-                    interactionPanel.HideIfCurrentAnimal(this);
-                }
+                if(highlightController) highlightController.SetHighlight(false);
+                return;
             }
+
+            if (highlightController) highlightController.SetHighlight(state);
         }
 
-        // hàm này sẽ được gọi từ minigame khi muốn khóa one-shot
+        // được minigame gọi sau khi player confirm chơi xong 1 lần
         public void MarkMinigamePlayed()
         {
             _hasPlayedMinigame = true;
-            // khong despawn o day nua, cho RewardPanel goi sau khi user bam OK
+
+            if (oneShotMinigame)
+            {
+                // one-shot: tắt highlight luôn, sau đó đợi RewardPanel quyết định despawn
+                SetHighlighted(false);
+            }
         }
 
-        // public API de despawn sau minigame (goi tu RewardPanel)
         public void DespawnAfterMinigame()
-{
-    if (!oneShotMinigame)
-    {
-        if (interactionPanel != null)
-            interactionPanel.HideIfCurrentAnimal(this);
-        return;
-    }
+        {
+            if (!oneShotMinigame)
+            {
+                if (interactionPanel != null)
+                    interactionPanel.HideIfCurrentAnimal(this);
 
-    if (interactionPanel != null)
-        interactionPanel.HideIfCurrentAnimal(this);
+                return;
+            }
 
-    if (AnimalManager.HasInstance)
-    {
-        AnimalManager.Instance.DespawnAnimalWithFade(this);
-    }
-    else
-    {
-        // dev mode, khong co manager thi tat luon
-        gameObject.SetActive(false);
-    }
-}
+            if (interactionPanel != null)
+                interactionPanel.HideIfCurrentAnimal(this);
 
+            // despawn -> OnDisable cũng sẽ tắt highlight
+            if (AnimalManager.HasInstance)
+                AnimalManager.Instance.DespawnAnimalWithFade(this);
+            else
+                gameObject.SetActive(false);
+        }
     }
 }

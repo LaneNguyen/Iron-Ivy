@@ -8,6 +8,7 @@ TagManager:
   - PW - Prop
   - PW - Building
   - Animal
+  - Synty Tree
   layers:
   - Default
   - TransparentFX
@@ -22,7 +23,7 @@ TagManager:
   - PW_Object_Medium
   - PW_Object_Large
   - Ground
-  - 
+  - Interactable
   - 
   - 
   - 

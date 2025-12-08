@@ -10,11 +10,9 @@ using IronIvy.Systems.Camera;
 
 namespace IronIvy.Gameplay.Rhythm
 {
-    // Animal rhythm minigame kieu click/hold target
     public class ClickAnimalRhythmMinigame : MonoBehaviour, IMinigame
     {
         [Header("Root / Focus")]
-        [Tooltip("Fallback neu khong co animal focus, dung chinh object nay.")]
         public Transform defaultRoot;
 
         [Header("UI & Target")]
@@ -23,32 +21,28 @@ namespace IronIvy.Gameplay.Rhythm
         public RhythmClickTarget targetPrefab;
 
         [Header("Reward Panel")]
-        [Tooltip("Panel recap rieng cho animal rhythm. Keo prefab panel vao day.")]
         public AnimalRhythmRewardPanel rewardPanel;
 
-        [Header("Playlist / Pattern (fallback)")]
-        [Tooltip("Playlist fallback neu AnimalDefinition khong co pattern.")]
+        [Header("Playlist / Pattern")]
         public List<RhythmPattern> fallbackPlaylist = new List<RhythmPattern>();
 
         [Header("Beat Settings")]
-        [Tooltip("Beats Per Minute cho minigame.")]
         public float bpm = 90f;
-
-        [Tooltip("Thoi gian beat (giay) = 60 / bpm.")]
         public float BeatDuration => 60f / Mathf.Max(1f, bpm);
-
-        [Tooltip("Thoi gian can giu chuot de tinh hold (giay).")]
         public float defaultHoldRequiredSeconds = 0.7f;
 
         [Header("BGM")]
-        [Tooltip("Ten key BGM dung cho animal rhythm, de rong neu khong muon auto play.")]
         public string bgmKey = "animal_rhythm_bgm";
 
-        // -------- Runtime state --------
+        // Runtime state
         public bool IsRunning { get; private set; }
 
         private AnimalController _currentAnimal;
         private Transform _currentFocus;
+        
+        // [BUFF STATE]
+        private bool _hasFavoriteBuff;
+        private int _safetyNetRemains;
 
         private readonly List<RhythmPattern> _playlist = new List<RhythmPattern>();
         private RhythmPattern _currentPattern;
@@ -70,31 +64,35 @@ namespace IronIvy.Gameplay.Rhythm
             if (hud != null) hud.ResetHUD();
         }
 
-        //=====================
-        // API cho AnimalController
-        //=====================
-        public void RequestPlay(AnimalController animal)
+        // API Start
+        public void RequestPlay(AnimalController animal, bool isFavoriteBuff = false)
         {
             _currentAnimal = animal;
             _currentFocus = (animal != null) ? animal.transform : (defaultRoot != null ? defaultRoot : transform);
+            
+            // SETUP BUFF
+            _hasFavoriteBuff = isFavoriteBuff;
+            
+            int baseSafety = 0;
+            if (animal != null && animal.Definition != null) 
+                baseSafety = animal.Definition.buffSafetyNet;
+            else 
+                baseSafety = 3; // Default fallback
+
+            _safetyNetRemains = _hasFavoriteBuff ? baseSafety : 0;
+
+            Debug.Log($"[AnimalRhythm] Start. Buff: {_hasFavoriteBuff}. SafetyNet: {_safetyNetRemains}");
             StartGame();
         }
 
-        //=====================
-        // IMinigame
-        //=====================
+        // Game Logic
         public void StartGame()
         {
             if (IsRunning) return;
-
             if (_currentFocus == null) _currentFocus = defaultRoot != null ? defaultRoot : transform;
 
             BuildPlaylist(_playlist);
-            if (_playlist.Count == 0)
-            {
-                Debug.LogWarning("[ClickAnimalRhythm] No pattern in playlist.");
-                return;
-            }
+            if (_playlist.Count == 0) return;
 
             _totalBeatsForProgress = 0;
             foreach (var p in _playlist) _totalBeatsForProgress += CountBeatsInPattern(p);
@@ -111,13 +109,13 @@ namespace IronIvy.Gameplay.Rhythm
             if (hud != null)
             {
                 if (hud.hudRoot != null) hud.hudRoot.SetActive(true);
-                if (hud.titleText != null)
-                {
-                    string title = "Animal Rhythm";
-                    if (_currentAnimal != null && _currentAnimal.Definition != null && !string.IsNullOrEmpty(_currentAnimal.Definition.displayName))
-                        title = _currentAnimal.Definition.displayName;
-                    hud.titleText.text = title;
-                }
+                string title = (_currentAnimal != null && _currentAnimal.Definition != null) ? _currentAnimal.Definition.displayName : "Animal Rhythm";
+                
+                // [VISUAL] Hiện icon khiên nếu có buff
+                if (_hasFavoriteBuff) title += " <color=green>[Protected]</color>";
+                
+                if (hud.titleText != null) hud.titleText.text = title;
+                
                 hud.SetStatus("Ready", false);
                 hud.SetProgress(0f);
                 hud.SetHitMiss(0, 0);
@@ -151,14 +149,22 @@ namespace IronIvy.Gameplay.Rhythm
                 hud.ResetHUD();
             }
 
-            // Tính toán reward và raise event
+            // Tính toán kết quả
             float successRatio = ComputeSuccessRatio();
             float finalReward = GrantArchiveReward(successRatio);
+            
+            // [LOGIC] LOOT BONUS
+            FoodItem lootItem = null;
+            int lootCount = 0;
+            GrantLootReward(successRatio, out lootItem, out lootCount);
 
             if (ListenManager.HasInstance) ListenManager.Instance.RaiseMinigameStopped();
 
             if (_currentAnimal != null && rewardPanel != null)
-                rewardPanel.ShowAnimalRhythmResult(_currentAnimal, successRatio, finalReward);
+            {
+                // [UI] Truyền thông tin Loot vào Panel
+                rewardPanel.ShowAnimalRhythmResult(_currentAnimal, successRatio, finalReward, lootItem, lootCount);
+            }
 
             if (_currentAnimal != null) _currentAnimal.MarkMinigamePlayed();
 
@@ -166,33 +172,31 @@ namespace IronIvy.Gameplay.Rhythm
             _currentFocus = null;
         }
 
-        private void OnDisable()
-        {
-            if (IsRunning) StopGame();
-        }
-
-        // ... (Giữ nguyên phần Playlist / Pattern / Beat logic không đổi) ...
-        // ... (Để tiết kiệm không gian, tôi chỉ liệt kê các hàm logic beat ở dạng rút gọn, code logic bên trong không đổi) ...
-        
+        // Playlist Logic (Sửa lỗi biến p -> pat)
         private void BuildPlaylist(List<RhythmPattern> outList)
         {
             outList.Clear();
             AnimalDefinition def = _currentAnimal != null ? _currentAnimal.Definition : null;
+            
             if (def != null && def.patterns != null && def.patterns.Length > 0)
             {
-                foreach (var p in def.patterns) if (p != null) outList.Add(p);
+                // [FIXED] Đổi p thành pat để tránh trùng tên
+                foreach (var pat in def.patterns) 
+                    if (pat != null) outList.Add(pat);
             }
             else
             {
-                foreach (var p in fallbackPlaylist) if (p != null) outList.Add(p);
+                // [FIXED] Đổi p thành pat
+                foreach (var pat in fallbackPlaylist) 
+                    if (pat != null) outList.Add(pat);
             }
         }
 
-        private int CountBeatsInPattern(RhythmPattern p)
+        private int CountBeatsInPattern(RhythmPattern pattern)
         {
-            if (p == null || p.sequence == null) return 0;
+            if (pattern == null || pattern.sequence == null) return 0;
             int count = 0;
-            foreach (var step in p.sequence) count += Mathf.Max(1, step.beats <= 0 ? 1 : step.beats);
+            foreach (var step in pattern.sequence) count += Mathf.Max(1, step.beats <= 0 ? 1 : step.beats);
             return count;
         }
 
@@ -287,6 +291,7 @@ namespace IronIvy.Gameplay.Rhythm
             ResolveBeat(hit);
         }
 
+        // [LOGIC] BUFF SYSTEM & SCORING
         private void ResolveBeat(bool? hit)
         {
             if (!IsRunning) return;
@@ -299,14 +304,46 @@ namespace IronIvy.Gameplay.Rhythm
                 isScorableStep = (step.type == RhythmPattern.StepType.Tap || step.type == RhythmPattern.StepType.Hold);
             }
 
-            if (hit == true && isScorableStep) _totalHit++;
-            else if (hit == false && isScorableStep) _totalMiss++;
+            string statusMsg = "";
+            bool statusPositive = false;
+
+            if (hit == true && isScorableStep)
+            {
+                // [LOGIC] TRUST MULTIPLIER (Hiển thị thôi, trust thật tính cuối game)
+                _totalHit++;
+                statusMsg = "Hit!";
+                
+                if (_hasFavoriteBuff)
+                {
+                    // Có thể thêm effect visual cho xịn ở đây
+                    statusMsg = "Perfect! (Buffed)";
+                }
+                statusPositive = true;
+            }
+            else if (hit == false && isScorableStep)
+            {
+                // [LOGIC] SAFETY NET (Bảo hiểm)
+                if (_hasFavoriteBuff && _safetyNetRemains > 0)
+                {
+                    // Được tha mạng!
+                    _safetyNetRemains--;
+                    statusMsg = $"Shield! ({_safetyNetRemains} left)";
+                    statusPositive = true; // Màu xanh để người chơi biết mình được cứu
+                    
+                    // KHÔNG tính vào _totalMiss, coi như chưa từng xảy ra
+                }
+                else
+                {
+                    _totalMiss++;
+                    statusMsg = "Miss";
+                    statusPositive = false;
+                }
+            }
 
             if (hud != null)
             {
                 hud.SetHitMiss(_totalHit, _totalMiss);
-                if (hit == true && isScorableStep) hud.SetStatus("Hit!", true);
-                else if (hit == false && isScorableStep) hud.SetStatus("Miss", false);
+                if (isScorableStep) hud.SetStatus(statusMsg, statusPositive);
             }
 
             if (IsRunning) StartNextBeat();
@@ -323,9 +360,7 @@ namespace IronIvy.Gameplay.Rhythm
             StopGame();
         }
 
-        //=====================
-        // Archive reward
-        //=====================
+        // [LOGIC] REWARDS CALCULATION
 
         private float ComputeSuccessRatio()
         {
@@ -334,7 +369,6 @@ namespace IronIvy.Gameplay.Rhythm
             return (float)_totalHit / total;
         }
 
-       // tra ve so % archive thuc su da cong
         private float GrantArchiveReward(float successRatio)
         {
             if (_currentAnimal == null) return 0f;
@@ -343,27 +377,51 @@ namespace IronIvy.Gameplay.Rhythm
             var def = _currentAnimal.Definition;
             if (def == null) return 0f;
 
-            // Kiểm tra xem Archive Reward trong data có > 0 không
             float baseReward = def.archiveReward; 
-            if (baseReward <= 0f) 
-            {
-                Debug.LogWarning($"[ClickAnimalRhythm] Animal {def.name} has 0 archive reward configured!");
-                return 0f;
-            }
+            if (baseReward <= 0f) return 0f;
 
             float finalReward = 0f;
 
-            if (successRatio >= 0.99f) finalReward = baseReward;
-            else if (successRatio >= 0.5f) finalReward = baseReward * 0.5f;
+            // [LOGIC] TRUST MULTIPLIER (Áp dụng vào Archive Reward)
+            float multiplier = 1f;
+            if (_hasFavoriteBuff) multiplier = def.buffTrustMultiplier;
+
+            if (successRatio >= 0.99f) finalReward = baseReward * multiplier;
+            else if (successRatio >= 0.5f) finalReward = baseReward * 0.5f * multiplier;
             else finalReward = 0f;
 
             if (finalReward > 0f)
             {
-                // CHỈ CẦN GỌI DÒNG NÀY, ArchiveManager sẽ tự Raise Event
                 ArchiveManager.Instance.AddProgress(finalReward);
             }
 
             return finalReward;
+        }
+
+        private void GrantLootReward(float successRatio, out FoodItem item, out int count)
+        {
+            item = null;
+            count = 0;
+
+            if (_currentAnimal == null || _currentAnimal.Definition == null) return;
+            if (!InventoryManager.HasInstance) return;
+
+            // Chỉ thưởng Loot nếu thắng (Success >= 50%)
+            if (successRatio < 0.5f) return;
+
+            var def = _currentAnimal.Definition;
+            if (def.dropItem == null || def.dropCount <= 0) return;
+
+            item = def.dropItem;
+            count = def.dropCount;
+
+            // [LOGIC] LOOT BONUS (Nhân đôi quà)
+            if (_hasFavoriteBuff && def.doubleLootOnBuff)
+            {
+                count *= 2;
+            }
+
+            InventoryManager.Instance.AddFood(item, count);
         }
     }
 }

@@ -17,10 +17,9 @@ namespace IronIvy.Core
             
             items[item] = GetCount(item) + count;
             
-            // --- [DEBUG MỚI] ---
+            // DEBUG MỚI thử ne
             int listenerCount = OnInventoryChanged != null ? OnInventoryChanged.GetInvocationList().Length : 0;
             Debug.Log($"[Inventory] ADDED: {item.displayName}. Đang bắn tin cho {listenerCount} người nghe.");
-            // -------------------
 
             OnInventoryChanged?.Invoke();
         }
@@ -38,7 +37,7 @@ namespace IronIvy.Core
         public int GetCount(FoodItem item) => items.TryGetValue(item, out var c) ? c : 0;
         public IEnumerable<KeyValuePair<FoodItem, int>> All() => items;
 
-        // === [DEBUG TOOLS] ===
+        // [DEBUG TOOLS]
         // Chuột phải vào component InventoryManager chọn "Print Inventory" để kiểm tra
         [ContextMenu("Print Inventory Debug")]
         public void PrintDebug()

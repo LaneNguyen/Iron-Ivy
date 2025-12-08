@@ -7,13 +7,18 @@ using IronIvy.UI;
 
 namespace IronIvy.UI
 {
+    // UI chính của game
+    // - quản lý energy
+    // - entry plant/animal minigame
+    // - archive, day, trust popup
+    // - hook với ListenManager để sync state
     public class MainGameUIPanel : MonoBehaviour
     {
         [Header("Energy UI")]
-        public TextMeshProUGUI energyText;        
-        public Slider energySlider;               
-        public TextMeshProUGUI plantCostText;     
-        public TextMeshProUGUI animalCostText;    
+        public TextMeshProUGUI energyText;
+        public Slider energySlider;
+        public TextMeshProUGUI plantCostText;
+        public TextMeshProUGUI animalCostText;
 
         [Header("Energy Config")]
         public int displayMaxEnergy = 6;
@@ -21,14 +26,12 @@ namespace IronIvy.UI
 
         [Header("Start Panels")]
         public PlantRhythmStartPanel plantRhythmStartPanel;
-        // Bỏ hoặc không dùng reference này nữa
-        public AnimalRhythmStartPanel animalRhythmStartPanel;   
+        // reference này tạm chưa dùng, để dành phase sau
+        public AnimalRhythmStartPanel animalRhythmStartPanel;
 
-        // === [TÍCH HỢP FOOD PANEL] ===
         [Header("Inventory UI")]
-        [Tooltip("Kéo script FoodInventoryPanel vào đây để MainUI tự động refresh nó khi bật")]
-        public FoodInventoryPanel foodInventoryPanel; 
-        // =============================
+        [Tooltip("Kéo script FoodInventoryPanel vào để Main UI tự refresh khi bật lên")]
+        public FoodInventoryPanel foodInventoryPanel;
 
         [Header("Minigame State")]
         public bool isMinigameRunning;
@@ -50,10 +53,6 @@ namespace IronIvy.UI
 
         private Coroutine trustPopupCoroutine;
 
-        //==================================================
-        //  Unity
-        //==================================================
-
         private void OnEnable()
         {
             if (ListenManager.HasInstance)
@@ -66,18 +65,15 @@ namespace IronIvy.UI
                 ListenManager.Instance.OnTrustSuccess += OnTrustSuccess;
             }
 
-            // ⭐ FORCE REFRESH ENERGY
+            // ép UI sync với EnergyManager khi panel bật lên
             RefreshEnergyUIFromManager();
 
             if (ArchiveManager.HasInstance)
                 OnArchiveChanged(ArchiveManager.Instance.GetPercent());
 
-            // ⭐ FORCE REFRESH FOOD INVENTORY
-            // Đảm bảo khi Main UI bật lên, list đồ ăn được cập nhật mới nhất
+            // ép food inventory update lại list mới nhất
             if (foodInventoryPanel != null)
-            {
                 foodInventoryPanel.UpdateUI();
-            }
         }
 
         private void OnDisable()
@@ -93,13 +89,12 @@ namespace IronIvy.UI
             }
         }
 
-        //==================================================
-        //  ENERGY
-        //==================================================
+        // energy
 
         private void RefreshEnergyUIFromManager()
         {
             if (!EnergyManager.HasInstance) return;
+
             int current = EnergyManager.Instance.Current;
             RefreshEnergyUI(current);
         }
@@ -108,8 +103,11 @@ namespace IronIvy.UI
         {
             int max = Mathf.Max(displayMaxEnergy, 1);
 
-            if (energyText != null) energyText.text = $"{current} / {max}";
-            if (energySlider != null) energySlider.value = Mathf.Clamp01((float)current / max);
+            if (energyText != null)
+                energyText.text = $"{current} / {max}";
+
+            if (energySlider != null)
+                energySlider.value = Mathf.Clamp01((float)current / max);
 
             if (plantCostText != null && plantRhythmStartPanel != null)
                 plantCostText.text = $"-{plantRhythmStartPanel.baseEnergyCost} energy";
@@ -123,9 +121,7 @@ namespace IronIvy.UI
             RefreshEnergyUI(current);
         }
 
-        //==================================================
-        //  MINIGAME STATE
-        //==================================================
+        // minigame state
 
         private void OnMinigameStarted()
         {
@@ -142,36 +138,39 @@ namespace IronIvy.UI
 
         private void RefreshMinigameStateUI()
         {
-            if (plantStartButton != null) plantStartButton.interactable = !isMinigameRunning;
-            if (animalStartButton != null) animalStartButton.interactable = !isMinigameRunning;
+            if (plantStartButton != null)
+                plantStartButton.interactable = !isMinigameRunning;
+
+            if (animalStartButton != null)
+                animalStartButton.interactable = !isMinigameRunning;
 
             if (minigameStatusText != null)
                 minigameStatusText.text = isMinigameRunning ? "Playing rhythm..." : "";
         }
 
-        //==================================================
-        //  ENTRY POINT BUTTONS
-        //==================================================
+        // entry buttons
 
         public void OnClickPlayPlantRhythm()
         {
             if (isMinigameRunning) return;
-            if (plantRhythmStartPanel != null) plantRhythmStartPanel.Show();
+
+            if (plantRhythmStartPanel != null)
+                plantRhythmStartPanel.Show();
         }
 
         public void OnClickPlayAnimalRhythm()
         {
-            // Người chơi cần đi lại gần con thú để chơi.
+            // hiện tại animal phải lại gần con thú để chơi
             Debug.Log("Please approach an animal to play Animal Rhythm.");
         }
 
-        //==================================================
-        //  ARCHIVE / DAY / TRUST
-        //==================================================
+        // archive / day / trust
 
         private void OnArchiveChanged(float value)
         {
-            if (archiveSlider != null) archiveSlider.value = Mathf.Clamp01(value);
+            if (archiveSlider != null)
+                archiveSlider.value = Mathf.Clamp01(value);
+
             if (archiveText != null)
             {
                 int percentInt = Mathf.RoundToInt(value * 100f);
@@ -181,7 +180,8 @@ namespace IronIvy.UI
 
         private void OnDayEnded()
         {
-            if (endDayButton != null) endDayButton.interactable = false;
+            if (endDayButton != null)
+                endDayButton.interactable = false;
         }
 
         private void OnTrustSuccess()
@@ -192,7 +192,10 @@ namespace IronIvy.UI
         private void ShowTrustPopup(string message)
         {
             if (trustPopupText == null) return;
-            if (trustPopupCoroutine != null) StopCoroutine(trustPopupCoroutine);
+
+            if (trustPopupCoroutine != null)
+                StopCoroutine(trustPopupCoroutine);
+
             trustPopupCoroutine = StartCoroutine(TrustPopupRoutine(message));
         }
 
@@ -200,19 +203,22 @@ namespace IronIvy.UI
         {
             trustPopupText.gameObject.SetActive(true);
             trustPopupText.text = message;
+
             float t = 0f;
             while (t < trustPopupDuration)
             {
                 t += Time.deltaTime;
                 yield return null;
             }
+
             trustPopupText.gameObject.SetActive(false);
             trustPopupCoroutine = null;
         }
 
         public void SetDayText(string text)
         {
-            if (dayText != null) dayText.text = text;
+            if (dayText != null)
+                dayText.text = text;
         }
     }
 }

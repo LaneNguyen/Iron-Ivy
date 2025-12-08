@@ -7,10 +7,9 @@ using IronIvy.Gameplay.Rhythm;
 
 namespace IronIvy.UI
 {
-    /// <summary>
-    /// Panel thu hoạch sau khi chơi xong plant rhythm.
-    /// Đã nâng cấp để hiển thị danh sách item (Dictionary) thay vì 1 item lẻ.
-    /// </summary>
+    // panel kết quả sau khi chơi xong plant rhythm
+    // - show trust, hit/miss
+    // - spawn list item reward từ Dictionary<FoodItem, int>
     public class PlantRhythmRewardPanel : MonoBehaviour
     {
         [Header("Root")]
@@ -22,13 +21,13 @@ namespace IronIvy.UI
         public TextMeshProUGUI hitMissText;
 
         [Header("Rewards List (Setup Mới)")]
-        [Tooltip("Container chứa các slot item (Gắn Horizontal Layout Group)")]
+        [Tooltip("Container chứa các slot item (gắn Horizontal Layout Group)")]
         public Transform rewardContainer; 
         
-        [Tooltip("Prefab UI_ItemSlot (Dùng chung với Inventory)")]
+        [Tooltip("Prefab UI_ItemSlot (dùng chung với Inventory)")]
         public GameObject itemSlotPrefab;
 
-        // Biến cũ (Không dùng nữa nhưng giữ lại để đỡ lỗi Inspector nếu lỡ quên xóa)
+        // biến cũ giữ lại cho an toàn Inspector
         [HideInInspector] public TextMeshProUGUI plantNameText;
         [HideInInspector] public TextMeshProUGUI rewardText;
         [HideInInspector] public Image rewardIcon;
@@ -39,25 +38,26 @@ namespace IronIvy.UI
             root.SetActive(false);
         }
 
-        /// <summary>
-        /// Show kết quả harvest với danh sách quà.
-        /// </summary>
+            // show kết quả harvest với danh sách reward
+            // - rewards: item + số lượng
+            // - hit/miss + trust %
         public void Show(Dictionary<FoodItem, int> rewards, int hit, int miss, float trust)
         {
             if (root == null) root = gameObject;
             gameObject.SetActive(true);
             root.SetActive(true);
 
-            // 1. Update thông tin chung
+            // info chung
             if (titleText) titleText.text = "Harvest Complete!";
             if (trustText) trustText.text = $"Trust: {Mathf.RoundToInt(trust)}%";
             if (hitMissText) hitMissText.text = $"Perfect: {hit} | Miss: {miss}";
 
-            // 2. Spawn Item Slots vào Container
+            // spawn item slots vào container
             if (rewardContainer && itemSlotPrefab)
             {
-                // Xóa slot cũ
-                foreach (Transform child in rewardContainer) Destroy(child.gameObject);
+                // clear slot cũ
+                foreach (Transform child in rewardContainer)
+                    Destroy(child.gameObject);
 
                 if (rewards != null && rewards.Count > 0)
                 {
@@ -72,7 +72,7 @@ namespace IronIvy.UI
                         slotObj.SetActive(true);
                         slotObj.transform.localScale = Vector3.one;
 
-                        // Dùng script UI_ItemSlot để setup visual (Icon + Text)
+                        // dùng UIItemSlot để set icon + số lượng
                         var slotScript = slotObj.GetComponent<UIItemSlot>();
                         if (slotScript)
                         {
@@ -82,8 +82,8 @@ namespace IronIvy.UI
                 }
                 else
                 {
-                    // Nếu không có quà (Trust thấp hoặc lỗi)
-                    // Có thể instantiate một text báo "No Reward" ở đây nếu muốn
+                    // trường hợp không có quà
+                    // có thể thêm 1 text "No reward" nếu cần
                 }
             }
         }
@@ -98,11 +98,12 @@ namespace IronIvy.UI
         {
             Hide();
             
-            // Ép Main UI cập nhật lại kho đồ lần cuối để đồng bộ visual
+            // ép Main UI update lại food panel
             var mainUI = FindObjectOfType<MainGameUIPanel>(true);
             if (mainUI != null)
             {
                 mainUI.gameObject.SetActive(true);
+
                 if (mainUI.foodInventoryPanel != null)
                 {
                     mainUI.foodInventoryPanel.UpdateUI();

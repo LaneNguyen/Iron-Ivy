@@ -134,7 +134,7 @@ namespace IronIvy.Gameplay.Animals
             // 1. lay XZ base tu zone / spawnPoint
             Vector3 basePos = GetRandomPointInside();
 
-            // ---------- STEP 1: tim ground chinh xac ----------
+            // STEP 1: tim ground chinh xac
             Vector3 groundPos = basePos; // se cap nhat Y sau
 
             if (useGroundRaycast)
@@ -171,7 +171,7 @@ namespace IronIvy.Gameplay.Animals
                 }
             }
 
-            // --------- STEP 2: snap vao NavMesh NHUNG khong cho keo xuong qua sau ----------
+            // STEP 2: snap vao NavMesh NHUNG khong cho keo xuong qua sau
             Vector3 finalPos = groundPos;
 
             if (snapToNavMesh)
@@ -190,7 +190,7 @@ namespace IronIvy.Gameplay.Animals
                 }
             }
 
-            // --------- STEP 3: nhoi them len 1 chut ----------
+            // STEP 3: nhoi them len 1 chut
             finalPos.y += groundYOffset;
 
             return finalPos;

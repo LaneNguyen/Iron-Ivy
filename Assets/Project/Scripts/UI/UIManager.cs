@@ -17,9 +17,7 @@ namespace IronIvy.Core
         public GameObject settingsMenu;             // menu cài đặt
         public GameObject loadingScreen;            // màn loading
 
-        //==================================================
-        //  INIT HUD
-        //==================================================
+        // INIT HUD
 
         // Hàm mới: dùng khi không cần truyền energy/archive nữa
         public void InitHUD()
@@ -39,9 +37,7 @@ namespace IronIvy.Core
             InitHUD();
         }
 
-        //==================================================
-        //  GLOBAL UI CONTROL
-        //==================================================
+        // GLOBAL UI CONTROL
 
         public void ShowPauseMenu(bool show)
         {

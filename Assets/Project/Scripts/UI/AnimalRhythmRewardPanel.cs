@@ -3,15 +3,13 @@ using UnityEngine.UI;
 using TMPro;
 using IronIvy.Core;
 using IronIvy.Gameplay.Animals;
+using IronIvy.Data; // Để dùng FoodItem
 
 namespace IronIvy.UI
 {
-    // Panel recap sau khi choi xong animal rhythm
-    // lam giong plant reward panel nhung data khac xiu
     public class AnimalRhythmRewardPanel : MonoBehaviour
     {
         [Header("Root")]
-        [Tooltip("Panel goc bat / tat. Neu de trong se dung chinh gameObject nay.")]
         public GameObject root;
 
         [Header("Texts")]
@@ -20,6 +18,10 @@ namespace IronIvy.UI
         public TextMeshProUGUI successText;
         public TextMeshProUGUI archiveGainText;
         public TextMeshProUGUI archiveCurrentText;
+        
+        //  Text hiển thị loot
+        [Tooltip("Text hiển thị vật phẩm nhận được")]
+        public TextMeshProUGUI lootText; 
 
         [Header("Icon (optional)")]
         public Image animalIcon;
@@ -29,113 +31,84 @@ namespace IronIvy.UI
 
         private void Awake()
         {
-            if (root == null)
-                root = gameObject;
-
-            // an panel luc moi vao scene
+            if (root == null) root = gameObject;
             root.SetActive(false);
         }
 
-        // show ket qua minigame animal
-        public void ShowAnimalRhythmResult(AnimalController animal, float successRatio, float archiveGained)
+        // Thêm tham số Loot
+        public void ShowAnimalRhythmResult(AnimalController animal, float successRatio, float archiveGained, FoodItem lootItem, int lootCount)
         {
-            if (root == null)
-                root = gameObject;
-
+            if (root == null) root = gameObject;
             _currentAnimal = animal;
             _lastGainedArchive = archiveGained;
 
-            // GameObject chua script dang tat san trong editor -> bat len
-            if (!gameObject.activeSelf)
-                gameObject.SetActive(true);
+            if (!gameObject.activeSelf) gameObject.SetActive(true);
+            if (!root.activeSelf) root.SetActive(true);
 
-            // bat panel root
-            if (!root.activeSelf)
-                root.SetActive(true);
+            // Fill UI
+            if (titleText != null) titleText.text = "Rhythm complete";
 
-            // debug nho de chac panel thuc su chay
-            Debug.Log("[AnimalRhythmRewardPanel] ShowAnimalRhythmResult called -> activating animal reward panel");
-
-            // ==== Fill UI ====
-
-            if (titleText != null)
-                titleText.text = "Rhythm complete";
-
-            // ten animal
+            // Name
             string displayName = "Animal";
-            if (animal != null && animal.Definition != null && !string.IsNullOrEmpty(animal.Definition.displayName))
-                displayName = animal.Definition.displayName;
+            if (animal != null && animal.Definition != null) displayName = animal.Definition.displayName;
+            if (animalNameText != null) animalNameText.text = displayName;
 
-            if (animalNameText != null)
-                animalNameText.text = displayName;
-
-            // success text + grade
+            // Success
             string grade = "Missed";
-            if (successRatio >= 0.99f)
-                grade = "Perfect";
-            else if (successRatio >= 0.5f)
-                grade = "Good";
-
+            if (successRatio >= 0.99f) grade = "Perfect";
+            else if (successRatio >= 0.5f) grade = "Good";
             int percent = Mathf.RoundToInt(successRatio * 100f);
-            if (successText != null)
-                successText.text = $"Success: {percent}% ({grade})";
+            if (successText != null) successText.text = $"Success: {percent}% ({grade})";
 
-            // archive gain
+            // Archive
             if (archiveGainText != null)
             {
-                if (archiveGained > 0f)
-                {
-                    float rounded = Mathf.Round(archiveGained * 10f) / 10f;
-                    archiveGainText.text = $"+{rounded}% Archive";
-                }
-                else
-                {
-                    archiveGainText.text = "No archive gained";
-                }
+                if (archiveGained > 0f) archiveGainText.text = $"+{archiveGained:F1}% Archive";
+                else archiveGainText.text = "No archive gained";
             }
 
-            // archive current tu ArchiveManager
+            // Archive Current
             if (archiveCurrentText != null)
             {
                 if (ArchiveManager.HasInstance)
                 {
                     float cur = ArchiveManager.Instance.CurrentPercent;
-                    int curInt = Mathf.RoundToInt(cur);
-                    archiveCurrentText.text = $"Archive now: {curInt}%";
+                    archiveCurrentText.text = $"Archive now: {Mathf.RoundToInt(cur)}%";
+                }
+                else archiveCurrentText.text = "";
+            }
+            
+            //  Loot Info
+            if (lootText != null)
+            {
+                if (lootItem != null && lootCount > 0)
+                {
+                    lootText.text = $"Loot: +{lootCount} {lootItem.displayName}";
+                    if (lootItem.icon != null) 
+                    {
+                        // Nếu muốn hiện icon loot, có thể mở rộng thêm Image lootIcon
+                    }
                 }
                 else
                 {
-                    archiveCurrentText.text = "";
+                    lootText.text = "";
                 }
             }
 
-            // icon neu muon show (co the gan sprite san trong inspector)
-            if (animalIcon != null)
-            {
-                // giu nguyen sprite dang co, neu khong dung thi disable trong inspector
-                animalIcon.enabled = animalIcon.sprite != null;
-            }
+            // Icon
+            if (animalIcon != null) animalIcon.enabled = animalIcon.sprite != null;
         }
 
         public void Hide()
         {
-            if (root == null)
-                root = gameObject;
-
+            if (root == null) root = gameObject;
             root.SetActive(false);
         }
 
-        // gan ham nay cho nut OK / Close tren panel
         public void OnConfirmButton()
         {
             Hide();
-
-            // sau khi user confirm moi bat dau despawn one-shot
-            if (_currentAnimal != null)
-            {
-                _currentAnimal.DespawnAfterMinigame();
-            }
-
+            if (_currentAnimal != null) _currentAnimal.DespawnAfterMinigame();
             _currentAnimal = null;
             _lastGainedArchive = 0f;
         }

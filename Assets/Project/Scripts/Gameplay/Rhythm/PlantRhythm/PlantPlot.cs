@@ -5,7 +5,9 @@ using IronIvy.Data;
 
 namespace IronIvy.Gameplay
 {
-    // PlantPlot MỚI: Chỉ lo visual, KHÔNG lo tương tác UI (UI do PlantArea lo)
+    // plot này chỉ lo phần visual cho cây
+    // - không xử lý UI
+    // - UI bấm trồng để PlantArea lo
     public class PlantPlot : MonoBehaviour
     {
         [Header("Setup")]
@@ -14,7 +16,7 @@ namespace IronIvy.Gameplay
         public float animDuration = 0.5f;
 
         [Header("Visual References")]
-        public GameObject emptyVisual; // Đất trống
+        public GameObject emptyVisual; // visual đất trống ban đầu
 
         private List<GameObject> _spawnedStages = new List<GameObject>();
         private int _currentStageIndex = -1;
@@ -23,7 +25,10 @@ namespace IronIvy.Gameplay
 
         public void InitializePlant(PlantDefinition plant)
         {
-            if (emptyVisual) emptyVisual.SetActive(false); // Ẩn đất trống
+            // setup plot với cây mới
+            // - ẩn đất trống
+            // - clear stage cũ
+            if (emptyVisual) emptyVisual.SetActive(false);
             Cleanup();
 
             if (plant == null || plant.stages == null) return;
@@ -34,42 +39,65 @@ namespace IronIvy.Gameplay
                 if (prefab)
                 {
                     GameObject go = Instantiate(prefab, cropRoot);
+
+                    // stage đầu để ngay vị trí chuẩn, mấy stage sau giấu xuống dưới
                     if (i == 0) go.transform.localPosition = Vector3.zero;
                     else go.transform.localPosition = new Vector3(0, hiddenDepth, 0);
-                    
+
                     go.transform.localRotation = Quaternion.identity;
                     _spawnedStages.Add(go);
                 }
-                else _spawnedStages.Add(null);
+                else
+                {
+                    // vẫn giữ slot để index không lệch
+                    _spawnedStages.Add(null);
+                }
             }
+
             _currentStageIndex = 0;
         }
 
         public void TransitionToStage(int targetStageIndex)
         {
+            // chuyển visual từ stage cũ sang stage mới
             if (targetStageIndex < 0 || targetStageIndex >= _spawnedStages.Count) return;
             if (targetStageIndex == _currentStageIndex) return;
+
             StartCoroutine(AnimateTransition(_currentStageIndex, targetStageIndex));
             _currentStageIndex = targetStageIndex;
         }
 
         public void Cleanup()
         {
-            foreach (var go in _spawnedStages) if (go) Destroy(go);
+            // clear toàn bộ cây đang có trên plot
+            foreach (var go in _spawnedStages)
+            {
+                if (go) Destroy(go);
+            }
+
             _spawnedStages.Clear();
             _currentStageIndex = -1;
-            if (emptyVisual) emptyVisual.SetActive(true); // Hiện lại đất trống
+
+            // show lại đất trống nếu có
+            if (emptyVisual) emptyVisual.SetActive(true);
         }
 
         public void PlayDisappearVFX(GameObject vfxPrefab)
         {
+            // gọi vfx biến mất tại stage hiện tại
             if (_currentStageIndex >= 0 && _currentStageIndex < _spawnedStages.Count)
             {
                 var go = _spawnedStages[_currentStageIndex];
-                if (go && vfxPrefab) Instantiate(vfxPrefab, go.transform.position, Quaternion.identity);
+                if (go && vfxPrefab)
+                {
+                    Instantiate(vfxPrefab, go.transform.position, Quaternion.identity);
+                }
             }
         }
 
+        // animate đổi stage
+        // - stage cũ trượt xuống dưới
+        // - stage mới trồi lên
         private IEnumerator AnimateTransition(int oldIndex, int newIndex)
         {
             GameObject oldObj = (oldIndex >= 0 && oldIndex < _spawnedStages.Count) ? _spawnedStages[oldIndex] : null;
@@ -83,12 +111,19 @@ namespace IronIvy.Gameplay
             {
                 timer += Time.deltaTime;
                 float t = timer / animDuration;
-                t = t * t * (3f - 2f * t); 
 
-                if (oldObj) oldObj.transform.localPosition = Vector3.Lerp(zeroPos, hiddenPos, t);
-                if (newObj) newObj.transform.localPosition = Vector3.Lerp(hiddenPos, zeroPos, t);
+                // ease nhẹ cho mượt mượt
+                t = t * t * (3f - 2f * t);
+
+                if (oldObj)
+                    oldObj.transform.localPosition = Vector3.Lerp(zeroPos, hiddenPos, t);
+
+                if (newObj)
+                    newObj.transform.localPosition = Vector3.Lerp(hiddenPos, zeroPos, t);
+
                 yield return null;
             }
+
             if (oldObj) oldObj.transform.localPosition = hiddenPos;
             if (newObj) newObj.transform.localPosition = zeroPos;
         }

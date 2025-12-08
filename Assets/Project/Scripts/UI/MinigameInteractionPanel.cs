@@ -1,13 +1,14 @@
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
+using System.Collections.Generic;
 using IronIvy.Gameplay.Rhythm;
 using IronIvy.Gameplay.Animals;
 using IronIvy.Core;
-using IronIvy.UI;
+using IronIvy.Data;
 
 namespace IronIvy.UI
 {
-    // Panel hỏi "Chơi minigame không?" khi lại gần đối tượng
     public class MinigameInteractionPanel : MonoBehaviour
     {
         public static MinigameInteractionPanel Instance { get; private set; }
@@ -18,44 +19,59 @@ namespace IronIvy.UI
         [Header("Texts")]
         public TextMeshProUGUI titleText;
         public TextMeshProUGUI questionText;
+        [Tooltip("Text hiển thị thông báo buff (ví dụ: 'Favorite Food!')")]
+        public TextMeshProUGUI buffInfoText; 
 
         [TextArea]
         public string defaultQuestion = "Chơi với bạn nhỏ này?";
 
+        [Header("Feeding UI")]
+        public GameObject feedingSectionRoot; // Parent chứa UI chọn đồ ăn
+        public Transform foodContainer;       // Grid layout
+        public GameObject foodSlotPrefab;     // Prefab slot
+        public Color selectedColor = Color.green;
+        public Color normalColor = Color.white;
+
         [Header("Config")]
-        [Tooltip("Cost khi chơi với thú (trừ ngay khi bấm Play)")]
         [SerializeField] int animalEnergyCost = 1;
-        
-        [Tooltip("Cost fallback cho Plant khi test trực tiếp không qua StartPanel")]
         [SerializeField] int plantDirectCost = 1; 
 
-        // context animal
+        // context
         private AnimalController _currentAnimal;
         private ClickAnimalRhythmMinigame _currentAnimalMinigame;
-
-        // context plant
         private ClickPlantRhythmMinigame _currentPlantMinigame;
         private PlantRhythmStartPanel _currentPlantStartPanel;
+
+        // Feeding State
+        private FoodItem _selectedFood;
+        private Dictionary<FoodItem, GameObject> _spawnedSlots = new Dictionary<FoodItem, GameObject>();
+
+        // Dictionary lưu FoodItem và cái Image nền để đổi màu
+private Dictionary<FoodItem, Image> _slotBackgrounds = new Dictionary<FoodItem, Image>();
 
         private void Awake()
         {
             Instance = this;
             if (panelRoot != null) panelRoot.SetActive(false);
+            if (buffInfoText) buffInfoText.text = "";
         }
 
-        // ---------------------
-        // SETUP CONTEXT
-        // ---------------------
+        // --- SETUP ---
         public void ShowForAnimal(AnimalController animal, ClickAnimalRhythmMinigame minigame)
         {
             _currentAnimal = animal;
             _currentAnimalMinigame = minigame;
             
-            // Reset plant context
             _currentPlantMinigame = null;
             _currentPlantStartPanel = null;
+            _selectedFood = null; // Reset selection
+            if (buffInfoText) buffInfoText.text = "";
 
             ShowPanel("Play Animal Rhythm?", $"{defaultQuestion}\n(-{animalEnergyCost} Energy)");
+
+            // Bật UI Feeding
+            if (feedingSectionRoot) feedingSectionRoot.SetActive(true);
+            RenderFoodList();
         }
 
         public void ShowForPlant(ClickPlantRhythmMinigame minigame, PlantRhythmStartPanel startPanel)
@@ -63,14 +79,15 @@ namespace IronIvy.UI
             _currentPlantMinigame = minigame;
             _currentPlantStartPanel = startPanel;
             
-            // Reset animal context
             _currentAnimal = null;
             _currentAnimalMinigame = null;
+            _selectedFood = null;
 
-            // Nếu có start panel, lấy cost hiển thị từ đó cho đúng visual
             int displayCost = (startPanel != null) ? startPanel.baseEnergyCost : plantDirectCost;
-            
             ShowPanel("Play Plant Rhythm?", $"{defaultQuestion}\n(-{displayCost} Energy)");
+
+            // Tắt UI Feeding cho Plant
+            if (feedingSectionRoot) feedingSectionRoot.SetActive(false);
         }
 
         private void ShowPanel(string title, string question)
@@ -92,52 +109,153 @@ namespace IronIvy.UI
             _currentAnimalMinigame = null;
             _currentPlantMinigame = null;
             _currentPlantStartPanel = null;
+            _selectedFood = null;
         }
 
-        // ---------------------
-        // BUTTON ACTIONS
-        // ---------------------
+        // --- FEEDING LOGIC ---
+       private void RenderFoodList()
+{
+    if (!foodContainer || !foodSlotPrefab) return;
+
+    // 1. Dọn dẹp cũ
+    foreach (Transform child in foodContainer) Destroy(child.gameObject);
+    _spawnedSlots.Clear();
+    _slotBackgrounds.Clear();
+
+    if (!InventoryManager.HasInstance) return;
+
+    var allItems = InventoryManager.Instance.All();
+
+    foreach (var kvp in allItems)
+    {
+        FoodItem food = kvp.Key;
+        int count = kvp.Value;
+
+        if (count <= 0) continue;
+
+        // 2. Tạo Slot từ Prefab chung (Chưa có Button)
+        GameObject slotObj = Instantiate(foodSlotPrefab, foodContainer);
+        
+        // Setup hiển thị (Icon, số lượng...)
+        var slotScript = slotObj.GetComponent<UIItemSlot>(); 
+        if (slotScript) slotScript.Setup(food.icon, count);
+        
+        // 3. Làm magic tự gắn Button vào bằng code!
+        Button btn = slotObj.GetComponent<Button>();
+        if (btn == null) btn = slotObj.AddComponent<Button>();
+
+        // Tắt hiệu ứng màu mặc định của Button để mình tự chỉnh màu
+        btn.transition = Selectable.Transition.None;
+
+        // Gán sự kiện Click
+        btn.onClick.AddListener(() => OnFoodSelected(food));
+
+        // 4. Tìm cái Background Image để đổi màu
+        // Giả định: Prefab của bạn có Image ở ngay root (cùng chỗ với Button)
+        // Hoặc nếu Background nằm sâu bên trong, bạn cần GetComponentInChildren<Image>()
+        Image bgImage = slotObj.GetComponent<Image>();
+        
+        // Lưu lại để tí nữa đổi màu
+        if (bgImage)
+        {
+            _slotBackgrounds.Add(food, bgImage);
+            // Reset về màu thường
+            bgImage.color = normalColor;
+        }
+
+        _spawnedSlots.Add(food, slotObj);
+    }
+}
+
+
+
+        private void OnFoodSelected(FoodItem food)
+        {
+            if (_selectedFood == food)
+            {
+                _selectedFood = null; // Toggle off
+                UpdateSlotHighlights();
+                if (buffInfoText) buffInfoText.text = "";
+                return;
+            }
+
+            _selectedFood = food;
+            UpdateSlotHighlights();
+
+            // Check favorite
+            if (_currentAnimal != null && _currentAnimal.Definition != null)
+            {
+                if (_currentAnimal.Definition.favoriteFood == food)
+                {
+                    if (buffInfoText) buffInfoText.text = "<color=green>Favorite! (Buffs Active)</color>";
+                }
+                else
+                {
+                    if (buffInfoText) buffInfoText.text = "Give Food";
+                }
+            }
+        }
+
+       // Hàm này chạy mỗi khi bấm chọn món ăn
+private void UpdateSlotHighlights()
+{
+    foreach (var kvp in _slotBackgrounds)
+    {
+        FoodItem thisFood = kvp.Key;
+        Image bgImage = kvp.Value;
+
+        if (bgImage == null) continue;
+
+        // Logic so sánh đơn giản
+        if (thisFood == _selectedFood)
+        {
+            // Đang chọn -> Màu Xanh (hoặc màu bạn set)
+            bgImage.color = selectedColor;
+        }
+        else
+        {
+            // Không chọn -> Màu Trắng (bình thường)
+            bgImage.color = normalColor;
+        }
+    }
+}
+        // --- ACTIONS ---
         public void OnPlayButton()
         {
-            // CASE 1: ANIMAL - Trừ Energy -> Chơi luôn
+            // CASE ANIMAL
             if (_currentAnimal != null && _currentAnimalMinigame != null)
             {
-                if (EnergyManager.HasInstance)
+                if (EnergyManager.HasInstance && !EnergyManager.Instance.TrySpend(animalEnergyCost))
                 {
-                    if (!EnergyManager.Instance.TrySpend(animalEnergyCost))
+                    Debug.LogWarning("Not enough energy.");
+                    return; 
+                }
+
+                // Xử lý Feeding
+                bool isFavorite = false;
+                if (_selectedFood != null)
+                {
+                    if (InventoryManager.HasInstance && InventoryManager.Instance.Consume(_selectedFood, 1))
                     {
-                        Debug.LogWarning("[MinigameInteractionPanel] Not enough energy for animal.");
-                        // TODO: Thêm effect rung lắc hoặc popup báo thiếu energy
-                        return; 
+                        if (_currentAnimal.Definition.favoriteFood == _selectedFood) isFavorite = true;
+                        _currentAnimal.TryFeed(_selectedFood);
                     }
                 }
-                _currentAnimalMinigame.RequestPlay(_currentAnimal);
+
+                // Gọi Play kèm cờ Buff (Chưa có logic tính toán bên trong)
+                _currentAnimalMinigame.RequestPlay(_currentAnimal, isFavorite);
             }
-            // CASE 2: PLANT (Có Panel chọn) - Chỉ mở Panel -> Panel lo trừ Energy sau
-            else if (_currentPlantStartPanel != null)
-            {
-                _currentPlantStartPanel.Show();
-            }
-            // CASE 3: PLANT (Direct Test) - Trừ Energy -> Chơi luôn
+            // CASE PLANT
+            else if (_currentPlantStartPanel != null) _currentPlantStartPanel.Show();
             else if (_currentPlantMinigame != null)
             {
-                if (EnergyManager.HasInstance)
-                {
-                    if (!EnergyManager.Instance.TrySpend(plantDirectCost))
-                    {
-                        Debug.LogWarning("[MinigameInteractionPanel] Not enough energy for plant (direct).");
-                        return;
-                    }
-                }
+                if (EnergyManager.HasInstance && !EnergyManager.Instance.TrySpend(plantDirectCost)) return;
                 _currentPlantMinigame.StartGame();
             }
 
             Hide();
         }
 
-        public void OnCancelButton()
-        {
-            Hide();
-        }
+        public void OnCancelButton() => Hide();
     }
 }

@@ -7,15 +7,13 @@ using IronIvy.Gameplay.Rhythm;
 
 namespace IronIvy.UI
 {
-    /// <summary>
-    /// HUD tối giản cho rhythm:
-    /// - Title
-    /// - Hint text (CLICK / HOLD)
-    /// - Trust slider
-    /// - Progress slider
-    /// - Status + Hit/Miss
-    /// - Beat window preview cho engine cũ (giờ bỏ dùng)
-    /// </summary>
+    // HUD đơn giản cho rhythm
+    // - title minigame
+    // - hint text (CLICK / HOLD)
+    // - trust slider + progress slider
+    // - status + icon màu
+    // - hit / miss
+    // mấy hàm cũ cho engine V3/V4 vẫn giữ lại để không lỗi compile
     public class RhythmHUD : MonoBehaviour
     {
         [Header("Root")]
@@ -25,7 +23,7 @@ namespace IronIvy.UI
         public TextMeshProUGUI titleText;
 
         [Header("Hint")]
-        [Tooltip("Text đơn giản để show hướng dẫn (CLICK / HOLD) nếu muốn.")]
+        [Tooltip("Text hướng dẫn đơn giản (CLICK / HOLD...)")]
         public TextMeshProUGUI hintText;
 
         [Header("Trust & Progress")]
@@ -42,12 +40,12 @@ namespace IronIvy.UI
         public TextMeshProUGUI hitText;
         public TextMeshProUGUI missText;
 
-        // Giữ reference của engine cũ (V3/V4) để Bind nếu cần
+        // engine rhythm cũ, vẫn giữ reference cho ai còn dùng
         private RhythmMinigameBase current;
 
         private void OnEnable()
         {
-            // Đã đổi EventBus -> ListenManager
+            // đã chuyển qua ListenManager
             if (ListenManager.HasInstance)
             {
                 ListenManager.Instance.OnMinigameStarted += OnMinigameStarted;
@@ -57,7 +55,6 @@ namespace IronIvy.UI
 
         private void OnDisable()
         {
-            // Đã đổi EventBus -> ListenManager
             if (ListenManager.HasInstance)
             {
                 ListenManager.Instance.OnMinigameStarted -= OnMinigameStarted;
@@ -65,35 +62,29 @@ namespace IronIvy.UI
             }
         }
 
-        //=====================================================
-        //  ListenManager callbacks
-        //=====================================================
+        // ListenManager callbacks
 
         private void OnMinigameStarted()
         {
-            // tìm engine V4 nếu có (Animal / Plant cũ)
+            // thử tìm engine cũ nếu có (animal / plant bản trước)
             if (current == null)
                 current = FindObjectOfType<RhythmMinigameBase>();
 
             if (hudRoot != null)
                 hudRoot.SetActive(true);
 
-            // nếu current khác null thì dùng tên đó, còn không thì giữ lại title đã set sẵn
+            // nếu có reference minigame thì lấy tên nó làm title
             if (titleText != null && current != null)
                 titleText.text = current.name;
         }
 
         private void OnMinigameStopped()
         {
-            // không auto tắt HUD, để engine mới tự quyết
-            // nếu muốn tắt thì uncomment:
-            // if (hudRoot != null)
-            //     hudRoot.SetActive(false);
+            // không auto tắt HUD ở đây
+            // engine mới tự gọi ResetHUD khi cần
         }
 
-        /// <summary>
-        /// Cho phép gán minigame thủ công (nếu không muốn rely ListenManager).
-        /// </summary>
+        // bind thủ công cho engine cũ nếu không muốn rely ListenManager
         public void BindMinigame(RhythmMinigameBase minigame)
         {
             current = minigame;
@@ -105,9 +96,7 @@ namespace IronIvy.UI
                 titleText.text = minigame.name;
         }
 
-        /// <summary>
-        /// Set hint text đơn giản. Engine mới có thể truyền "CLICK (LMB)" / "HOLD (LMB)".
-        /// </summary>
+        // set hint text, ví dụ: CLICK (LMB) / HOLD (LMB)
         public void SetKeyHints(IList<string> hints)
         {
             if (hintText == null) return;
@@ -118,7 +107,7 @@ namespace IronIvy.UI
                 return;
             }
 
-            // gộp mấy hint lại cho lẹ
+            // gộp vài hint lại cho gọn
             hintText.text = string.Join(" / ", hints);
         }
 
@@ -134,9 +123,10 @@ namespace IronIvy.UI
             progressSlider.value = Mathf.Clamp01(value01);
         }
 
+        // giữ cho tương thích engine cũ
         public void SetHoldVisual(float value01)
         {
-            // chỗ này trước là fill amount của vòng hold, giờ bỏ visual nên để trống
+            // trước đây dùng cho vòng hold chung, giờ target tự lo nên để trống
         }
 
         public void SetStatus(string message, bool isSuccess)
@@ -157,51 +147,39 @@ namespace IronIvy.UI
                 missText.text = miss.ToString();
         }
 
-        /// <summary>
-        /// Preview vùng hot window trên vòng (engine V4 dùng). Giờ bỏ visual.
-        /// </summary>
+        // preview beat window cũ, giờ không xài nữa
         public void SetBeatWindow(float center01, float halfWidth01)
         {
-            // bỏ trống, giờ không dùng vòng beat chung nữa
+            // no-op, để cho code cũ compile
         }
 
-        /// <summary>
-        /// Phase 0..1 + đang ở trong window. Trước dùng để quay BeatCursor trên HUD.
-        /// Giờ BeatCursor đã chuyển sang target riêng nên bỏ trống.
-        /// </summary>
+        // phase 0..1 + inWindow cho hệ cursor cũ trên HUD
         public void SetBeatPhase(float phase, bool inWindow)
         {
-            // no-op, giữ cho code cũ compile
+            // no-op
         }
 
-        /// <summary>
-        /// Highlight 1 key slot (engine cũ). Giờ không xài keySlots nên bỏ trống.
-        /// </summary>
+        // highlight 1 key slot (engine cũ)
         public void PulseKey(int index)
         {
             // no-op
         }
 
-        /// <summary>
-        /// Clear highlight key.
-        /// </summary>
         public void ClearPulseKey(int index)
         {
             // no-op
         }
 
-        //=====================================================
-        //  Convenience helpers cho engine mới
-        //=====================================================
+        // helper cho engine mới
 
-        // set title tay cho minigame, dung cho Click-based rhythm moi
+        // set title tay cho minigame click-based
         public void SetMinigameTitle(string title)
         {
             if (titleText == null) return;
             titleText.text = title;
         }
 
-        // wrapper cho progress, giu ten de code moi doc de hon
+        // wrapper cho progress
         public void UpdateProgress(float value01)
         {
             SetProgress(value01);
@@ -213,7 +191,9 @@ namespace IronIvy.UI
             SetHitMiss(hit, miss);
         }
 
-        // reset nhanh HUD ve trang thai mac dinh
+        // reset HUD về state default
+        // - tắt root
+        // - clear text
         public void ResetHUD()
         {
             if (hudRoot != null)

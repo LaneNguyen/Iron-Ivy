@@ -14,6 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Data.AnimalDefinition
   id: squirrel_a
   displayName: Squirrel
+  favoriteFood: {fileID: 11400000, guid: 00e9e275c37774f4abe494bf5a3f27d9, type: 2}
+  buffSafetyNet: 3
+  buffTrustMultiplier: 1.5
+  dropItem: {fileID: 11400000, guid: e5b41e7a0209d4e41aef6fe16925bb48, type: 2}
+  dropCount: 1
+  doubleLootOnBuff: 1
   prefab: {fileID: 1261419133072088562, guid: b4c6ac88d9c75ef4f8863377c10ad6b9, type: 3}
   maxCountGlobal: 10
   spawnWeight: 1

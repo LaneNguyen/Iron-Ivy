@@ -50,7 +50,6 @@ namespace IronIvy.Gameplay
         public Animator animator;
 
         private CharacterController _cc;
-        private InteractionSystem _interaction;
 
         private Vector2 _moveInput;
         private Vector3 _smoothedVelocity = Vector3.zero;
@@ -61,7 +60,6 @@ namespace IronIvy.Gameplay
         private void Awake()
         {
             _cc = GetComponent<CharacterController>();
-            _interaction = GetComponent<InteractionSystem>();
 
             if (!mainCamera) mainCamera = Camera.main;
 
@@ -169,11 +167,6 @@ namespace IronIvy.Gameplay
                 animator.SetFloat("Speed", targetSpeed, 0.1f, Time.deltaTime);
             }
 
-            // 7. tương tác simple
-            if (_interaction && ReadInteractPressed())
-            {
-                _interaction.TryInteract();
-            }
         }
 
         private Vector2 ReadMove()
