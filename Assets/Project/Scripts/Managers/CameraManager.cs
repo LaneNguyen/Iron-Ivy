@@ -275,37 +275,49 @@ namespace IronIvy.Systems.Camera
         public void ApplyAnimalMinigameProfile() => ApplyAnimalMinigameProfile(null);
 
         // thoát minigame, trả camera + world về normal
-        public void RestoreMinigameCamera()
-        {
-            if (!_hasActiveMinigame && !_worldPaused) return;
+       public void RestoreMinigameCamera()
+{
+    if (!_hasActiveMinigame && !_worldPaused) return;
 
-            ResumeWorldFromMinigame();
+    // 1. resume world trước
+    ResumeWorldFromMinigame();
 
-            if (_currentMinigameProfile != null && _currentMinigameProfile.virtualCamera != null)
-            {
-                _currentMinigameProfile.virtualCamera.Priority = inactivePriority;
-            }
+    // 2. hạ priority của camera minigame
+    if (_currentMinigameProfile != null && _currentMinigameProfile.virtualCamera != null)
+    {
+        _currentMinigameProfile.virtualCamera.Priority = inactivePriority;
+    }
 
-            if (_hasPreviousMinigameCamera && _previousMinigameCamera != null)
-            {
-                _previousMinigameCamera.Lens.FieldOfView = _previousMinigameFov;
-                _previousMinigameCamera.Priority = activePriority;
-                CurrentCamera = _previousMinigameCamera;
+    // 3. nếu có camera trước đó (ví dụ TPS cam) thì switch lại đúng chuẩn
+    if (_hasPreviousMinigameCamera && _previousMinigameCamera != null)
+    {
+        // restore FOV cũ
+        _previousMinigameCamera.Lens.FieldOfView = _previousMinigameFov;
 
-                _previousMinigameCamera = null;
-                _hasPreviousMinigameCamera = false;
-            }
-            else
-            {
-                if (defaultCamera != null)
-                    SwitchCamera(defaultCamera);
-            }
+        // dùng InternalSwitch để:
+        // - set priority
+        // - update CurrentCamera
+        // - bắn OnCameraChanged cho PlayerThirdPersonController
+        var oldCam = CurrentCamera;
+        InternalSwitch(oldCam, _previousMinigameCamera);
 
-            _currentMinigameProfile = null;
-            _hasActiveMinigame = false;
-            _isAnimalOrbitActive = false;
-            _animalFocus = null;
-        }
+        _previousMinigameCamera = null;
+        _hasPreviousMinigameCamera = false;
+    }
+    else
+    {
+        // nếu không có previous thì fallback về default + vẫn dùng SwitchCamera (có event)
+        if (defaultCamera != null)
+            SwitchCamera(defaultCamera);
+    }
+
+    _currentMinigameProfile = null;
+    _hasActiveMinigame = false;
+    _isAnimalOrbitActive = false;
+    _animalFocus = null;
+}
+
+
 
         // helper apply profile generic cho minigame
         private void ApplyMinigameProfile(MinigameCameraProfile profile, Transform focusTarget)

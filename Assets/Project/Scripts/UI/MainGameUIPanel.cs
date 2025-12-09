@@ -21,7 +21,7 @@ namespace IronIvy.UI
         public TextMeshProUGUI animalCostText;
 
         [Header("Energy Config")]
-        public int displayMaxEnergy = 6;
+        public int displayMaxEnergy;
         public int animalBaseEnergyCost = 1;
 
         [Header("Start Panels")]
@@ -91,34 +91,57 @@ namespace IronIvy.UI
 
         // energy
 
-        private void RefreshEnergyUIFromManager()
+    private void RefreshEnergyUIFromManager()
+{
+    if (!EnergyManager.HasInstance) return;
+
+    int current = EnergyManager.Instance.Current;
+    displayMaxEnergy = EnergyManager.Instance.MaxEnergy;   // <-- dòng quan trọng
+    RefreshEnergyUI(current);
+}
+
+private void RefreshEnergyUI(int current)
+{
+    int max = Mathf.Max(displayMaxEnergy, 1);
+
+    if (energyText != null)
+        energyText.text = $"{current}/{max}";
+
+    if (energySlider != null)
+    {
+        energySlider.maxValue = max;
+        energySlider.value = Mathf.Clamp(current, 0, max);
+    }
+
+    if (plantCostText != null && plantRhythmStartPanel != null)
+        plantCostText.text = $"-{plantRhythmStartPanel.baseEnergyCost} energy";
+
+    if (animalCostText != null)
+        animalCostText.text = $"-{animalBaseEnergyCost} energy";
+}
+
+
+       private void OnEnergyChanged(int current)
         {
-            if (!EnergyManager.HasInstance) return;
+            // 1. Luôn lấy Max mới nhất từ EnergyManager
+            if (EnergyManager.HasInstance)
+            {
+                displayMaxEnergy = EnergyManager.Instance.MaxEnergy;
+            }
 
-            int current = EnergyManager.Instance.Current;
-            RefreshEnergyUI(current);
-        }
-
-        private void RefreshEnergyUI(int current)
-        {
-            int max = Mathf.Max(displayMaxEnergy, 1);
-
+            // 2. Cập nhật Text (VD: 7/7)
             if (energyText != null)
-                energyText.text = $"{current} / {max}";
+            {
+                energyText.text = $"{current}/{displayMaxEnergy}";
+            }
 
+            // 3. Cập nhật Slider
             if (energySlider != null)
-                energySlider.value = Mathf.Clamp01((float)current / max);
-
-            if (plantCostText != null && plantRhythmStartPanel != null)
-                plantCostText.text = $"-{plantRhythmStartPanel.baseEnergyCost} energy";
-
-            if (animalCostText != null)
-                animalCostText.text = $"-{animalBaseEnergyCost} energy";
-        }
-
-        private void OnEnergyChanged(int current)
-        {
-            RefreshEnergyUI(current);
+            {
+                // Quan trọng: Phải update maxValue trước khi update value
+                energySlider.maxValue = displayMaxEnergy; 
+                energySlider.value = current;
+            }
         }
 
         // minigame state

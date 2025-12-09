@@ -94,7 +94,7 @@ namespace IronIvy.UI
         slotObj.SetActive(true);
         slotObj.transform.localScale = Vector3.one;
 
-        // Lấy script UI_ItemSlot ra để dùng
+        // Lấy script UIItemSlot ra để dùng
         var slotScript = slotObj.GetComponent<UIItemSlot>();
         if (slotScript)
         {

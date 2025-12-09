@@ -1,34 +1,39 @@
 using UnityEngine;
+using System.Collections.Generic;
+using System.Linq; // Cần cái này để xử lý chuỗi
 
 namespace IronIvy.Core
 {
     public class SaveLoadManager : BaseManager<SaveLoadManager>
     {
-        const string KEY_ARCHIVE = "ironivy.archive";
-        const string KEY_ENERGY = "ironivy.energy";
+        const string KEY_ARCHIVE_POINTS = "ironivy.archive.points";
+        const string KEY_ARCHIVE_NODES = "ironivy.archive.nodes"; // Key lưu danh sách node
+        const string KEY_ENERGY_CUR = "ironivy.energy.cur";
+        const string KEY_ENERGY_MAX = "ironivy.energy.max";
 
-        // PUBLIC API
-        // ArchiveTree gọi hàm này khi interact
         public void SaveGame()
         {
             SaveAll();
-            Debug.Log("[SaveLoadManager] Game Saved successfully!");
+            Debug.Log("[SaveLoadManager] Game Saved!");
         }
 
         public void SaveAll()
         {
-            // Lưu Archive Percent
+            // 1. Save Archive
             if (ArchiveManager.HasInstance)
             {
-                // Lấy % hiện tại (Read-only property) để lưu
-                float currentPercent = ArchiveManager.Instance.CurrentPercent;
-                PlayerPrefs.SetFloat(KEY_ARCHIVE, currentPercent);
+                PlayerPrefs.SetFloat(KEY_ARCHIVE_POINTS, ArchiveManager.Instance.currentPoints);
+                
+                // [FIX] Convert List<string> thành 1 chuỗi để lưu (VD: "node1,node2,node3")
+                string nodesString = string.Join(",", ArchiveManager.Instance.unlockedNodeIDs);
+                PlayerPrefs.SetString(KEY_ARCHIVE_NODES, nodesString);
             }
 
-            // Lưu Energy hiện tại (nếu cần load lại đúng mức năng lượng đó)
+            // 2. Save Energy
             if (EnergyManager.HasInstance)
             {
-                PlayerPrefs.SetInt(KEY_ENERGY, EnergyManager.Instance.Current);
+                PlayerPrefs.SetInt(KEY_ENERGY_CUR, EnergyManager.Instance.Current);
+                PlayerPrefs.SetInt(KEY_ENERGY_MAX, EnergyManager.Instance.MaxEnergy);
             }
 
             PlayerPrefs.Save();
@@ -36,23 +41,34 @@ namespace IronIvy.Core
 
         public void LoadAll()
         {
-            // Load Archive Data
-            if (PlayerPrefs.HasKey(KEY_ARCHIVE) && ArchiveManager.HasInstance)
+            // 1. Load Energy
+            if (EnergyManager.HasInstance)
             {
-                float savedPercent = PlayerPrefs.GetFloat(KEY_ARCHIVE, 0);
-                
-                // Vì ArchiveManager mới chạy theo Points chứ không phải %,
-                // ta cần quy đổi % đã lưu thành Points.
-                // Points = (Percent / 100) * MaxPoints
-                float maxPoints = ArchiveManager.Instance.maxArchivePoints;
-                float estimatedPoints = (savedPercent / 100f) * maxPoints;
+                int defaultMax = 6; 
+                int savedMax = PlayerPrefs.GetInt(KEY_ENERGY_MAX, defaultMax);
+                int savedCur = PlayerPrefs.GetInt(KEY_ENERGY_CUR, savedMax);
 
-                // Gọi hàm LoadState (Compatibility Layer) mà chúng ta đã thêm vào ArchiveManager
-                ArchiveManager.Instance.LoadState(estimatedPoints);
+                // Gọi hàm set data mới trong EnergyManager
+                EnergyManager.Instance.SetLoadedData(savedCur, savedMax);
             }
-            
-            // Note: Energy thường reset theo ngày (ResetDaily), nên có thể không cần Load lại Energy
-            // trừ khi bạn muốn lưu chính xác state giữa ngày.
+
+            // 2. Load Archive
+            if (ArchiveManager.HasInstance)
+            {
+                float points = PlayerPrefs.GetFloat(KEY_ARCHIVE_POINTS, 0);
+                
+                // [FIX] Load chuỗi node và tách ra thành List
+                List<string> loadedNodes = new List<string>();
+                string nodesString = PlayerPrefs.GetString(KEY_ARCHIVE_NODES, "");
+                
+                if (!string.IsNullOrEmpty(nodesString))
+                {
+                    loadedNodes = nodesString.Split(',').ToList();
+                }
+
+                // Đẩy data vào ArchiveManager để nó tự Rebuild
+                ArchiveManager.Instance.LoadState(points, loadedNodes);
+            }
         }
     }
 }

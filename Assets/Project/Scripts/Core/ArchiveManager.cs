@@ -5,219 +5,207 @@ using IronIvy.Data;
 
 namespace IronIvy.Core
 {
-    // manager cho hệ thống Archive (cây ký ức)
-    // - giữ điểm archive tổng
-    // - mở khóa node + apply reward
-    // - quản lý list plant đã unlock
     public class ArchiveManager : BaseManager<ArchiveManager>
     {
         [Header("Config")]
-        // giới hạn điểm tối đa để tính % tiến độ
         public float maxArchivePoints = 1000f;
-
-        // list tất cả node trong cây ký ức
         public List<ArchiveNodeDefinition> allNodes;
 
         [Header("Plant System Integration")]
-        // mấy giống cây có sẵn từ đầu game
-        public List<PlantDefinition> startingPlants;
+        public List<PlantDefinition> startingPlants; // seed mặc định lúc đầu
 
-        // cache lại list cây đã mở khóa để lấy cho nhanh
+        // runtime
         private List<PlantDefinition> _unlockedPlants = new List<PlantDefinition>();
 
         [Header("Debug Info")]
-        public float currentPoints = 0f;
+        public float currentPoints = 0f;                  // điểm thô
+        public List<string> unlockedNodeIDs = new List<string>(); // node đã mở
 
-        // lưu id mấy node đã mở rồi
-        public List<string> unlockedNodeIDs = new List<string>();
+        // % dạng 0–1 cho UI
+        public float CurrentPercent => Mathf.Clamp01(
+            maxArchivePoints > 0f ? currentPoints / maxArchivePoints : 0f
+        );
 
-        // tính % tiến độ, clamp lại cho chắc
-        public float CurrentPercent => Mathf.Clamp01(currentPoints / maxArchivePoints) * 100f;
-
-        // event báo cho UI biết khi điểm thay đổi
-        public event Action<float> OnPointsChanged;
+        // event nội bộ (nếu script khác muốn nghe)
+        public event Action<float> OnPointsChanged; // float = 0–1
 
         protected override void Awake()
         {
             base.Awake();
-
-            // build lại list cây đã unlock lúc start game
+            // lúc start game rebuild lại list seed
             RebuildUnlockedPlants();
         }
 
-        // api cộng trừ điểm archive
+        // ================= PUBLIC API =================
 
+        // cộng điểm archive (dùng cho hệ thống mới)
         public void AddArchivePoints(float amount)
         {
-            // check input <= 0 thì thôi không cộng
-            if (amount <= 0) return;
-
             currentPoints += amount;
+            currentPoints = Mathf.Clamp(currentPoints, 0f, maxArchivePoints);
 
-            // log nhanh xem có cộng đúng không
-            Debug.Log($"[Archive] Da cong them {amount} diem. Tong hien tai: {currentPoints}");
+            Debug.Log($"[Archive] +{amount} pts, total = {currentPoints}/{maxArchivePoints}");
 
-            CheckWorldThresholds();
-
-            // báo UI update thanh progress
-            OnPointsChanged?.Invoke(currentPoints);
-
-            // báo ListenManager nếu có
-            // để nó phát event archive cho chỗ khác dùng
-            if (ListenManager.HasInstance)
-            {
-                ListenManager.Instance.RaiseArchiveChanged(CurrentPercent / 100f);
-            }
+            NotifyArchiveChanged();
         }
 
-        public bool TrySpendPoints(float cost)
+        // API cũ: ClickAnimal / ClickPlant vẫn đang gọi AddProgress
+        public void AddProgress(float amount)
         {
-            // check đủ điểm mới trừ
-            if (currentPoints >= cost)
-            {
-                currentPoints -= cost;
-
-                // trừ xong cũng phải báo UI update lại
-                OnPointsChanged?.Invoke(currentPoints);
-
-                return true;
-            }
-
-            return false;
+            // để tương thích ngược
+            AddArchivePoints(amount);
         }
 
-        // logic mở khóa node
-
-        public bool IsNodeUnlocked(string nodeID)
-        {
-            return unlockedNodeIDs.Contains(nodeID);
-        }
+        public bool IsNodeUnlocked(string nodeID) => unlockedNodeIDs.Contains(nodeID);
 
         public void UnlockNode(ArchiveNodeDefinition node)
         {
-            // check xem node này mở chưa
-            if (IsNodeUnlocked(node.id))
+            if (node == null) return;
+            if (IsNodeUnlocked(node.id)) return;
+
+            if (currentPoints < node.costToUnlock)
             {
-                Debug.Log("Cai node nay mo roi ma?");
+                Debug.Log($"[Archive] Not enough points for node {node.id}");
                 return;
             }
 
-            // thử trừ điểm, nếu ok mới add vào list unlocked
-            if (TrySpendPoints(node.costToUnlock))
-            {
-                unlockedNodeIDs.Add(node.id);
-                ApplyReward(node);
-                Debug.Log($"Da mo khoa node: {node.title}");
-            }
+            currentPoints -= node.costToUnlock;
+            unlockedNodeIDs.Add(node.id);
+
+            ApplyReward(node);
+
+            Debug.Log($"[Archive] Unlocked Node: {node.title}");
+
+            // sau khi trừ điểm + thưởng -> update UI
+            NotifyArchiveChanged();
+
+            // auto save nếu có SaveLoad
+            if (SaveLoadManager.HasInstance)
+                SaveLoadManager.Instance.SaveGame();
         }
 
-        // xử lý reward khi unlock node
+        // ================= REWARD =================
+
         private void ApplyReward(ArchiveNodeDefinition node)
         {
             switch (node.rewardType)
             {
                 case ArchiveRewardType.MaxEnergy:
-                    // tăng max energy cho player
                     if (EnergyManager.HasInstance)
                         EnergyManager.Instance.UpgradeMaxEnergy(node.rewardValue);
                     break;
 
                 case ArchiveRewardType.NewSeed:
-                    // thêm giống cây mới vào hệ thống
-                    if (node.rewardObject is PlantDefinition newPlant)
+                    if (node.rewardObject is PlantDefinition p)
                     {
-                        UnlockPlant(newPlant);
+                        UnlockPlant(p);
+                    }
+                    else
+                    {
+                        Debug.LogError($"[Archive] Node {node.id} missing PlantDefinition reward");
                     }
                     break;
 
-                case ArchiveRewardType.ZoneUnlock:
-                    // chỗ này để dành cho việc mở zone, map mới
-                    // chưa làm nên tạm để trống
-                    break;
+                // nếu có loại reward khác thì bổ sung thêm case ở đây
             }
         }
 
-        // plant management
-
-        public List<PlantDefinition> GetAvailablePlants()
-        {
-            // trả về bản copy để ngoài kia không sửa trực tiếp list trong manager
-            return new List<PlantDefinition>(_unlockedPlants);
-        }
+        // ================= PLANT / SEED FLOW =================
 
         private void UnlockPlant(PlantDefinition plant)
         {
-            // check coi đã unlock chưa, chưa có thì add vào
+            if (plant == null) return;
+
             if (!_unlockedPlants.Contains(plant))
             {
                 _unlockedPlants.Add(plant);
-                Debug.Log($"[Archive] Da mo khoa giong cay moi: {plant.displayName}");
+                Debug.Log($"[Archive] NEW SEED UNLOCKED: {plant.displayName}");
             }
         }
 
+        // dùng cho PlantRhythmStartPanel / hệ thống chọn seed
+        public List<PlantDefinition> GetAvailablePlants()
+        {
+            // trả copy cho an toàn
+            return new List<PlantDefinition>(_unlockedPlants);
+        }
+
+        // rebuild lại seed runtime từ:
+        // - startingPlants
+        // - list unlockedNodeIDs (node reward là NewSeed)
         private void RebuildUnlockedPlants()
         {
-            // tính toán lại list cây dựa trên:
-            // - startingPlants
-            // - các node đã unlock có reward là NewSeed
             _unlockedPlants.Clear();
 
-            if (startingPlants != null)
+            if (startingPlants != null && startingPlants.Count > 0)
                 _unlockedPlants.AddRange(startingPlants);
 
-            // quét qua mấy node đã unlock xem có giống cây nào không
+            if (unlockedNodeIDs == null || unlockedNodeIDs.Count == 0)
+                return;
+
+            if (allNodes == null || allNodes.Count == 0)
+                return;
+
             foreach (var nodeID in unlockedNodeIDs)
             {
-                var node = allNodes.Find(n => n.id == nodeID);
-                if (node != null &&
-                    node.rewardType == ArchiveRewardType.NewSeed &&
+                if (string.IsNullOrEmpty(nodeID)) continue;
+
+                var node = allNodes.Find(n => n != null && n.id == nodeID);
+                if (node == null) continue;
+
+                if (node.rewardType == ArchiveRewardType.NewSeed &&
                     node.rewardObject is PlantDefinition p)
                 {
-                    // check duplicate cho chắc
                     if (!_unlockedPlants.Contains(p))
                         _unlockedPlants.Add(p);
                 }
             }
         }
 
-        // world events / threshold theo % archive
-        private void CheckWorldThresholds()
+        // ================= LOAD / SAVE HOOK =================
+
+        // load điểm + node IDs
+        public void LoadState(float savedPoints, List<string> savedNodeIDs)
         {
-            // float p = CurrentPercent
-            // chỗ này để dành trigger cutscene hoặc update zone sau này
+            currentPoints = savedPoints;
+
+            unlockedNodeIDs.Clear();
+            if (savedNodeIDs != null && savedNodeIDs.Count > 0)
+                unlockedNodeIDs.AddRange(savedNodeIDs);
+
+            RebuildUnlockedPlants();
+
+            // bắn lại % cho UI sau khi load
+            NotifyArchiveChanged();
         }
 
+        // overload cũ chỉ có điểm
+        public void LoadState(float savedPoints)
+        {
+            LoadState(savedPoints, null);
+        }
+
+        // UI hay dùng GetPercent, trả về 0–1
         public float GetPercent()
         {
             return CurrentPercent;
         }
 
-        // alias cho AddArchivePoints cho code chỗ khác đọc dễ hơn
-        public void AddProgress(float amount)
+        // ================= INTERNAL HELPERS =================
+
+        // chỗ này gom lại logic bắn event + ListenManager
+        private void NotifyArchiveChanged()
         {
-            AddArchivePoints(amount);
-        }
+            float percent01 = CurrentPercent;
 
-        // load dữ liệu archive từ save
-        public void LoadState(float savedPoints)
-        {
-            currentPoints = savedPoints;
+            // event nội bộ nếu có ai đăng ký
+            OnPointsChanged?.Invoke(percent01);
 
-            // load xong cũng cần báo UI update lại
-            OnPointsChanged?.Invoke(currentPoints);
-
-            // check lại toàn bộ node
-            foreach (var node in allNodes)
+            // bắn ra ListenManager để MainGameUIPanel nhận được
+            if (ListenManager.HasInstance)
             {
-                if (!IsNodeUnlocked(node.id) && node.costToUnlock <= 0)
-                {
-                    // chỗ này có thể thêm logic auto unlock node free
-                    // hiện tại để trống cho dễ kiểm soát sau
-                }
+                ListenManager.Instance.RaiseArchiveChanged(percent01);
             }
-
-            // tính lại list cây cho đồng bộ với state mới
-            RebuildUnlockedPlants();
         }
     }
 }

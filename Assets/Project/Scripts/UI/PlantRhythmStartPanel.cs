@@ -28,34 +28,33 @@ namespace IronIvy.UI
 
         [Header("UI - Actions")]
         public Button startButton;
+        public Button cancelButton;        // <-- thêm nút cancel nè Lane
         public TextMeshProUGUI energyCostText;
 
         [Header("Config")]
         public int energyPerPlant = 1;
 
-        // giữ lại cho mấy script cũ còn gọi
         public int baseEnergyCost => energyPerPlant; 
+
+        private PlantArea _currentArea;
+        private List<PlantDefinition> _selectedPlants = new List<PlantDefinition>(); 
+        private int _currentSelectedSlotIndex = -1; 
 
         public void Show() 
         {
             if (root) root.SetActive(true);
             Debug.LogWarning("Old Show() called. Please update caller to use ShowForArea().");
         }
-        
-        // --- Runtime State ---
-        private PlantArea _currentArea;
-        private List<PlantDefinition> _selectedPlants = new List<PlantDefinition>(); 
-        private int _currentSelectedSlotIndex = -1; 
 
         private void Start()
         {
             if (startButton)
                 startButton.onClick.AddListener(OnStartClicked);
+
+            if (cancelButton)
+                cancelButton.onClick.AddListener(OnCancelClicked);   // <-- hook cancel
         }
 
-        // show panel cho 1 PlantArea cụ thể
-        // - lấy số plot từ area.plots
-        // - tạo list selectedPlants cùng size
         public void ShowForArea(PlantArea area)
         {
             _currentArea = area;
@@ -75,13 +74,17 @@ namespace IronIvy.UI
         public void Hide()
         {
             if (root) root.SetActive(false);
+            // giữ lại selectedPlants để người dùng không phải chọn lại nếu mở lên lần nữa
             _currentArea = null;
         }
 
-        // refresh toàn bộ UI
-        // - plot slots
-        // - seed list
-        // - energy status
+        // ==== NEW: Cancel ====
+        private void OnCancelClicked()
+        {
+            // lane muốn nút close panel cho nhẹ nhàng hén
+            Hide();
+        }
+
         private void RefreshUI()
         {
             RenderPlotSlots();
@@ -89,9 +92,6 @@ namespace IronIvy.UI
             UpdateStatus();
         }
 
-        // vẽ list plot
-        // - mỗi plot là 1 button
-        // - hiển thị tên plant đã chọn hoặc Empty
         private void RenderPlotSlots()
         {
             if (!plotSlotContainer || !plotSlotPrefab || _currentArea == null) return;
@@ -107,7 +107,9 @@ namespace IronIvy.UI
                 var txt = btn.GetComponentInChildren<TextMeshProUGUI>();
                 if (txt)
                 {
-                    string plantName = _selectedPlants[index] != null ? _selectedPlants[index].displayName : "Empty";
+                    string plantName = _selectedPlants[index] != null ? 
+                        _selectedPlants[index].displayName : "Empty";
+
                     txt.text = $"Plot {index + 1}\n<size=80%>{plantName}</size>";
                 }
 
@@ -115,7 +117,6 @@ namespace IronIvy.UI
                 if (img)
                     img.color = (index == _currentSelectedSlotIndex) ? Color.yellow : Color.white;
 
-                // chọn plot hiện tại để assign seed
                 btn.onClick.AddListener(() =>
                 {
                     _currentSelectedSlotIndex = index;
@@ -124,9 +125,6 @@ namespace IronIvy.UI
             }
         }
 
-        // vẽ danh sách seed khả dụng
-        // - hiện tại lấy từ ClickPlantRhythmMinigame.debugAvailablePlants
-        // - bỏ qua plant có displayName = "More"
         private void RenderSeedList()
         {
             if (!seedListContainer || !seedButtonPrefab) return;
@@ -134,8 +132,23 @@ namespace IronIvy.UI
             foreach (Transform child in seedListContainer)
                 Destroy(child.gameObject);
 
-            var minigame = FindObjectOfType<ClickPlantRhythmMinigame>();
-            var availableSeeds = minigame ? minigame.debugAvailablePlants : new List<PlantDefinition>();
+            List<PlantDefinition> availableSeeds = null;
+
+            if (ArchiveManager.HasInstance)
+                availableSeeds = ArchiveManager.Instance.GetAvailablePlants();
+
+            if (availableSeeds == null || availableSeeds.Count == 0)
+            {
+                var minigame = FindObjectOfType<ClickPlantRhythmMinigame>();
+                if (minigame != null && minigame.debugAvailablePlants != null)
+                    availableSeeds = minigame.debugAvailablePlants;
+            }
+
+            if (availableSeeds == null || availableSeeds.Count == 0)
+            {
+                Debug.LogWarning("[PlantRhythmStartPanel] No available seeds from ArchiveManager or ClickPlantRhythmMinigame.");
+                return;
+            }
 
             foreach (var plant in availableSeeds)
             {
@@ -144,7 +157,7 @@ namespace IronIvy.UI
                 if (plant.displayName.Equals("More", System.StringComparison.OrdinalIgnoreCase)) continue; 
 
                 Button btn = Instantiate(seedButtonPrefab, seedListContainer);
-                
+
                 var txt = btn.GetComponentInChildren<TextMeshProUGUI>();
                 if (txt != null)
                     txt.text = plant.displayName;
@@ -154,14 +167,12 @@ namespace IronIvy.UI
             }
         }
 
-        // gán seed cho plot đang chọn
         private void SelectPlantForCurrentSlot(PlantDefinition plant)
         {
             if (_currentSelectedSlotIndex >= 0 && _currentSelectedSlotIndex < _selectedPlants.Count)
             {
                 _selectedPlants[_currentSelectedSlotIndex] = plant;
 
-                // auto nhảy sang plot kế tiếp cho tiện
                 if (_currentSelectedSlotIndex < _selectedPlants.Count - 1)
                     _currentSelectedSlotIndex++;
 
@@ -169,7 +180,6 @@ namespace IronIvy.UI
             }
         }
 
-        // update energy cost + trạng thái nút Start
         private void UpdateStatus()
         {
             int plantCount = 0;
@@ -185,10 +195,6 @@ namespace IronIvy.UI
                 startButton.interactable = plantCount > 0;
         }
 
-        // bắt đầu minigame
-        // - check đủ plant
-        // - trừ energy
-        // - gọi ClickPlantRhythmMinigame.StartSequence
         private void OnStartClicked()
         {
             int plantCount = 0;

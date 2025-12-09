@@ -1,378 +1,268 @@
-﻿using System;
-using UnityEngine;
-using IronIvy.Systems.Camera;
+﻿using UnityEngine;
 using Unity.Cinemachine;
+using IronIvy.Systems.Camera;
 
 namespace IronIvy.Gameplay
 {
-    // controller third person cho player
-    // - dùng CharacterController
-    // - pivot camera riêng, vcam follow pivot
     [RequireComponent(typeof(CharacterController))]
     public class PlayerThirdPersonController : MonoBehaviour
     {
         [Header("Movement Settings")]
-        [Tooltip("walk speed m/s")]
+        [Tooltip("Tốc độ đi bộ (m/s)")]
         public float walkSpeed = 3f;
 
-        [Tooltip("run speed m/s (hold Left Shift)")]
+        [Tooltip("Tốc độ chạy (m/s) - Giữ Shift")]
         public float runSpeed = 6f;
 
-        [Tooltip("how fast we turn toward move dir (bigger = snappier)")]
+        [Tooltip("Tốc độ xoay người theo hướng di chuyển")]
         public float rotationSpeed = 12f;
 
-        [Tooltip("accel smooth time (smaller = snappier)")]
-        public float acceleration = 0.08f;
+        [Header("Physics Settings (Restored)")]
+        [Tooltip("Thời gian để đạt tốc độ tối đa (Càng nhỏ càng nhanh)")]
+        public float acceleration = 0.1f; 
 
-        [Tooltip("decel smooth time (smaller = snappier)")]
-        public float deceleration = 0.12f;
+        [Tooltip("Thời gian để dừng lại hẳn (Càng nhỏ dừng càng nhanh)")]
+        public float deceleration = 0.15f; 
 
-        [Tooltip("smooth rotate or instant")]
-        public bool smoothRotate = true;
+        [Tooltip("Trọng lực")]
+        public float gravity = 15.0f;
+
+        [Tooltip("Độ cao nhảy (nếu có)")]
+        public float jumpHeight = 1.0f;
 
         [Header("Camera Settings")]
-        [Tooltip("orbit pivot used by vcam; dont parent under player")]
         public Transform cameraPivot;
-
-        [Tooltip("mouse X sens when RMB hold")]
-        public float camSensitivityX = 2f;
-
-        [Tooltip("mouse Y sens when RMB hold")]
-        public float camSensitivityY = 1.5f;
-
-        [Tooltip("min look angle (negative)")]
-        public float minPitch = -40f;
-
-        [Tooltip("max look angle")]
-        public float maxPitch = 60f;
-
-        [Header("Pivot Follow Settings")]
-        [Tooltip("pivot height above player feet")]
-        public float pivotHeight = 1.6f;
-
-        [Tooltip("follow damping for pivot position")]
-        public float pivotFollowDamping = 12f;
-
-        [Header("Animation")]
-        [Tooltip("Animator with params: bool IsMoving, float Speed")]
-        public Animator animator;
-
-        [Header("Gravity / Jump (optional)")]
-        [Tooltip("gravity m/s^2")]
-        public float gravity = 9.81f;
-
-        [Tooltip("jump height meters")]
-        public float jumpHeight = 1.2f;
-
-        [Tooltip("press Space to jump")]
-        public bool enableJump = false;
-
-        [Header("Camera Integration (optional)")]
-        [Tooltip("TPS vcam ref used to auto gate by CameraManager")]
         public CinemachineCamera thirdPersonCamRef;
-
-        [Tooltip("auto gate by CameraManager (keep component enabled!)")]
         public bool autoEnableByCamera = true;
 
-        [Header("Mode Gate")]
-        [Tooltip("when false, TPS input/move disabled; only pivot follow keeps running")]
-        public bool isTPSActive = false;
+        [Header("Input Sensitivity")]
+        public float camSensitivityX = 2f;
+        public float camSensitivityY = 1.5f;
+        public float minPitch = -30f;
+        public float maxPitch = 60f;
 
-        // state
-        private float yaw, pitch;
-        private CharacterController controller;
-        private Transform cam;             // fallback Camera.main nếu cần
-        private Vector3 currentVelocity;   // XZ velocity
-        private Vector3 velocityRef;
-        private float verticalVel;
-        private bool wasMovingLastFrame;
+        // --- Runtime State ---
+        private float yaw;
+        private float pitch;
+        private CharacterController _cc;
+        private Animator _anim;
 
-        // flag nhỏ để tránh subscribe event nhiều lần
-        private bool hasCameraEventsHooked = false;
+        // Physics State
+        private float _verticalVelocity;       // Y velocity
+        private Vector3 _currentVelocity;      // XZ velocity
+        private Vector3 _smoothDampVelocity;   // helper cho SmoothDamp
 
-        // events cho chỗ khác hook vào
-        public event Action OnPlayerMoveStart;
-        public event Action OnPlayerMoveStop;
+        [SerializeField, Tooltip("Debug: Check xem controller có đang active không")]
+        private bool isTPSActive = true;
+
+        // tham chiếu qua IsoPlayer để còn bật/tắt cho đỡ cộng dồn
+        private IsoPlayerController _isoController;
 
         private void Awake()
         {
-            controller = GetComponent<CharacterController>();
+            _cc = GetComponent<CharacterController>();
+            _anim = GetComponent<Animator>();
+            _isoController = GetComponent<IsoPlayerController>(); // có thì lấy, không có thì thôi
+        }
 
-            // auto tìm animator quanh player
-            if (!animator)
-            {
-                animator = GetComponent<Animator>();
-                if (!animator) animator = GetComponentInChildren<Animator>();
-            }
-
-            if (!cam && Camera.main)
-                cam = Camera.main.transform;
-
-            // init yaw/pitch từ pivot để tránh bị giật frame đầu
+        private void Start()
+        {
             if (cameraPivot)
             {
-                Vector3 e = cameraPivot.rotation.eulerAngles;
+                Vector3 e = cameraPivot.eulerAngles;
                 yaw = e.y;
-
-                float rawPitch = e.x;
-                if (rawPitch > 180f) rawPitch -= 360f;
-
-                pitch = Mathf.Clamp(rawPitch, minPitch, maxPitch);
-                cameraPivot.rotation = Quaternion.Euler(pitch, yaw, 0f);
+                pitch = e.x;
             }
-        }
 
-        private void OnEnable()
-        {
-            // reset state hook event
-            hasCameraEventsHooked = false;
-
-            // thử hook nếu CameraManager đã có sẵn
-            EnsureCameraEventsHooked();
-
-            // sync gate theo camera hiện tại lúc start (nếu có)
-            GateByCurrentCamera();
-        }
-
-        private void OnDisable()
-        {
-            // đảm bảo gỡ event cho sạch
-            if (autoEnableByCamera && hasCameraEventsHooked && CameraManager.HasInstance)
+            if (CameraManager.HasInstance)
             {
-                CameraManager.Instance.OnCameraChanged -= HandleCameraChanged;
+                CameraManager.Instance.OnCameraChanged += OnCameraChanged;
             }
 
-            hasCameraEventsHooked = false;
+            // sync trạng thái Iso theo TPS ban đầu
+            if (_isoController != null)
+            {
+                // nếu TPS đang active => tắt iso, ngược lại bật iso
+                _isoController.enabled = !isTPSActive;
+            }
+        }
+
+        private void OnDestroy()
+        {
+            if (CameraManager.HasInstance)
+            {
+                CameraManager.Instance.OnCameraChanged -= OnCameraChanged;
+            }
         }
 
         private void Update()
         {
-            if (!isTPSActive)
+            if (isTPSActive)
             {
-                // khi gate off thì iso controller xử lý move
-                // ở đây chỉ lo phần pivot follow trong LateUpdate
-                return;
-            }
-
-            // step 1: đọc input move
-            float h = Input.GetAxisRaw("Horizontal");
-            float v = Input.GetAxisRaw("Vertical");
-            Vector3 inputDir = new Vector3(h, 0f, v);
-            if (inputDir.sqrMagnitude > 1f) inputDir.Normalize();
-
-            // chạy hay đi tùy theo shift
-            float targetSpeed = (Input.GetKey(KeyCode.LeftShift) ? runSpeed : walkSpeed) * inputDir.magnitude;
-
-            // step 2: convert move theo hướng camera
-            Vector3 moveDir;
-            if (cameraPivot)
-            {
-                Vector3 camForward = cameraPivot.forward;
-                camForward.y = 0f;
-                camForward.Normalize();
-
-                Vector3 camRight = cameraPivot.right;
-                camRight.y = 0f;
-                camRight.Normalize();
-
-                moveDir = camForward * v + camRight * h;
+                HandleCameraInput();
+                HandleMovement();      // TPS tự move
             }
             else
             {
-                moveDir = new Vector3(h, 0f, v);
+                // nếu TPS tắt mà Iso cũng tắt (trường hợp đặc biệt) thì vẫn phải có gravity
+                // còn nếu Iso đang bật thì để Iso lo SimpleMove + gravity luôn, mình không đụng
+                if (_isoController == null || !_isoController.enabled)
+                {
+                    ApplyGravityOnly();
+                }
             }
-            if (moveDir.sqrMagnitude > 1f) moveDir.Normalize();
+        }
 
-            Vector3 targetVelocity = moveDir * targetSpeed;
+        private void HandleCameraInput()
+        {
+            if (!cameraPivot) return;
 
-            // step 3: smooth accel / decel
-            float smoothTime = (targetSpeed > 0.01f)
-                ? Mathf.Max(0.0001f, acceleration)
-                : Mathf.Max(0.0001f, deceleration);
+            if (Input.GetMouseButton(1))
+            {
+                float mx = Input.GetAxis("Mouse X") * camSensitivityX;
+                float my = Input.GetAxis("Mouse Y") * camSensitivityY;
 
-            currentVelocity = Vector3.SmoothDamp(
-                currentVelocity,
+                yaw += mx;
+                pitch -= my;
+                pitch = Mathf.Clamp(pitch, minPitch, maxPitch);
+            }
+
+            cameraPivot.rotation = Quaternion.Euler(pitch, yaw, 0f);
+            cameraPivot.position = transform.position + Vector3.up * 1.5f;
+        }
+
+        // Movement dùng SmoothDamp, giữ nguyên như bạn đang xài
+        private void HandleMovement()
+        {
+            float h = Input.GetAxis("Horizontal");
+            float v = Input.GetAxis("Vertical");
+            bool isRun = Input.GetKey(KeyCode.LeftShift);
+
+            // 1. Hướng move theo camera
+            Vector3 targetDir = Vector3.zero;
+            if (Camera.main != null)
+            {
+                Vector3 camForward = Camera.main.transform.forward;
+                Vector3 camRight = Camera.main.transform.right;
+                camForward.y = 0; 
+                camRight.y = 0;
+                camForward.Normalize(); 
+                camRight.Normalize();
+                targetDir = (camForward * v + camRight * h).normalized;
+            }
+
+            // 2. Tốc độ mong muốn
+            float targetSpeed = 0f;
+            if (targetDir.magnitude > 0.1f)
+            {
+                targetSpeed = isRun ? runSpeed : walkSpeed;
+            }
+
+            // 3. Quán tính accel/decel
+            float smoothTime = (targetSpeed > 0.1f) ? acceleration : deceleration;
+            Vector3 targetVelocity = targetDir * targetSpeed;
+
+            _currentVelocity = Vector3.SmoothDamp(
+                _currentVelocity,
                 targetVelocity,
-                ref velocityRef,
+                ref _smoothDampVelocity,
                 smoothTime
             );
 
-            // step 4: move controller + gravity
-            if (controller.isGrounded)
+            // 4. Xoay theo hướng đang di chuyển
+            if (_currentVelocity.magnitude > 0.1f)
             {
-                // giữ 1 ít negative để CharacterController báo grounded
-                verticalVel = -0.5f;
+                Quaternion targetRot = Quaternion.LookRotation(_currentVelocity.normalized);
+                transform.rotation = Quaternion.Slerp(
+                    transform.rotation,
+                    targetRot,
+                    rotationSpeed * Time.deltaTime
+                );
+            }
 
-                if (enableJump && Input.GetKeyDown(KeyCode.Space))
-                    verticalVel = Mathf.Sqrt(2f * gravity * Mathf.Max(0.01f, jumpHeight));
+            // 5. Gravity
+            if (_cc.isGrounded)
+            {
+                if (_verticalVelocity < 0.0f)
+                    _verticalVelocity = -2f;
+
+                if (Input.GetButtonDown("Jump"))
+                {
+                    _verticalVelocity = Mathf.Sqrt(jumpHeight * 2f * gravity);
+                }
             }
             else
             {
-                verticalVel -= gravity * Time.deltaTime;
+                _verticalVelocity -= gravity * Time.deltaTime;
             }
 
-            Vector3 frameMotion = new Vector3(currentVelocity.x, verticalVel, currentVelocity.z) * Time.deltaTime;
-            controller.Move(frameMotion);
+            // 6. Move final
+            Vector3 finalMove = _currentVelocity;
+            finalMove.y = _verticalVelocity;
 
-            // step 5: rotate character theo hướng chạy
-            Vector3 flatVel = currentVelocity;
-            flatVel.y = 0f;
+            _cc.Move(finalMove * Time.deltaTime);
 
-            bool isMovingNow = flatVel.sqrMagnitude > 0.0001f;
-
-            if (isMovingNow)
+            // 7. Animation
+            if (_anim)
             {
-                Quaternion targetRot = Quaternion.LookRotation(flatVel, Vector3.up);
-                if (smoothRotate)
-                    transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, rotationSpeed * Time.deltaTime);
-                else
-                    transform.rotation = targetRot;
+                float speedPercent = new Vector3(_cc.velocity.x, 0, _cc.velocity.z).magnitude;
+                _anim.SetFloat("Speed", speedPercent);
             }
-
-            // animator sync speed + flag
-            if (animator)
-            {
-                float speedParam = new Vector3(controller.velocity.x, 0f, controller.velocity.z).magnitude;
-                animator.SetFloat("Speed", speedParam, 0.1f, Time.deltaTime);
-                animator.SetBool("IsMoving", isMovingNow);
-            }
-
-            // fire event move start/stop
-            if (isMovingNow && !wasMovingLastFrame)
-                OnPlayerMoveStart?.Invoke();
-            else if (!isMovingNow && wasMovingLastFrame)
-                OnPlayerMoveStop?.Invoke();
-
-            wasMovingLastFrame = isMovingNow;
         }
 
-        private void LateUpdate()
+        private void ApplyGravityOnly()
         {
-            // đảm bảo mỗi frame đều thử hook nếu CameraManager spawn trễ
-            EnsureCameraEventsHooked();
+            if (_cc.isGrounded && _verticalVelocity < 0)
+                _verticalVelocity = -2f;
+            else
+                _verticalVelocity -= gravity * Time.deltaTime;
 
-            // pivot follow player mọi lúc, dù tps active hay không
-            if (cameraPivot)
-            {
-                Vector3 targetPos = new Vector3(
-                    transform.position.x,
-                    transform.position.y + pivotHeight,
-                    transform.position.z
-                );
-
-                // dạng damping 1 - exp(-k * dt)
-                float t = 1f - Mathf.Exp(-pivotFollowDamping * Time.deltaTime);
-                cameraPivot.position = Vector3.Lerp(cameraPivot.position, targetPos, t);
-            }
-
-            // phần xoay camera chỉ chạy khi TPS đang active
-            if (!isTPSActive) return;
-
-            // xử lý lock/unlock cursor khi giữ chuột phải
-            if (Input.GetMouseButtonDown(1))
-            {
-                Cursor.lockState = CursorLockMode.Locked;
-                Cursor.visible = false;
-            }
-            else if (Input.GetMouseButtonUp(1))
-            {
-                Cursor.lockState = CursorLockMode.None;
-                Cursor.visible = true;
-            }
-
-            // step 6: orbit yaw/pitch khi giữ RMB
-            if (cameraPivot && Input.GetMouseButton(1))
-            {
-                yaw += Input.GetAxis("Mouse X") * camSensitivityX;
-                pitch -= Input.GetAxis("Mouse Y") * camSensitivityY;
-                pitch = Mathf.Clamp(pitch, minPitch, maxPitch);
-                cameraPivot.rotation = Quaternion.Euler(pitch, yaw, 0f);
-            }
+            _cc.Move(new Vector3(0, _verticalVelocity, 0) * Time.deltaTime);
         }
 
-        // auto hook event đổi camera khi cần
-        private void EnsureCameraEventsHooked()
+        // =========================================================
+        // CAMERA EVENT LISTENER
+        // =========================================================
+
+        private void OnCameraChanged(CinemachineCamera oldCam, CinemachineCamera newCam)
         {
             if (!autoEnableByCamera) return;
-            if (hasCameraEventsHooked) return;
-            if (!CameraManager.HasInstance) return;
             if (thirdPersonCamRef == null) return;
 
-            // đăng kí 1 lần thôi
-            CameraManager.Instance.OnCameraChanged += HandleCameraChanged;
-            hasCameraEventsHooked = true;
-
-            // vừa hook xong thì sync luôn theo camera hiện tại
-            GateByCurrentCamera();
+            bool isMyCamera = (newCam == thirdPersonCamRef);
+            SetTPSActive(isMyCamera);
         }
 
-        // camera manager auto gate khu này
-        // - khi camera đổi thì bật/tắt tps bằng flag isTPSActive
-        private void HandleCameraChanged(CinemachineCamera oldCam, CinemachineCamera newCam)
+        public void SetTPSActive(bool active)
         {
-            if (!autoEnableByCamera || thirdPersonCamRef == null) return;
+            isTPSActive = active;
 
-            bool active = (newCam != null && newCam == thirdPersonCamRef);
-            SetTPSActive(active);
-
-#if UNITY_EDITOR
-            // log nhẹ cho dễ debug xem lúc nào tps được bật
-            // Debug.Log($"[TPS] CameraChanged -> active = {active}");
-#endif
-
-            if (active) ResyncCameraAnglesFromPivot();
-        }
-
-        private void GateByCurrentCamera()
-        {
-            if (!autoEnableByCamera || thirdPersonCamRef == null || !CameraManager.HasInstance)
+            // bật TPS => tắt Iso; tắt TPS => bật Iso
+            if (_isoController != null)
             {
-                // nếu không quyết định được thì giữ lại giá trị inspector
-                SetTPSActive(isTPSActive);
-                return;
+                _isoController.enabled = !active;
             }
 
-            var current = CameraManager.Instance.CurrentCamera;
-            bool active = (current != null && current == thirdPersonCamRef);
-            SetTPSActive(active);
-            if (active) ResyncCameraAnglesFromPivot();
-        }
+            if (active)
+            {
+                // reset quán tính một chút cho đỡ bị "kéo" từ iso
+                _currentVelocity = Vector3.zero;
+                _smoothDampVelocity = Vector3.zero;
 
-        // public để switcher bên ngoài gọi
-        public void SetTPSActive(bool value)
-        {
-            isTPSActive = value;    // chỉ gate logic, không đụng this.enabled
-            if (isTPSActive) ResyncCameraAnglesFromPivot();
+                ResyncCameraAnglesFromPivot();
+            }
         }
 
         public void ResyncCameraAnglesFromPivot()
         {
             if (!cameraPivot) return;
 
-            Vector3 e = cameraPivot.rotation.eulerAngles;
+            Vector3 e = cameraPivot.eulerAngles;
             yaw = e.y;
 
             float rawPitch = e.x;
             if (rawPitch > 180f) rawPitch -= 360f;
-
             pitch = Mathf.Clamp(rawPitch, minPitch, maxPitch);
-            cameraPivot.rotation = Quaternion.Euler(pitch, yaw, 0f);
         }
-
-#if UNITY_EDITOR
-        private void OnValidate()
-        {
-            // vài guard nhỏ cho giá trị
-            minPitch = Mathf.Clamp(minPitch, -89f, 0f);
-            maxPitch = Mathf.Clamp(maxPitch, 0f, 89f);
-            walkSpeed = Mathf.Max(0f, walkSpeed);
-            runSpeed = Mathf.Max(0f, runSpeed);
-            rotationSpeed = Mathf.Max(0f, rotationSpeed);
-            acceleration = Mathf.Max(0.0001f, acceleration);
-            deceleration = Mathf.Max(0.0001f, deceleration);
-            gravity = Mathf.Max(0f, gravity);
-            jumpHeight = Mathf.Max(0f, jumpHeight);
-        }
-#endif
     }
 }

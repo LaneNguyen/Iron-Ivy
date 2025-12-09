@@ -5,7 +5,7 @@ using IronIvy.Core;
 using IronIvy.Data;
 using IronIvy.UI;
 using IronIvy.Systems.Camera;
-using IronIvy.Gameplay; 
+using IronIvy.Gameplay;
 
 namespace IronIvy.Gameplay.Rhythm
 {
@@ -16,7 +16,7 @@ namespace IronIvy.Gameplay.Rhythm
     public class ClickPlantRhythmMinigame : MonoBehaviour
     {
         [Header("Config")]
-        public List<PlantDefinition> debugAvailablePlants; 
+        public List<PlantDefinition> debugAvailablePlants;
         // list seed test cho chế độ debug
 
         [Header("Game References")]
@@ -27,14 +27,14 @@ namespace IronIvy.Gameplay.Rhythm
         public GameObject disappearVfxPrefab;
 
         [Header("Settings")]
-        public float bpm = 90f; 
-        public float delayBetweenPlots = 1.0f; 
+        public float bpm = 90f;
+        public float delayBetweenPlots = 1.0f;
         public float showResultDuration = 3f;
 
         [Header("Hold Note Settings")]
         public float defaultHoldRequiredSeconds = 0.7f;
         [Range(0.1f, 1.0f)]
-        public float holdTimePercentage = 0.8f; 
+        public float holdTimePercentage = 0.8f;
 
         // --- Runtime State ---
         public bool IsRunning { get; private set; }
@@ -50,9 +50,9 @@ namespace IronIvy.Gameplay.Rhythm
         private PlantDefinition _currentPlant;
         private bool _isRhythmPlaying;
         private bool _isStagePlaying;
-        
+
         private List<RhythmPattern> _playlist = new List<RhythmPattern>();
-        private int _beatsHit, _beatsMiss; 
+        private int _beatsHit, _beatsMiss;
         private float _trust;
         private RhythmClickTarget _currentTarget;
         private Coroutine _restCoroutine;
@@ -69,9 +69,9 @@ namespace IronIvy.Gameplay.Rhythm
         {
             // debug cho nhanh
             // - tự tìm tất cả PlantPlot trong scene
-            // - gán hết dùng chung 1 debug plant
+            // - seed lấy từ ArchiveManager nếu có
             Debug.LogWarning("[ClickPlantRhythmMinigame] StartGame() called directly (Debug Mode).");
-            
+
             var foundPlots = new List<PlantPlot>(FindObjectsOfType<PlantPlot>());
             foundPlots.Sort((a, b) => string.Compare(a.name, b.name));
 
@@ -81,14 +81,49 @@ namespace IronIvy.Gameplay.Rhythm
                 return;
             }
 
-            var foundPlants = new List<PlantDefinition>();
-            PlantDefinition debugPlant = (debugAvailablePlants != null && debugAvailablePlants.Count > 0) ? debugAvailablePlants[0] : null;
+            // --- Lấy seed flow từ ArchiveManager ---
+            List<PlantDefinition> sourcePlants = null;
 
-            foreach (var p in foundPlots)
-                foundPlants.Add(debugPlant);
+            // 1. Ưu tiên lấy từ ArchiveManager (startingPlants + seed đã unlock)
+            if (ArchiveManager.HasInstance)
+            {
+                sourcePlants = ArchiveManager.Instance.GetAvailablePlants();
+                if (sourcePlants == null || sourcePlants.Count == 0)
+                {
+                    Debug.LogWarning("[ClickPlantRhythm] ArchiveManager has no available plants, sẽ fallback qua debugAvailablePlants.");
+                    sourcePlants = null;
+                }
+            }
+
+            // 2. Nếu ArchiveManager chưa có / không có seed nào -> dùng debugAvailablePlants
+            if ((sourcePlants == null || sourcePlants.Count == 0)
+                && debugAvailablePlants != null
+                && debugAvailablePlants.Count > 0)
+            {
+                sourcePlants = debugAvailablePlants;
+            }
+
+            // 3. Nếu vẫn không có seed nào -> bó tay
+            if (sourcePlants == null || sourcePlants.Count == 0)
+            {
+                Debug.LogError("[ClickPlantRhythm] No plants available from ArchiveManager or debugAvailablePlants. Cannot start debug game.");
+                return;
+            }
+
+            var foundPlants = new List<PlantDefinition>();
+
+            // gán seed cho từng plot
+            // - simple: cứ lấy theo index, nếu plot > số seed thì dùng seed cuối
+            for (int i = 0; i < foundPlots.Count; i++)
+            {
+                int idx = Mathf.Clamp(i, 0, sourcePlants.Count - 1);
+                var plantDef = sourcePlants[idx];
+                foundPlants.Add(plantDef);
+            }
 
             StartSequence(foundPlots, foundPlants, null);
         }
+
 
         // giữ tham số PlantArea cho tương thích UI
         // - hiện tại chưa dùng đến, chỉ truyền qua cho vui
@@ -99,7 +134,7 @@ namespace IronIvy.Gameplay.Rhythm
             IsRunning = true;
             _seqPlots = plots;
             _seqPlants = plants;
-            
+
             // data-driven camera
             // - camera đặt sẵn trong scene
             // - không tự tính toán offset ở đây nữa
@@ -126,6 +161,7 @@ namespace IronIvy.Gameplay.Rhythm
                 hud.SetMinigameTitle("Farm Sequence");
                 hud.SetStatus("Get Ready...", true);
                 hud.UpdateHitMiss(0, 0);
+                hud.SetProgress(0f);
             }
 
             for (int i = 0; i < _seqPlots.Count; i++)
@@ -136,13 +172,13 @@ namespace IronIvy.Gameplay.Rhythm
                 if (plot == null) continue;
 
                 // báo CameraManager chỉ xoay nhìn vào plot này
-                if (CameraManager.HasInstance) 
+                if (CameraManager.HasInstance)
                 {
                     CameraManager.Instance.ApplyPlantMinigameProfile(plot.transform);
                 }
 
                 // để 1 frame cho camera update đã
-                yield return null; 
+                yield return null;
 
                 if (plant == null)
                 {
@@ -151,10 +187,10 @@ namespace IronIvy.Gameplay.Rhythm
                     continue;
                 }
 
-                if (hud) 
+                if (hud)
                 {
                     hud.SetStatus($"Plot {i + 1}/{_seqPlots.Count}", true);
-                    hud.UpdateProgress(0); 
+                    hud.SetProgress(0f);
                 }
 
                 // chơi minigame cho 1 cây
@@ -162,13 +198,13 @@ namespace IronIvy.Gameplay.Rhythm
 
                 if (hud)
                     hud.SetStatus($"Plot {i + 1} Done!", true);
-                
+
                 if (i < _seqPlots.Count - 1)
                 {
                     yield return new WaitForSeconds(delayBetweenPlots);
                 }
             }
-            
+
             FinishSequence();
         }
 
@@ -184,16 +220,16 @@ namespace IronIvy.Gameplay.Rhythm
 
             if (CameraManager.HasInstance)
                 CameraManager.Instance.RestoreMinigameCamera();
-            
+
             if (hud)
                 hud.ResetHUD();
 
             foreach (var kvp in _totalAccumulatedRewards)
             {
-                InventoryManager.Instance.AddFood(kvp.Key, kvp.Value); 
+                InventoryManager.Instance.AddFood(kvp.Key, kvp.Value);
             }
 
-            if (rewardPanel) 
+            if (rewardPanel)
             {
                 int totalNotes = _seqTotalHits + _seqTotalMisses;
                 float finalTrust = (totalNotes > 0) ? ((float)_seqTotalHits / totalNotes) * 100f : 0f;
@@ -235,7 +271,7 @@ namespace IronIvy.Gameplay.Rhythm
         {
             _currentPlant = plant;
             _isRhythmPlaying = true;
-            
+
             if (plant.musicLoop)
                 AudioManager.Instance.PlayBGM(plant.musicLoop.name);
 
@@ -257,13 +293,13 @@ namespace IronIvy.Gameplay.Rhythm
             _totalScorableBeats = 0;
 
             CalculateTotalScorableBeatsForAllStages(plant);
-            
+
             if (hud)
             {
                 hud.SetMinigameTitle(plant.displayName);
                 hud.SetTrust01(0f);
                 hud.SetProgress(0f);
-                hud.UpdateHitMiss(_seqTotalHits, _seqTotalMisses); 
+                hud.UpdateHitMiss(_seqTotalHits, _seqTotalMisses);
             }
 
             // cho plot hiện cây từ stage 0
@@ -280,7 +316,7 @@ namespace IronIvy.Gameplay.Rhythm
                     if (i > 0)
                     {
                         plot.TransitionToStage(i);
-                        yield return new WaitForSeconds(0.6f); 
+                        yield return new WaitForSeconds(0.6f);
                     }
 
                     BuildPlaylistForStage(stageData);
@@ -289,13 +325,13 @@ namespace IronIvy.Gameplay.Rhythm
                     {
                         // nếu stage này không có pattern thì cho nghỉ 1 xíu
                         yield return new WaitForSeconds(1.0f);
-                        continue; 
+                        continue;
                     }
 
                     _playlistIndex = 0;
                     SetupPattern(_playlist[0]);
 
-                    _isStagePlaying = true; 
+                    _isStagePlaying = true;
                     StartNextBeat();
 
                     // loop cho tới khi stage xong
@@ -310,7 +346,7 @@ namespace IronIvy.Gameplay.Rhythm
                 _isRhythmPlaying = false;
             }
 
-            _isRhythmPlaying = false; 
+            _isRhythmPlaying = false;
 
             // tính lượng quả drop dựa theo trust
             int yieldCount = (_trust >= 90) ? 3 : (_trust >= 60) ? 2 : (_trust >= 30) ? 1 : 0;
@@ -337,14 +373,14 @@ namespace IronIvy.Gameplay.Rhythm
             }
 
             // hết step hiện tại thì nhảy sang pattern tiếp theo
-            if (_currentStepIndex >= _currentPattern.sequence.Length) 
+            if (_currentStepIndex >= _currentPattern.sequence.Length)
             {
                 _playlistIndex++;
 
                 if (_playlistIndex >= _playlist.Count)
-                { 
-                    _isStagePlaying = false; 
-                    return; 
+                {
+                    _isStagePlaying = false;
+                    return;
                 }
 
                 SetupPattern(_playlist[_playlistIndex]);
@@ -352,7 +388,7 @@ namespace IronIvy.Gameplay.Rhythm
 
             var step = _currentPattern.sequence[_currentStepIndex];
             _currentBeatDuration = 60f / Mathf.Max(1, bpm);
-            
+
             int totalBeatsOfStep = Mathf.Max(1, step.beats);
             bool isFirstBeatOfStep = (_beatsLeftInStep == totalBeatsOfStep);
 
@@ -360,7 +396,7 @@ namespace IronIvy.Gameplay.Rhythm
             {
                 // chỉ tính điểm với Tap / Hold
                 _currentBeatIsScorable = (step.type == RhythmPattern.StepType.Tap || step.type == RhythmPattern.StepType.Hold);
-                
+
                 if (step.type == RhythmPattern.StepType.Rest)
                 {
                     if (_currentTarget)
@@ -415,7 +451,7 @@ namespace IronIvy.Gameplay.Rhythm
 
             bool isHold = step.type == RhythmPattern.StepType.Hold;
             float totalStepDuration = Mathf.Max(1, step.beats) * _currentBeatDuration;
-            
+
             float requiredHoldTime = 0f;
             if (isHold)
             {
@@ -448,28 +484,35 @@ namespace IronIvy.Gameplay.Rhythm
             if (_currentBeatIsScorable)
             {
                 if (hit)
-                { 
-                    _beatsHit++; 
-                    _seqTotalHits++; 
-                    _trust += (100f / _totalScorableBeats); 
+                {
+                    _beatsHit++;
+                    _seqTotalHits++;
+                    _trust += (100f / _totalScorableBeats);
                 }
                 else
-                { 
-                    _beatsMiss++; 
-                    _seqTotalMisses++; 
-                    _trust -= (50f / _totalScorableBeats); 
+                {
+                    _beatsMiss++;
+                    _seqTotalMisses++;
+                    _trust -= (50f / _totalScorableBeats);
                 }
 
                 _trust = Mathf.Clamp(_trust, 0, 100);
             }
-            
-            if (hud) 
+
+            if (hud)
             {
                 hud.SetTrust01(_trust / 100f);
-                hud.UpdateHitMiss(_seqTotalHits, _seqTotalMisses); 
+                hud.UpdateHitMiss(_seqTotalHits, _seqTotalMisses);
                 hud.SetStatus(hit ? "Perfect!" : "Miss!", hit);
+
+                // thêm phần PROGRESS: dựa trên số beat đã chấm điểm / tổng scorable beats
+                if (_totalScorableBeats > 0)
+                {
+                    float progress01 = (_beatsHit + _beatsMiss) / (float)_totalScorableBeats;
+                    hud.SetProgress(Mathf.Clamp01(progress01));
+                }
             }
-            
+
             StartNextBeat();
         }
 

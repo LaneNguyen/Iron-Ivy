@@ -19,6 +19,9 @@ namespace IronIvy.Gameplay.Interaction
         [Header("Logic")]
         public UnityEvent onInteract;
 
+
+        
+
         private bool _isPlayerInZone;
 
         private void Start()

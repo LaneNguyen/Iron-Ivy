@@ -19,4 +19,4 @@ MonoBehaviour:
   requiredParent: {fileID: 0}
   rewardType: 2
   rewardValue: 1
-  rewardObject: {fileID: 0}
+  rewardObject: {fileID: 11400000, guid: b6b86f439b65a544882e50ea4a6b60dc, type: 2}

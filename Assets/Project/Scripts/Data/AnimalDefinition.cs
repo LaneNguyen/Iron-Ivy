@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using IronIvy.Gameplay.Rhythm;
 
 namespace IronIvy.Data
@@ -10,7 +10,7 @@ namespace IronIvy.Data
         public string id;
         public string displayName;
         
-        // [NEW] Feeding System & Buffs
+        //   Feeding System & Buffs
         [Header("Feeding & Buffs")]
         [Tooltip("Món ăn yêu thích. Nếu cho ăn trước khi chơi -> Kích hoạt Buff.")]
         public FoodItem favoriteFood;

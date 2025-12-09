@@ -654,7 +654,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 066945f7d7d959848b1a146d130a62f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Gameplay.Interaction.InteractionTrigger
-  interactText: F
   interactKey: 102
   playerTag: Player
   interactPrompt: {fileID: 2653235985341634695}
