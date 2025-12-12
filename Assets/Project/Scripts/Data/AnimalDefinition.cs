@@ -9,7 +9,10 @@ namespace IronIvy.Data
         [Header("Basic")]
         public string id;
         public string displayName;
-        
+
+        [Tooltip("Icon đại diện cho Animal này (dùng trong UI Reward Panel)")]
+        public Sprite icon;     // >>> NEW FIELD ADDED <<<
+
         //   Feeding System & Buffs
         [Header("Feeding & Buffs")]
         [Tooltip("Món ăn yêu thích. Nếu cho ăn trước khi chơi -> Kích hoạt Buff.")]
@@ -23,7 +26,7 @@ namespace IronIvy.Data
 
         [Header("Loot (Drops)")]
         [Tooltip("Vật phẩm rớt ra khi hoàn thành minigame (Ví dụ: Lông, Sữa...).")]
-        public FoodItem dropItem; // Dùng chung class FoodItem cho tiện, hoặc tách ra ItemDefinition
+        public FoodItem dropItem;
 
         [Tooltip("Số lượng rớt ra mặc định.")]
         public int dropCount = 1;
@@ -65,6 +68,25 @@ namespace IronIvy.Data
         [Header("Rhythm (multi-pattern)")]
         public RhythmPattern[] patterns;
         public RhythmPlaybackMode playbackMode = RhythmPlaybackMode.Sequential;
+
+        [Header("Rhythm (random mix)")]
+        [Tooltip("Bật lên để animal dùng random mix thay vì pattern cố định.")]
+        public bool useRandomRhythm = false;
+
+        [Tooltip("Pool các pattern nhỏ đại diện style con này.")]
+        public RhythmPattern[] randomFragments;
+
+        [Tooltip("Tổng số beat tối thiểu cho bài random.")]
+        [Min(1)] public int minRandomBeats = 8;
+
+        [Tooltip("Tổng số beat tối đa cho bài random.")]
+        [Min(1)] public int maxRandomBeats = 24;
+
+        [Tooltip("Số fragment tối thiểu trong playlist random.")]
+        [Min(1)] public int minRandomFragments = 2;
+
+        [Tooltip("Số fragment tối đa trong playlist random.")]
+        [Min(1)] public int maxRandomFragments = 6;
 
         [Header("Animation names")]
         public string goodAnim = "Good";

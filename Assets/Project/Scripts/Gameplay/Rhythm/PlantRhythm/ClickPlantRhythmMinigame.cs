@@ -158,8 +158,8 @@ namespace IronIvy.Gameplay.Rhythm
             if (hud)
             {
                 hud.hudRoot.SetActive(true);
-                hud.SetMinigameTitle("Farm Sequence");
-                hud.SetStatus("Get Ready...", true);
+                hud.SetMinigameTitle("Trồng cây thôi!");
+                hud.SetStatus("Sẵn sàng...", true);
                 hud.UpdateHitMiss(0, 0);
                 hud.SetProgress(0f);
             }
@@ -189,7 +189,7 @@ namespace IronIvy.Gameplay.Rhythm
 
                 if (hud)
                 {
-                    hud.SetStatus($"Plot {i + 1}/{_seqPlots.Count}", true);
+                    hud.SetStatus($"Ô đất {i + 1}/{_seqPlots.Count}", true);
                     hud.SetProgress(0f);
                 }
 
@@ -197,7 +197,7 @@ namespace IronIvy.Gameplay.Rhythm
                 yield return StartCoroutine(PlayOnePlantRoutine(plot, plant));
 
                 if (hud)
-                    hud.SetStatus($"Plot {i + 1} Done!", true);
+                    hud.SetStatus($"Ô đất {i + 1} đã xong!", true);
 
                 if (i < _seqPlots.Count - 1)
                 {
@@ -292,7 +292,11 @@ namespace IronIvy.Gameplay.Rhythm
             _trust = 0f;
             _totalScorableBeats = 0;
 
+            // tính tổng scorable beats (Tap/Hold) cho trust
             CalculateTotalScorableBeatsForAllStages(plant);
+
+            // tính tổng beat của cả màn (bao gồm Rest)
+            int totalBeatsForTimeline = CalculateTotalBeatsForTimeline(plant);
 
             if (hud)
             {
@@ -300,6 +304,16 @@ namespace IronIvy.Gameplay.Rhythm
                 hud.SetTrust01(0f);
                 hud.SetProgress(0f);
                 hud.UpdateHitMiss(_seqTotalHits, _seqTotalMisses);
+
+                // bật mode timeline: thanh chạy từ 0 -> 1 dựa trên tổng số beat
+                hud.useTimelineProgress = true;
+
+                // thời gian 1 beat tính theo bpm
+                float beatDuration = 60f / Mathf.Max(1f, bpm);
+
+                // config timeline = total beats * beatDuration
+                hud.ConfigureTimelineByBeats(totalBeatsForTimeline, beatDuration);
+                hud.StartTimeline();
             }
 
             // cho plot hiện cây từ stage 0
@@ -347,6 +361,12 @@ namespace IronIvy.Gameplay.Rhythm
             }
 
             _isRhythmPlaying = false;
+
+            // dừng timeline khi xong 1 plant
+            if (hud)
+            {
+                hud.StopTimeline();
+            }
 
             // tính lượng quả drop dựa theo trust
             int yieldCount = (_trust >= 90) ? 3 : (_trust >= 60) ? 2 : (_trust >= 30) ? 1 : 0;
@@ -503,9 +523,10 @@ namespace IronIvy.Gameplay.Rhythm
             {
                 hud.SetTrust01(_trust / 100f);
                 hud.UpdateHitMiss(_seqTotalHits, _seqTotalMisses);
-                hud.SetStatus(hit ? "Perfect!" : "Miss!", hit);
+                hud.SetStatus(hit ? "HOÀN HẢO!" : "[ERROR]SAI NHỊP", hit);
 
-                // thêm phần PROGRESS: dựa trên số beat đã chấm điểm / tổng scorable beats
+                // phần progress cũ theo scorable beats
+                // giờ nếu useTimelineProgress = true thì SetProgress tự ignore
                 if (_totalScorableBeats > 0)
                 {
                     float progress01 = (_beatsHit + _beatsMiss) / (float)_totalScorableBeats;
@@ -544,6 +565,37 @@ namespace IronIvy.Gameplay.Rhythm
 
             if (_totalScorableBeats == 0)
                 _totalScorableBeats = 1;
+        }
+
+        // tổng số beat của màn cho timeline (bao gồm cả Rest)
+        private int CalculateTotalBeatsForTimeline(PlantDefinition plant)
+        {
+            int totalBeats = 0;
+
+            if (plant.stages != null)
+            {
+                foreach (var stage in plant.stages)
+                {
+                    if (stage.patterns == null) continue;
+
+                    foreach (var p in stage.patterns)
+                    {
+                        if (p && p.sequence != null)
+                        {
+                            foreach (var s in p.sequence)
+                            {
+                                // bước nào cũng chiếm beat trên timeline
+                                totalBeats += Mathf.Max(1, s.beats);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (totalBeats == 0)
+                totalBeats = 1;
+
+            return totalBeats;
         }
 
         // build playlist từ stage

@@ -67,7 +67,7 @@ private Dictionary<FoodItem, Image> _slotBackgrounds = new Dictionary<FoodItem, 
             _selectedFood = null; // Reset selection
             if (buffInfoText) buffInfoText.text = "";
 
-            ShowPanel("Play Animal Rhythm?", $"{defaultQuestion}\n(-{animalEnergyCost} Energy)");
+            ShowPanel("Play Animal Rhythm?", $"{defaultQuestion}\n(-{animalEnergyCost} năng lượng)");
 
             // Bật UI Feeding
             if (feedingSectionRoot) feedingSectionRoot.SetActive(true);
@@ -84,7 +84,7 @@ private Dictionary<FoodItem, Image> _slotBackgrounds = new Dictionary<FoodItem, 
             _selectedFood = null;
 
             int displayCost = (startPanel != null) ? startPanel.baseEnergyCost : plantDirectCost;
-            ShowPanel("Play Plant Rhythm?", $"{defaultQuestion}\n(-{displayCost} Energy)");
+            ShowPanel("Play Plant Rhythm?", $"{defaultQuestion}\n(-{displayCost} năng lượng)");
 
             // Tắt UI Feeding cho Plant
             if (feedingSectionRoot) feedingSectionRoot.SetActive(false);
@@ -187,11 +187,11 @@ private Dictionary<FoodItem, Image> _slotBackgrounds = new Dictionary<FoodItem, 
             {
                 if (_currentAnimal.Definition.favoriteFood == food)
                 {
-                    if (buffInfoText) buffInfoText.text = "<color=green>Favorite! (Buffs Active)</color>";
+                    if (buffInfoText) buffInfoText.text = "<color=green> Trúng gu trúng gu!(Buffs Active)</color>";
                 }
                 else
                 {
-                    if (buffInfoText) buffInfoText.text = "Give Food";
+                    if (buffInfoText) buffInfoText.text = "Chọn món này.";
                 }
             }
         }

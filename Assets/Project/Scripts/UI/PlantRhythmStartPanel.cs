@@ -108,9 +108,9 @@ namespace IronIvy.UI
                 if (txt)
                 {
                     string plantName = _selectedPlants[index] != null ? 
-                        _selectedPlants[index].displayName : "Empty";
+                        _selectedPlants[index].displayName : "Trống";
 
-                    txt.text = $"Plot {index + 1}\n<size=80%>{plantName}</size>";
+                    txt.text = $"Ô đất {index + 1}\n<size=80%>{plantName}</size>";
                 }
 
                 var img = btn.GetComponent<Image>();

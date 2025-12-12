@@ -51,11 +51,12 @@ namespace IronIvy.Gameplay.Rhythm
         private int _beatsLeftInStep;
         private int _globalBeatIndex;
         private int _totalBeatsForProgress;
+        private int _totalBeatsForTimeline;   // tổng beat dùng cho thanh timeline liên tục
 
         private RhythmClickTarget _currentTarget;
         private Coroutine _restCoroutine;
         private float _currentBeatDuration;
-
+        private RhythmPattern _runtimeRestPattern;
         private int _totalHit;
         private int _totalMiss;
 
@@ -96,10 +97,21 @@ namespace IronIvy.Gameplay.Rhythm
             BuildPlaylist(_playlist);
             if (_playlist.Count == 0) return;
 
-            // tổng beat dùng cho progress & trust
+            // tổng beat dùng cho progress & trust (chỉ Tap/Hold)
             _totalBeatsForProgress = 0;
             foreach (var pat in _playlist)
-                _totalBeatsForProgress += CountBeatsInPattern(pat);
+                _totalBeatsForProgress += CountScorableBeatsInPattern(pat);
+
+            // tổng beat timeline: tính cả Rest vì Rest cũng chiếm thời gian
+            _totalBeatsForTimeline = 0;
+            foreach (var pat in _playlist)
+                _totalBeatsForTimeline += CountBeatsInPattern(pat);
+
+            if (_totalBeatsForTimeline <= 0)
+            {
+                // fallback nhẹ nếu pattern có vấn đề
+                _totalBeatsForTimeline = (_totalBeatsForProgress > 0) ? _totalBeatsForProgress : 1;
+            }
 
             _playlistIndex = 0;
             _currentPattern = null;
@@ -112,13 +124,22 @@ namespace IronIvy.Gameplay.Rhythm
             _totalMiss = 0;
             _trust01 = 0f;
 
+            bool isRandomMode = false;
+            var def = _currentAnimal != null ? _currentAnimal.Definition : null;
+            if (def != null && def.useRandomRhythm)
+                isRandomMode = true;
+
             if (hud != null)
             {
                 if (hud.hudRoot != null) hud.hudRoot.SetActive(true);
 
-                string title = (_currentAnimal != null && _currentAnimal.Definition != null)
-                    ? _currentAnimal.Definition.displayName
+                string title = (_currentAnimal != null && def != null)
+                    ? def.displayName
                     : "Animal Rhythm";
+
+                // tag nhỏ cho random mix cho dễ debug
+                if (isRandomMode)
+                    title += " [Mix]";
 
                 // hiện label nếu có buff
                 if (_hasFavoriteBuff)
@@ -127,11 +148,19 @@ namespace IronIvy.Gameplay.Rhythm
                 if (hud.titleText != null)
                     hud.titleText.text = title;
 
-                hud.SetStatus("Ready", false);
+                hud.SetStatus("Sẵn sàng", false);
                 hud.SetProgress(0f);
                 hud.SetHitMiss(0, 0);
                 hud.SetHoldVisual(0f);
                 hud.SetTrust01(0f);
+
+                // bật mode timeline: thanh chạy liên tục từ 0 -> 1 theo tổng beat * BeatDuration
+                if (_totalBeatsForTimeline > 0)
+                {
+                    hud.useTimelineProgress = true;
+                    hud.ConfigureTimelineByBeats(_totalBeatsForTimeline, BeatDuration);
+                    hud.StartTimeline();
+                }
             }
 
             if (CameraManager.HasInstance)
@@ -173,6 +202,7 @@ namespace IronIvy.Gameplay.Rhythm
 
             if (hud != null)
             {
+                hud.StopTimeline(); // dừng thanh timeline
                 hud.UpdateHitMiss(_totalHit, _totalMiss);
                 hud.ResetHUD();
             }
@@ -190,7 +220,15 @@ namespace IronIvy.Gameplay.Rhythm
 
             if (_currentAnimal != null && rewardPanel != null)
             {
-                rewardPanel.ShowAnimalRhythmResult(_currentAnimal, successRatio, finalReward, lootItem, lootCount);
+                rewardPanel.ShowAnimalRhythmResult(
+                    _currentAnimal,
+                    successRatio,
+                    finalReward,
+                    lootItem,
+                    lootCount,
+                    _totalHit,
+                    _totalMiss
+                );
             }
 
             if (_currentAnimal != null)
@@ -204,27 +242,202 @@ namespace IronIvy.Gameplay.Rhythm
         private void BuildPlaylist(List<RhythmPattern> outList)
         {
             outList.Clear();
-            AnimalDefinition def = _currentAnimal != null ? _currentAnimal.Definition : null;
 
-            if (def != null && def.patterns != null && def.patterns.Length > 0)
+            AnimalDefinition def = _currentAnimal != null ? _currentAnimal.Definition : null;
+            bool added = false;
+
+            // cố gắng dùng data từ animal definition trước
+            if (def != null)
             {
-                foreach (var pat in def.patterns)
-                    if (pat != null) outList.Add(pat);
+                if (def.useRandomRhythm)
+                {
+                    // build random playlist cho animal theo style riêng
+                    added = BuildRandomPlaylistForAnimal(def, outList);
+                    if (!added)
+                    {
+                        Debug.LogWarning($"[AnimalRhythm] Random mix failed for animal {def.id}, fallback fixed patterns.");
+                        added = BuildFixedPlaylistForAnimal(def, outList);
+                    }
+                }
+                else
+                {
+                    // chế độ cũ: dùng patterns[] cố định
+                    added = BuildFixedPlaylistForAnimal(def, outList);
+                }
             }
-            else
+
+            // nếu vẫn chưa có gì thì dùng fallback
+            if (!added)
+                BuildFallbackPlaylist(outList);
+
+            if (outList.Count == 0)
+                Debug.LogWarning("[AnimalRhythm] Playlist is empty. Check AnimalDefinition or fallbackPlaylist.");
+        }
+
+        // dùng patterns[] như cũ
+        private bool BuildFixedPlaylistForAnimal(AnimalDefinition def, List<RhythmPattern> outList)
+        {
+            if (def == null || def.patterns == null || def.patterns.Length == 0)
+                return false;
+
+            for (int i = 0; i < def.patterns.Length; i++)
             {
-                foreach (var pat in fallbackPlaylist)
-                    if (pat != null) outList.Add(pat);
+                var pat = def.patterns[i];
+                if (pat != null)
+                    outList.Add(pat);
+            }
+
+            return outList.Count > 0;
+        }
+
+        // fallbackPlaylist set tay trên inspector
+        private void BuildFallbackPlaylist(List<RhythmPattern> outList)
+        {
+            if (fallbackPlaylist == null || fallbackPlaylist.Count == 0)
+                return;
+
+            for (int i = 0; i < fallbackPlaylist.Count; i++)
+            {
+                var pat = fallbackPlaylist[i];
+                if (pat != null)
+                    outList.Add(pat);
+            }
+        }
+
+        // build random mix dựa trên pool fragment của animal
+        private bool BuildRandomPlaylistForAnimal(AnimalDefinition def, List<RhythmPattern> outList)
+        {
+            if (def == null) return false;
+
+            var pool = def.randomFragments;
+            if (pool == null || pool.Length == 0)
+                return false;
+
+            // lọc fragment hợp lệ
+            List<RhythmPattern> fragmentPool = new List<RhythmPattern>();
+            for (int i = 0; i < pool.Length; i++)
+            {
+                var pat = pool[i];
+                if (pat == null) continue;
+                if (pat.sequence == null || pat.sequence.Length == 0) continue;
+
+                int beats = CountBeatsInPattern(pat);
+                if (beats <= 0) continue;
+
+                fragmentPool.Add(pat);
+            }
+
+            if (fragmentPool.Count == 0)
+                return false;
+
+            // config safe
+            int minBeats = Mathf.Max(1, def.minRandomBeats);
+            int maxBeats = Mathf.Max(minBeats, def.maxRandomBeats);
+            int minFragments = Mathf.Max(1, def.minRandomFragments);
+            int maxFragments = Mathf.Max(minFragments, def.maxRandomFragments);
+
+            int totalBeats = 0;
+            int fragmentsUsed = 0;
+            int safety = 128;
+
+            List<RhythmPattern> working = new List<RhythmPattern>(fragmentPool);
+            ShuffleList(working);
+
+            int idx = 0;
+            bool isFirstFragment = true;
+            int restBeatsBetween = 1; // tạm thời cho 1 beat nghỉ giữa 2 fragment
+
+            while (safety-- > 0 && fragmentsUsed < maxFragments && totalBeats < maxBeats)
+            {
+                if (working.Count == 0)
+                {
+                    working.AddRange(fragmentPool);
+                    ShuffleList(working);
+                    idx = 0;
+                }
+
+                if (idx >= working.Count)
+                {
+                    ShuffleList(working);
+                    idx = 0;
+                }
+
+                var pick = working[idx++];
+                int beats = CountScorableBeatsInPattern(pick);
+                if (beats <= 0)
+                    continue;
+
+                // tính thử nếu add fragment này + đoạn rest phía trước (nếu không phải fragment đầu)
+                int extraRestBeats = isFirstFragment ? 0 : restBeatsBetween;
+                int projectedBeats = totalBeats + beats;
+
+                // nếu vượt max mà đã đủ min thì dừng luôn
+                if (projectedBeats > maxBeats && fragmentsUsed >= minFragments)
+                    break;
+
+                // chèn Rest ở giữa fragment (trừ fragment đầu)
+                if (!isFirstFragment && restBeatsBetween > 0)
+                {
+                    var restPat = GetOrCreateRestPattern(restBeatsBetween);
+                    outList.Add(restPat);
+                    // Rest không cộng vào totalBeats (cho scorable), nhưng vẫn chiếm thời gian timeline
+                }
+
+                // add fragment chính
+                outList.Add(pick);
+                totalBeats += beats;
+                fragmentsUsed++;
+                isFirstFragment = false;
+
+                if (fragmentsUsed >= minFragments && totalBeats >= minBeats && totalBeats <= maxBeats)
+                    break;
+            }
+
+            if (outList.Count == 0)
+                return false;
+
+            Debug.Log($"[AnimalRhythm] Random mix built: {fragmentsUsed} fragments, ~{totalBeats} beats (with rests).");
+            return true;
+        }
+
+        // shuffle đơn giản cho list generic
+        private void ShuffleList<T>(List<T> list)
+        {
+            for (int i = 0; i < list.Count; i++)
+            {
+                int j = Random.Range(i, list.Count);
+                T tmp = list[i];
+                list[i] = list[j];
+                list[j] = tmp;
             }
         }
 
         private int CountBeatsInPattern(RhythmPattern pattern)
         {
+            if (pattern == null) return 0;
+            return pattern.GetTotalBeats();
+        }
+
+        // chỉ tính beat có thể chấm điểm (Tap / Hold)
+        private int CountScorableBeatsInPattern(RhythmPattern pattern)
+        {
             if (pattern == null || pattern.sequence == null) return 0;
-            int count = 0;
-            foreach (var step in pattern.sequence)
-                count += Mathf.Max(1, step.beats <= 0 ? 1 : step.beats);
-            return count;
+
+            int total = 0;
+            var seq = pattern.sequence;
+
+            for (int i = 0; i < seq.Length; i++)
+            {
+                var s = seq[i];
+                if (s.type == RhythmPattern.StepType.Tap || s.type == RhythmPattern.StepType.Hold)
+                {
+                    int beats = s.beats;
+                    if (beats <= 0) beats = 1;
+                    total += beats;
+                }
+            }
+
+            return total;
         }
 
         private void SetupPattern(RhythmPattern pattern)
@@ -303,11 +516,9 @@ namespace IronIvy.Gameplay.Rhythm
             }
             else
             {
+                // beat có target thì spawn target
                 SpawnTargetForStep(step);
             }
-
-            _globalBeatIndex++;
-            UpdateProgressUI();
 
             _beatsLeftInStep--;
             if (_beatsLeftInStep <= 0)
@@ -327,6 +538,8 @@ namespace IronIvy.Gameplay.Rhythm
             }
 
             _restCoroutine = null;
+
+            // rest chỉ là thời gian chờ, không cộng progress, không ảnh hưởng trust
             StartNextBeat();
         }
 
@@ -448,6 +661,13 @@ namespace IronIvy.Gameplay.Rhythm
                 hud.SetTrust01(_trust01);
             }
 
+            // beat có target thì tính tiến độ sau khi xử lý
+            if (isScorableStep)
+            {
+                _globalBeatIndex++;
+                UpdateProgressUI();
+            }
+
             if (IsRunning)
                 StartNextBeat();
         }
@@ -455,6 +675,7 @@ namespace IronIvy.Gameplay.Rhythm
         private void UpdateProgressUI()
         {
             if (hud == null || _totalBeatsForProgress <= 0) return;
+            // nếu HUD đang dùng timeline theo tổng beat, SetProgress sẽ tự bỏ qua
             hud.SetProgress(Mathf.Clamp01((float)_globalBeatIndex / _totalBeatsForProgress));
         }
 
@@ -487,9 +708,9 @@ namespace IronIvy.Gameplay.Rhythm
             if (_hasFavoriteBuff)
                 multiplier = def.buffTrustMultiplier;
 
-            if (successRatio >= 0.99f)      finalReward = baseReward * multiplier;
+            if (successRatio >= 0.99f) finalReward = baseReward * multiplier;
             else if (successRatio >= 0.5f) finalReward = baseReward * 0.5f * multiplier;
-            else                            finalReward = 0f;
+            else finalReward = 0f;
 
             if (finalReward > 0f)
                 ArchiveManager.Instance.AddProgress(finalReward);
@@ -520,5 +741,31 @@ namespace IronIvy.Gameplay.Rhythm
 
             InventoryManager.Instance.AddFood(item, count);
         }
+
+        // tạo 1 pattern runtime với Step Rest duy nhất
+        private RhythmPattern GetOrCreateRestPattern(int beats = 1)
+        {
+            if (_runtimeRestPattern == null)
+            {
+                _runtimeRestPattern = ScriptableObject.CreateInstance<RhythmPattern>();
+                _runtimeRestPattern.patternId = "runtime_rest";
+                _runtimeRestPattern.displayName = "Runtime Rest";
+                _runtimeRestPattern.bpm = Mathf.RoundToInt(bpm);
+                _runtimeRestPattern.hitWindowSeconds = 0.2f;
+            }
+
+            // step array 1 phần tử Rest
+            _runtimeRestPattern.sequence = new RhythmPattern.Step[]
+            {
+                new RhythmPattern.Step
+                {
+                    type = RhythmPattern.StepType.Rest,
+                    beats = Mathf.Max(1, beats)
+                }
+            };
+
+            return _runtimeRestPattern;
+        }
     }
+
 }

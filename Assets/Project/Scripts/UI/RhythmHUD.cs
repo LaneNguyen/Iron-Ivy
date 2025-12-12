@@ -30,6 +30,25 @@ namespace IronIvy.UI
         public Slider trustSlider;
         public Slider progressSlider;
 
+        [Header("Timeline Progress (Beat Count)")]
+        [Tooltip("Nếu bật thì thanh chạy liên tục từ 0 -> 1 dựa trên tổng số beat, không phụ thuộc hit")]
+        public bool useTimelineProgress = false;
+
+        [Tooltip("Tổng số beat của màn, để map thành 100% timeline. Có thể set tay hoặc set từ code.")]
+        public int totalBeatsForTimeline = 0;
+
+        [Tooltip("Thời gian 1 beat (giây). Nếu để 0 thì nên gọi config từ code.")]
+        public float secondsPerBeat = 0.5f;
+
+        // internal cho timeline dựa trên beat
+        float _timelineDuration;   // tổng thời gian round = totalBeats * secondsPerBeat
+        float _timelineElapsed;    // thời gian đã trôi qua
+        bool _timelinePlaying;     // flag đang chạy timeline
+
+        [Header("Progress Lerp")]
+        [Tooltip("Tốc độ lerp progress (giá trị càng cao càng bám sát target nhanh)")]
+        public float progressLerpSpeed = 5f;
+
         [Header("Status")]
         public TextMeshProUGUI statusText;
         public Image statusIcon;
@@ -42,6 +61,10 @@ namespace IronIvy.UI
 
         // engine rhythm cũ, vẫn giữ reference cho ai còn dùng
         private RhythmMinigameBase current;
+
+        // internal progress state cho smooth bar (mode cũ: theo target)
+        float _currentProgress01;
+        float _targetProgress01;
 
         private void OnEnable()
         {
@@ -60,6 +83,32 @@ namespace IronIvy.UI
                 ListenManager.Instance.OnMinigameStarted -= OnMinigameStarted;
                 ListenManager.Instance.OnMinigameStopped -= OnMinigameStopped;
             }
+        }
+
+        private void Update()
+        {
+            if (progressSlider == null) return;
+
+            // nếu bật timeline progress: thanh chạy liên tục theo tổng thời gian (tổng số beat quy đổi)
+            if (useTimelineProgress && _timelinePlaying && _timelineDuration > 0f)
+            {
+                _timelineElapsed += Time.deltaTime;
+
+                // map thời gian 0..duration sang 0..1
+                _currentProgress01 = Mathf.Clamp01(_timelineElapsed / _timelineDuration);
+            }
+            else
+            {
+                // mode cũ: lerp progress slider mượt mượt từ current -> target
+                // MoveTowards cho ổn định, không bị overshoot
+                _currentProgress01 = Mathf.MoveTowards(
+                    _currentProgress01,
+                    _targetProgress01,
+                    progressLerpSpeed * Time.deltaTime
+                );
+            }
+
+            progressSlider.value = _currentProgress01;
         }
 
         // ListenManager callbacks
@@ -82,6 +131,9 @@ namespace IronIvy.UI
         {
             // không auto tắt HUD ở đây
             // engine mới tự gọi ResetHUD khi cần
+
+            // stop timeline luôn cho chắc
+            _timelinePlaying = false;
         }
 
         // bind thủ công cho engine cũ nếu không muốn rely ListenManager
@@ -117,10 +169,16 @@ namespace IronIvy.UI
             trustSlider.value = Mathf.Clamp01(value01);
         }
 
+        // đây là API được minigame gọi mỗi beat / mỗi step (mode cũ)
+        // giờ mình không set thẳng slider nữa mà chỉ update target
         public void SetProgress(float value01)
         {
-            if (progressSlider == null) return;
-            progressSlider.value = Mathf.Clamp01(value01);
+            // nếu đang dùng timeline thì bỏ qua, để thanh chỉ chạy theo tổng thời gian
+            if (useTimelineProgress)
+                return;
+
+            value01 = Mathf.Clamp01(value01);
+            _targetProgress01 = value01;
         }
 
         // giữ cho tương thích engine cũ
@@ -191,6 +249,43 @@ namespace IronIvy.UI
             SetHitMiss(hit, miss);
         }
 
+        // config timeline theo beat
+        // ví dụ: tổng 32 beat, mỗi beat 0.5s => duration = 16s
+        public void ConfigureTimelineByBeats(int totalBeats, float beatSeconds)
+        {
+            if (totalBeats <= 0) totalBeats = 1;
+            if (beatSeconds <= 0f) beatSeconds = 0.1f;
+
+            totalBeatsForTimeline = totalBeats;
+            secondsPerBeat = beatSeconds;
+            _timelineDuration = totalBeatsForTimeline * secondsPerBeat;
+        }
+
+        // config timeline nếu đã biết sẵn tổng thời lượng round (giây)
+        public void ConfigureTimelineByDuration(float durationSeconds)
+        {
+            if (durationSeconds <= 0f) durationSeconds = 0.1f;
+            _timelineDuration = durationSeconds;
+        }
+
+        // được gọi từ minigame khi bắt đầu round
+        public void StartTimeline()
+        {
+            _timelineElapsed = 0f;
+            _timelinePlaying = true;
+
+            // reset bar cho chắc
+            _currentProgress01 = 0f;
+            if (progressSlider != null)
+                progressSlider.value = 0f;
+        }
+
+        // được gọi từ minigame khi kết thúc round
+        public void StopTimeline()
+        {
+            _timelinePlaying = false;
+        }
+
         // reset HUD về state default
         // - tắt root
         // - clear text
@@ -201,7 +296,19 @@ namespace IronIvy.UI
 
             SetKeyHints(null);
             SetTrust01(0f);
-            SetProgress(0f);
+
+            // reset progress internal
+            _currentProgress01 = 0f;
+            _targetProgress01 = 0f;
+
+            // reset timeline
+            _timelineElapsed = 0f;
+            _timelineDuration = 0f;
+            _timelinePlaying = false;
+
+            if (progressSlider != null)
+                progressSlider.value = 0f;
+
             SetStatus(string.Empty, true);
             SetHitMiss(0, 0);
         }
