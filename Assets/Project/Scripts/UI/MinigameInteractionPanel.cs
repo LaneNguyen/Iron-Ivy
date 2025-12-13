@@ -112,60 +112,55 @@ private Dictionary<FoodItem, Image> _slotBackgrounds = new Dictionary<FoodItem, 
             _selectedFood = null;
         }
 
-        // --- FEEDING LOGIC ---
-       private void RenderFoodList()
-{
-    if (!foodContainer || !foodSlotPrefab) return;
-
-    // 1. Dọn dẹp cũ
-    foreach (Transform child in foodContainer) Destroy(child.gameObject);
-    _spawnedSlots.Clear();
-    _slotBackgrounds.Clear();
-
-    if (!InventoryManager.HasInstance) return;
-
-    var allItems = InventoryManager.Instance.All();
-
-    foreach (var kvp in allItems)
-    {
-        FoodItem food = kvp.Key;
-        int count = kvp.Value;
-
-        if (count <= 0) continue;
-
-        // 2. Tạo Slot từ Prefab chung (Chưa có Button)
-        GameObject slotObj = Instantiate(foodSlotPrefab, foodContainer);
-        
-        // Setup hiển thị (Icon, số lượng...)
-        var slotScript = slotObj.GetComponent<UIItemSlot>(); 
-        if (slotScript) slotScript.Setup(food.icon, count);
-        
-        // 3. Làm magic tự gắn Button vào bằng code!
-        Button btn = slotObj.GetComponent<Button>();
-        if (btn == null) btn = slotObj.AddComponent<Button>();
-
-        // Tắt hiệu ứng màu mặc định của Button để mình tự chỉnh màu
-        btn.transition = Selectable.Transition.None;
-
-        // Gán sự kiện Click
-        btn.onClick.AddListener(() => OnFoodSelected(food));
-
-        // 4. Tìm cái Background Image để đổi màu
-        // Giả định: Prefab của bạn có Image ở ngay root (cùng chỗ với Button)
-        // Hoặc nếu Background nằm sâu bên trong, bạn cần GetComponentInChildren<Image>()
-        Image bgImage = slotObj.GetComponent<Image>();
-        
-        // Lưu lại để tí nữa đổi màu
-        if (bgImage)
+        // render danh sách đồ ăn từ inventory
+        private void RenderFoodList()
         {
-            _slotBackgrounds.Add(food, bgImage);
-            // Reset về màu thường
-            bgImage.color = normalColor;
-        }
+            if (!foodContainer || !foodSlotPrefab) return;
 
-        _spawnedSlots.Add(food, slotObj);
-    }
-}
+            // xóa hết slot cũ trước đã
+            foreach (Transform child in foodContainer) Destroy(child.gameObject);
+            _spawnedSlots.Clear();
+            _slotBackgrounds.Clear();
+
+            if (!InventoryManager.HasInstance) return;
+
+            var allItems = InventoryManager.Instance.All();
+
+            foreach (var kvp in allItems)
+            {
+                FoodItem food = kvp.Key;
+                int count = kvp.Value;
+
+                if (count <= 0) continue;
+
+                // tạo slot từ prefab
+                GameObject slotObj = Instantiate(foodSlotPrefab, foodContainer);
+                
+                // setup icon và số lượng
+                var slotScript = slotObj.GetComponent<UIItemSlot>(); 
+                if (slotScript) slotScript.Setup(food.icon, count);
+                
+                // prefab có thể chưa có Button, nên tự add vào luôn
+                Button btn = slotObj.GetComponent<Button>();
+                if (btn == null) btn = slotObj.AddComponent<Button>();
+
+                // tắt transition mặc định vì tự đổi màu
+                btn.transition = Selectable.Transition.None;
+                btn.onClick.AddListener(() => OnFoodSelected(food));
+
+                // lấy background image để đổi màu khi chọn
+                // giả sử Image nằm ở root, nếu không thì dùng GetComponentInChildren
+                Image bgImage = slotObj.GetComponent<Image>();
+                
+                if (bgImage)
+                {
+                    _slotBackgrounds.Add(food, bgImage);
+                    bgImage.color = normalColor;
+                }
+
+                _spawnedSlots.Add(food, slotObj);
+            }
+        }
 
 
 
@@ -196,29 +191,22 @@ private Dictionary<FoodItem, Image> _slotBackgrounds = new Dictionary<FoodItem, 
             }
         }
 
-       // Hàm này chạy mỗi khi bấm chọn món ăn
-private void UpdateSlotHighlights()
-{
-    foreach (var kvp in _slotBackgrounds)
-    {
-        FoodItem thisFood = kvp.Key;
-        Image bgImage = kvp.Value;
+        // đổi màu highlight cho slot đang chọn
+        private void UpdateSlotHighlights()
+        {
+            foreach (var kvp in _slotBackgrounds)
+            {
+                FoodItem thisFood = kvp.Key;
+                Image bgImage = kvp.Value;
 
         if (bgImage == null) continue;
 
-        // Logic so sánh đơn giản
-        if (thisFood == _selectedFood)
-        {
-            // Đang chọn -> Màu Xanh (hoặc màu bạn set)
-            bgImage.color = selectedColor;
+                if (thisFood == _selectedFood)
+                    bgImage.color = selectedColor;
+                else
+                    bgImage.color = normalColor;
+            }
         }
-        else
-        {
-            // Không chọn -> Màu Trắng (bình thường)
-            bgImage.color = normalColor;
-        }
-    }
-}
         // --- ACTIONS ---
         public void OnPlayButton()
         {

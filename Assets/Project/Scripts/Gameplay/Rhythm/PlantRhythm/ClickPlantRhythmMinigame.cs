@@ -112,8 +112,7 @@ namespace IronIvy.Gameplay.Rhythm
 
             var foundPlants = new List<PlantDefinition>();
 
-            // gán seed cho từng plot
-            // - simple: cứ lấy theo index, nếu plot > số seed thì dùng seed cuối
+            // gán seed cho từng plot, lấy theo index, thiếu thì dùng seed cuối
             for (int i = 0; i < foundPlots.Count; i++)
             {
                 int idx = Mathf.Clamp(i, 0, sourcePlants.Count - 1);
@@ -135,9 +134,7 @@ namespace IronIvy.Gameplay.Rhythm
             _seqPlots = plots;
             _seqPlants = plants;
 
-            // data-driven camera
-            // - camera đặt sẵn trong scene
-            // - không tự tính toán offset ở đây nữa
+            // camera setup sẵn trong scene rồi, không cần tính offset
 
             _totalAccumulatedRewards.Clear();
             _seqTotalHits = 0;
@@ -208,11 +205,7 @@ namespace IronIvy.Gameplay.Rhythm
             FinishSequence();
         }
 
-        // kết thúc sequence
-        // - tắt BGM minigame
-        // - trả camera về bình thường
-        // - cộng reward vào inventory
-        // - show reward panel
+        // dọn dẹp sau khi chơi xong: tắt BGM, trả camera, cộng reward, show panel
         private void FinishSequence()
         {
             IsRunning = false;
@@ -242,9 +235,7 @@ namespace IronIvy.Gameplay.Rhythm
                 ListenManager.Instance.RaiseMinigameStopped();
         }
 
-        // sau khi show kết quả 1 lúc thì dọn plot
-        // - chơi hiệu ứng biến mất
-        // - gọi Cleanup trên plot
+        // dọn plot sau khi show kết quả: chơi VFX biến mất rồi cleanup
         private IEnumerator CleanupPlotsRoutine()
         {
             yield return new WaitForSeconds(showResultDuration);
@@ -379,9 +370,7 @@ namespace IronIvy.Gameplay.Rhythm
             }
         }
 
-        // điều khiển nhịp tiếp theo
-        // - handle chuyển pattern
-        // - spawn target hoặc rest
+        // xử lý beat tiếp theo: chuyển pattern, spawn target hoặc rest
         private void StartNextBeat()
         {
             if (!_isRhythmPlaying) return;
@@ -537,8 +526,7 @@ namespace IronIvy.Gameplay.Rhythm
             StartNextBeat();
         }
 
-        // tính tổng số beat có thể chấm điểm trong toàn bộ stages
-        // - dùng để chia trust cho đều
+        // đếm tổng beat có thể chấm điểm để chia trust cho đều
         private void CalculateTotalScorableBeatsForAllStages(PlantDefinition plant)
         {
             _totalScorableBeats = 0;

@@ -89,13 +89,9 @@ namespace IronIvy.UI
                 archiveGainText.transform.localScale = Vector3.one;
         }
 
-        /// <summary>
-        /// Show kết quả minigame animal
-        /// successRatio: 0..1 (dùng làm trust %)
-        /// archiveGained: lượng archive vừa cộng
-        /// lootItem/lootCount: phần thưởng thêm
-        /// hitCount/missCount: tổng hit / miss của minigame
-        /// </summary>
+        // hiển thị kết quả sau khi chơi xong minigame animal
+        // successRatio là trust tính từ 0-1, archiveGained là điểm archive vừa cộng
+        // còn lootItem/lootCount và hitCount/missCount thì tự hiểu rồi
         public void ShowAnimalRhythmResult(
             AnimalController animal,
             float successRatio,
@@ -243,7 +239,7 @@ namespace IronIvy.UI
             }
         }
 
-        // animate archive từ 0 -> archiveValue
+        // làm số archive chạy từ 0 lên archiveValue
         private IEnumerator AnimateArchiveNumber(float archiveValue)
         {
             if (archiveGainText == null)

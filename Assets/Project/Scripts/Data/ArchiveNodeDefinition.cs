@@ -23,6 +23,10 @@ namespace IronIvy.Data
         [TextArea]
         public string description;      // nội dung cột truyện hoặc mô tả ngắn
 
+        [Header("Visual")]
+        [Tooltip("Icon của node (để show trên UI)")]
+        public Sprite icon;             // icon cho node
+
         [Header("Yeu cau mo khoa")]
         public float costToUnlock;      // tốn bao nhiêu Archive Point để mở (0 = auto unlock)
         public ArchiveNodeDefinition requiredParent; // phải mở node này trước mới unlock được node con

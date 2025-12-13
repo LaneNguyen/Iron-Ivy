@@ -1,8 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using IronIvy.Data; 
-using IronIvy.Core; 
+using IronIvy.Data;
+using IronIvy.Core;
 
 namespace IronIvy.UI
 {
@@ -30,8 +30,12 @@ namespace IronIvy.UI
             _data = data;
             _parentPanel = parent;
 
-            // Setup hình ảnh (nếu trong Data có field icon - hiện tại Data bạn gửi chưa có icon, ta dùng tạm màu sắc)
-            // if (data.icon) iconImage.sprite = data.icon; 
+            // setup icon đúng theo definition
+            if (iconImage != null)
+            {
+                iconImage.sprite = (_data != null) ? _data.icon : null;
+                iconImage.enabled = (iconImage.sprite != null);
+            }
 
             RefreshVisual();
 
@@ -51,7 +55,10 @@ namespace IronIvy.UI
             {
                 // Đã mở: Sáng màu Cyan, tắt ổ khóa
                 if (borderImage) borderImage.color = unlockedColor;
-                if (iconImage) iconImage.color = Color.white;
+
+                // icon giữ trắng cho dễ nhìn (nếu có icon)
+                if (iconImage && iconImage.enabled) iconImage.color = Color.white;
+
                 if (lockOverlay) lockOverlay.SetActive(false);
             }
             else
@@ -63,13 +70,17 @@ namespace IronIvy.UI
                 {
                     // Đủ tiền mua: Màu vàng nhấp nháy (hoặc sáng hơn)
                     if (borderImage) borderImage.color = affordableColor;
-                    if (iconImage) iconImage.color = new Color(1, 1, 1, 0.5f);
+
+                    // icon hơi mờ cho cảm giác "chưa mở"
+                    if (iconImage && iconImage.enabled) iconImage.color = new Color(1, 1, 1, 0.5f);
                 }
                 else
                 {
                     // Nghèo / Chưa đủ điều kiện: Màu xám tối
                     if (borderImage) borderImage.color = lockedColor;
-                    if (iconImage) iconImage.color = new Color(0.3f, 0.3f, 0.3f, 1f);
+
+                    // icon tối lại
+                    if (iconImage && iconImage.enabled) iconImage.color = new Color(0.3f, 0.3f, 0.3f, 1f);
                 }
             }
         }

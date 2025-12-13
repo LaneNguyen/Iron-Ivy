@@ -15,6 +15,7 @@ MonoBehaviour:
   id: datanote_maxenergy1
   title: "T\u0103ng Energy"
   description: "T\u0103ng maximum Energy c\u1EE7a 1 ng\xE0y"
+  icon: {fileID: 554289780, guid: 94fb19094aba2bb499997d32e9bc7f18, type: 3}
   costToUnlock: 0
   requiredParent: {fileID: 0}
   rewardType: 1
