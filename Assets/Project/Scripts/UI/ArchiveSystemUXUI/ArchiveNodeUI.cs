@@ -11,87 +11,125 @@ namespace IronIvy.UI
         [Header("UI Components")]
         public Button btnSelect;
         public Image iconImage;
-        public Image borderImage;       // Viền ô
-        public GameObject lockOverlay;  // Icon ổ khóa che lên nếu chưa mở
-        public GameObject lineConnectorPrefab; // (Nâng cao) Để vẽ đường nối
+        public Image borderImage;
+        public GameObject lockOverlay;
+
+        [Header("Optional Texts (auto hide when unlocked)")]
+        public TextMeshProUGUI dataCostText;
+        public TextMeshProUGUI currentDataText;
+
+        [Header("Parent Gating Visual")]
+        [Range(0.1f, 1f)] public float blockedAlpha = 0.5f;
 
         [Header("Colors (Config)")]
         public Color lockedColor = Color.gray;
-        public Color unlockedColor = new Color(0f, 1f, 1f, 1f); // Cyan
-        public Color affordableColor = new Color(1f, 0.9f, 0.4f, 1f); // Vàng
-        public Color selectedColor = Color.white;
+        public Color unlockedColor = new Color(0f, 1f, 1f, 1f);
+        public Color affordableColor = new Color(1f, 0.9f, 0.4f, 1f);
+        public Color blockedByParentColor = new Color(0.2f, 0.2f, 0.2f, 1f);
 
-        // Data Runtime
         private ArchiveNodeDefinition _data;
         private ArchivePanel _parentPanel;
+        private CanvasGroup _cg;
 
         public void Setup(ArchiveNodeDefinition data, ArchivePanel parent)
         {
             _data = data;
             _parentPanel = parent;
 
-            // setup icon đúng theo definition
+            if (_cg == null) _cg = GetComponent<CanvasGroup>();
+            if (_cg == null) _cg = gameObject.AddComponent<CanvasGroup>();
+
             if (iconImage != null)
             {
                 iconImage.sprite = (_data != null) ? _data.icon : null;
                 iconImage.enabled = (iconImage.sprite != null);
             }
 
-            RefreshVisual();
-
-            // Gán sự kiện click
             btnSelect.onClick.RemoveAllListeners();
             btnSelect.onClick.AddListener(OnNodeClicked);
+
+            RefreshVisual();
         }
 
         public void RefreshVisual()
         {
-            if (_data == null) return;
+            if (_data == null || !ArchiveManager.HasInstance) return;
 
             bool isUnlocked = ArchiveManager.Instance.IsNodeUnlocked(_data.id);
             bool canAfford = ArchiveManager.Instance.currentPoints >= _data.costToUnlock;
+            bool parentUnlocked = IsParentUnlocked();
+
+            // node đã mở -> hide 2 text refs
+            SetCostTextsVisible(!isUnlocked);
+
+            // reset alpha default
+            SetWholeNodeAlpha(1f);
 
             if (isUnlocked)
             {
-                // Đã mở: Sáng màu Cyan, tắt ổ khóa
                 if (borderImage) borderImage.color = unlockedColor;
+                if (iconImage && iconImage.enabled) iconImage.color = Color.white;
+                if (lockOverlay) lockOverlay.SetActive(false);
 
-                // icon giữ trắng cho dễ nhìn (nếu có icon)
+                btnSelect.interactable = true;
+                return;
+            }
+
+            // blocked bởi parent: mờ toàn bộ node + màu riêng
+            if (!parentUnlocked)
+            {
+                SetWholeNodeAlpha(blockedAlpha);
+
+                if (borderImage) borderImage.color = blockedByParentColor;
                 if (iconImage && iconImage.enabled) iconImage.color = Color.white;
 
-                if (lockOverlay) lockOverlay.SetActive(false);
-            }
-            else
-            {
-                // Chưa mở: Hiện ổ khóa
                 if (lockOverlay) lockOverlay.SetActive(true);
 
-                if (canAfford)
-                {
-                    // Đủ tiền mua: Màu vàng nhấp nháy (hoặc sáng hơn)
-                    if (borderImage) borderImage.color = affordableColor;
-
-                    // icon hơi mờ cho cảm giác "chưa mở"
-                    if (iconImage && iconImage.enabled) iconImage.color = new Color(1, 1, 1, 0.5f);
-                }
-                else
-                {
-                    // Nghèo / Chưa đủ điều kiện: Màu xám tối
-                    if (borderImage) borderImage.color = lockedColor;
-
-                    // icon tối lại
-                    if (iconImage && iconImage.enabled) iconImage.color = new Color(0.3f, 0.3f, 0.3f, 1f);
-                }
+                // vẫn cho click để xem mô tả (unlock bị chặn ở panel + manager)
+                btnSelect.interactable = true;
+                return;
             }
+
+            // unlockable bình thường
+            if (canAfford)
+            {
+                if (borderImage) borderImage.color = affordableColor;
+                if (iconImage && iconImage.enabled) iconImage.color = new Color(1f, 1f, 1f, 0.8f);
+                if (lockOverlay) lockOverlay.SetActive(true);
+
+                btnSelect.interactable = true;
+                return;
+            }
+
+            if (borderImage) borderImage.color = lockedColor;
+            if (iconImage && iconImage.enabled) iconImage.color = new Color(0.3f, 0.3f, 0.3f, 1f);
+            if (lockOverlay) lockOverlay.SetActive(true);
+
+            btnSelect.interactable = true;
+        }
+
+        private bool IsParentUnlocked()
+        {
+            if (_data.requiredParent == null) return true;
+            return ArchiveManager.Instance.IsNodeUnlocked(_data.requiredParent.id);
+        }
+
+        private void SetCostTextsVisible(bool visible)
+        {
+            if (dataCostText != null) dataCostText.gameObject.SetActive(visible);
+            if (currentDataText != null) currentDataText.gameObject.SetActive(visible);
+        }
+
+        private void SetWholeNodeAlpha(float a)
+        {
+            if (_cg == null) return;
+            _cg.alpha = Mathf.Clamp01(a);
         }
 
         private void OnNodeClicked()
         {
-            // Báo cho Panel cha biết "Tao vừa bị bấm"
             if (_parentPanel != null)
-            {
                 _parentPanel.SelectNode(_data);
-            }
         }
     }
 }

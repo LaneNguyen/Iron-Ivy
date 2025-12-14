@@ -12,61 +12,140 @@ namespace IronIvy.Core
         public List<ArchiveNodeDefinition> allNodes;
 
         [Header("Plant System Integration")]
-        public List<PlantDefinition> startingPlants; // seed mặc định lúc đầu
+        public List<PlantDefinition> startingPlants;
 
-        // runtime
         private List<PlantDefinition> _unlockedPlants = new List<PlantDefinition>();
 
         [Header("Debug Info")]
-        public float currentPoints = 0f;                  // điểm thô
-        public List<string> unlockedNodeIDs = new List<string>(); // node đã mở
+        public float currentPoints = 0f;
+        public List<string> unlockedNodeIDs = new List<string>();
 
-        // % dạng 0–1 cho UI
-        public float CurrentPercent => Mathf.Clamp01(
-            maxArchivePoints > 0f ? currentPoints / maxArchivePoints : 0f
-        );
+        public float CurrentPercent => Mathf.Clamp01(maxArchivePoints > 0f ? currentPoints / maxArchivePoints : 0f);
 
-        // event nội bộ (nếu script khác muốn nghe)
-        public event Action<float> OnPointsChanged; // float = 0–1
+        public event Action<float> OnPointsChanged;
+
+        // cache để check trùng id
+        private Dictionary<string, int> _idCount = new Dictionary<string, int>();
 
         protected override void Awake()
         {
             base.Awake();
-            // lúc start game rebuild lại list seed
+            RebuildIdCountCache();
             RebuildUnlockedPlants();
         }
 
-        // ================= PUBLIC API =================
+        private void RebuildIdCountCache()
+        {
+            _idCount.Clear();
 
-        // cộng điểm archive (dùng cho hệ thống mới)
+            if (allNodes == null) return;
+
+            for (int i = 0; i < allNodes.Count; i++)
+            {
+                var n = allNodes[i];
+                if (n == null) continue;
+
+                if (string.IsNullOrEmpty(n.id)) continue;
+
+                if (_idCount.ContainsKey(n.id)) _idCount[n.id]++;
+                else _idCount[n.id] = 1;
+            }
+
+            // log warning nếu có trùng
+            foreach (var kv in _idCount)
+            {
+                if (kv.Value > 1)
+                    Debug.LogError($"[Archive] Duplicate node id detected: '{kv.Key}' appears {kv.Value} times. Fix ScriptableObjects ids nhé, không thì mở 1 node sẽ mở lây node khác.");
+            }
+        }
+
         public void AddArchivePoints(float amount)
         {
             currentPoints += amount;
             currentPoints = Mathf.Clamp(currentPoints, 0f, maxArchivePoints);
 
             Debug.Log($"[Archive] +{amount} pts, total = {currentPoints}/{maxArchivePoints}");
-
             NotifyArchiveChanged();
         }
 
-        // API cũ: ClickAnimal / ClickPlant vẫn đang gọi AddProgress
-        public void AddProgress(float amount)
-        {
-            // để tương thích ngược
-            AddArchivePoints(amount);
-        }
+        public void AddProgress(float amount) => AddArchivePoints(amount);
 
         public bool IsNodeUnlocked(string nodeID) => unlockedNodeIDs.Contains(nodeID);
 
-        public void UnlockNode(ArchiveNodeDefinition node)
+        private bool HasDuplicateId(string id)
         {
-            if (node == null) return;
-            if (IsNodeUnlocked(node.id)) return;
+            if (string.IsNullOrEmpty(id)) return false;
+            return _idCount != null && _idCount.TryGetValue(id, out int count) && count > 1;
+        }
+
+        public bool CanUnlockNode(ArchiveNodeDefinition node, out string reason)
+        {
+            reason = "";
+
+            if (node == null)
+            {
+                reason = "Node null";
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(node.id))
+            {
+                reason = "Node id empty";
+                return false;
+            }
+
+            // chặn cứng nếu id bị trùng (đúng bug Lane mô tả)
+            if (HasDuplicateId(node.id))
+            {
+                reason = $"Duplicate id '{node.id}' (fix ids in ArchiveNodeDefinition assets)";
+                return false;
+            }
+
+            if (IsNodeUnlocked(node.id))
+            {
+                reason = "Already unlocked";
+                return false;
+            }
+
+            // parent gating
+            if (node.requiredParent != null)
+            {
+                if (string.IsNullOrEmpty(node.requiredParent.id))
+                {
+                    reason = "Parent id empty";
+                    return false;
+                }
+
+                // nếu parent id cũng trùng -> chặn luôn để khỏi lộn
+                if (HasDuplicateId(node.requiredParent.id))
+                {
+                    reason = $"Duplicate parent id '{node.requiredParent.id}' (fix ids)";
+                    return false;
+                }
+
+                bool parentUnlocked = IsNodeUnlocked(node.requiredParent.id);
+                if (!parentUnlocked)
+                {
+                    reason = $"Need parent first: {node.requiredParent.id}";
+                    return false;
+                }
+            }
 
             if (currentPoints < node.costToUnlock)
             {
-                Debug.Log($"[Archive] Not enough points for node {node.id}");
-                return;
+                reason = "Not enough points";
+                return false;
+            }
+
+            return true;
+        }
+
+        public bool UnlockNode(ArchiveNodeDefinition node)
+        {
+            if (!CanUnlockNode(node, out string reason))
+            {
+                Debug.LogWarning($"[Archive] Unlock failed: {(node != null ? node.id : "NULL")} | {reason}");
+                return false;
             }
 
             currentPoints -= node.costToUnlock;
@@ -75,16 +154,13 @@ namespace IronIvy.Core
             ApplyReward(node);
 
             Debug.Log($"[Archive] Unlocked Node: {node.title}");
-
-            // sau khi trừ điểm + thưởng -> update UI
             NotifyArchiveChanged();
 
-            // auto save nếu có SaveLoad
             if (SaveLoadManager.HasInstance)
                 SaveLoadManager.Instance.SaveGame();
-        }
 
-        // ================= REWARD =================
+            return true;
+        }
 
         private void ApplyReward(ArchiveNodeDefinition node)
         {
@@ -97,20 +173,12 @@ namespace IronIvy.Core
 
                 case ArchiveRewardType.NewSeed:
                     if (node.rewardObject is PlantDefinition p)
-                    {
                         UnlockPlant(p);
-                    }
                     else
-                    {
                         Debug.LogError($"[Archive] Node {node.id} missing PlantDefinition reward");
-                    }
                     break;
-
-                // nếu có loại reward khác thì bổ sung thêm case ở đây
             }
         }
-
-        // ================= PLANT / SEED FLOW =================
 
         private void UnlockPlant(PlantDefinition plant)
         {
@@ -123,16 +191,11 @@ namespace IronIvy.Core
             }
         }
 
-        // dùng cho PlantRhythmStartPanel / hệ thống chọn seed
         public List<PlantDefinition> GetAvailablePlants()
         {
-            // trả copy cho an toàn
             return new List<PlantDefinition>(_unlockedPlants);
         }
 
-        // rebuild lại seed runtime từ:
-        // - startingPlants
-        // - list unlockedNodeIDs (node reward là NewSeed)
         private void RebuildUnlockedPlants()
         {
             _unlockedPlants.Clear();
@@ -140,11 +203,8 @@ namespace IronIvy.Core
             if (startingPlants != null && startingPlants.Count > 0)
                 _unlockedPlants.AddRange(startingPlants);
 
-            if (unlockedNodeIDs == null || unlockedNodeIDs.Count == 0)
-                return;
-
-            if (allNodes == null || allNodes.Count == 0)
-                return;
+            if (unlockedNodeIDs == null || unlockedNodeIDs.Count == 0) return;
+            if (allNodes == null || allNodes.Count == 0) return;
 
             foreach (var nodeID in unlockedNodeIDs)
             {
@@ -162,9 +222,6 @@ namespace IronIvy.Core
             }
         }
 
-        // ================= LOAD / SAVE HOOK =================
-
-        // load điểm + node IDs
         public void LoadState(float savedPoints, List<string> savedNodeIDs)
         {
             currentPoints = savedPoints;
@@ -173,39 +230,21 @@ namespace IronIvy.Core
             if (savedNodeIDs != null && savedNodeIDs.Count > 0)
                 unlockedNodeIDs.AddRange(savedNodeIDs);
 
+            RebuildIdCountCache();
             RebuildUnlockedPlants();
-
-            // bắn lại % cho UI sau khi load
             NotifyArchiveChanged();
         }
 
-        // overload cũ chỉ có điểm
-        public void LoadState(float savedPoints)
-        {
-            LoadState(savedPoints, null);
-        }
+        public float GetPercent() => CurrentPercent;
 
-        // UI hay dùng GetPercent, trả về 0–1
-        public float GetPercent()
-        {
-            return CurrentPercent;
-        }
-
-        // ================= INTERNAL HELPERS =================
-
-        // chỗ này gom lại logic bắn event + ListenManager
         private void NotifyArchiveChanged()
         {
             float percent01 = CurrentPercent;
 
-            // event nội bộ nếu có ai đăng ký
             OnPointsChanged?.Invoke(percent01);
 
-            // bắn ra ListenManager để MainGameUIPanel nhận được
             if (ListenManager.HasInstance)
-            {
                 ListenManager.Instance.RaiseArchiveChanged(percent01);
-            }
         }
     }
 }

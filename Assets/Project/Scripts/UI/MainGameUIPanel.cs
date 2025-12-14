@@ -74,6 +74,9 @@ namespace IronIvy.UI
             // ép food inventory update lại list mới nhất
             if (foodInventoryPanel != null)
                 foodInventoryPanel.UpdateUI();
+
+            // đảm bảo state UI không bị stale
+            RefreshMinigameStateUI();
         }
 
         private void OnDisable()
@@ -89,57 +92,67 @@ namespace IronIvy.UI
             }
         }
 
+        // gọi từ UIManager để ép sync 1 phát (tránh event timing)
+        public void ForceRefresh()
+        {
+            RefreshEnergyUIFromManager();
+
+            if (ArchiveManager.HasInstance)
+                OnArchiveChanged(ArchiveManager.Instance.GetPercent());
+
+            if (foodInventoryPanel != null)
+                foodInventoryPanel.UpdateUI();
+
+            RefreshMinigameStateUI();
+        }
+
         // energy
 
-    private void RefreshEnergyUIFromManager()
-{
-    if (!EnergyManager.HasInstance) return;
-
-    int current = EnergyManager.Instance.Current;
-    displayMaxEnergy = EnergyManager.Instance.MaxEnergy;   // <-- dòng quan trọng
-    RefreshEnergyUI(current);
-}
-
-private void RefreshEnergyUI(int current)
-{
-    int max = Mathf.Max(displayMaxEnergy, 1);
-
-    if (energyText != null)
-        energyText.text = $"{current}/{max}";
-
-    if (energySlider != null)
-    {
-        energySlider.maxValue = max;
-        energySlider.value = Mathf.Clamp(current, 0, max);
-    }
-
-    if (plantCostText != null && plantRhythmStartPanel != null)
-        plantCostText.text = $"-{plantRhythmStartPanel.baseEnergyCost} energy";
-
-    if (animalCostText != null)
-        animalCostText.text = $"-{animalBaseEnergyCost} energy";
-}
-
-
-       private void OnEnergyChanged(int current)
+        private void RefreshEnergyUIFromManager()
         {
-            // 1. Luôn lấy Max mới nhất từ EnergyManager
+            if (!EnergyManager.HasInstance) return;
+
+            int current = EnergyManager.Instance.Current;
+            displayMaxEnergy = EnergyManager.Instance.MaxEnergy;
+            RefreshEnergyUI(current);
+        }
+
+        private void RefreshEnergyUI(int current)
+        {
+            int max = Mathf.Max(displayMaxEnergy, 1);
+
+            if (energyText != null)
+                energyText.text = $"{current}/{max}";
+
+            if (energySlider != null)
+            {
+                energySlider.maxValue = max;
+                energySlider.value = Mathf.Clamp(current, 0, max);
+            }
+
+            if (plantCostText != null && plantRhythmStartPanel != null)
+                plantCostText.text = $"-{plantRhythmStartPanel.baseEnergyCost} energy";
+
+            if (animalCostText != null)
+                animalCostText.text = $"-{animalBaseEnergyCost} energy";
+        }
+
+        private void OnEnergyChanged(int current)
+        {
+            // luôn lấy Max mới nhất từ EnergyManager
             if (EnergyManager.HasInstance)
             {
                 displayMaxEnergy = EnergyManager.Instance.MaxEnergy;
             }
 
-            // 2. Cập nhật Text (VD: 7/7)
             if (energyText != null)
             {
                 energyText.text = $"{current}/{displayMaxEnergy}";
             }
 
-            // 3. Cập nhật Slider
             if (energySlider != null)
             {
-                // Quan trọng: Phải update maxValue trước khi update value
-                energySlider.maxValue = displayMaxEnergy; 
+                energySlider.maxValue = displayMaxEnergy;
                 energySlider.value = current;
             }
         }

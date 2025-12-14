@@ -1,109 +1,184 @@
 using UnityEngine;
-using UnityEngine.UI;
-using System.Collections; // Cần cái này để dùng Coroutine
-using IronIvy.UI; 
+using System.Collections;
+using IronIvy.UI;
 
 namespace IronIvy.Core
 {
     public class UIManager : BaseManager<UIManager>
     {
-        [Header("Main HUD (read-only)")]
-        public MainGameUIPanel mainGameUIPanel;      
 
-        [Header("Global UI")]
-        public GameObject pauseMenu;                
-        public GameObject settingsMenu;             
-        public GameObject loadingScreen;
-        
+        [Header("Main HUD")]
+        public MainGameUIPanel mainGameUIPanel;
+
         [Header("Archive UI")]
-        public ArchivePanel archivePanel; 
+        public ArchivePanel archivePanel;
 
-        [Header("Effects")]
-        [Tooltip("Image màu đen full màn hình + CanvasGroup để làm hiệu ứng chuyển cảnh")]
-        public CanvasGroup fadeOverlay; 
+        [Header("Pause / Settings")]
+        [SerializeField] private GameObject pauseMenu;
+        [SerializeField] private GameObject settingsMenu;
+
+        [Header("Fade Overlay")]
+        public CanvasGroup fadeOverlay;
         public float fadeDuration = 0.5f;
 
-        public void InitHUD()
+        private bool _isTransitioning;
+
+        // kiểu mở settings rồi mở thêm pause (hoặc ngược lại) vẫn không bị timeScale bật/tắt sai
+        private int _timeScaleLockCount;
+
+        // =========================
+        // HUD init (GameManager gọi)
+        // =========================
+        public void InitHUD(int currentEnergy, float archivePercent)
         {
-            if (mainGameUIPanel != null && !mainGameUIPanel.gameObject.activeSelf)
-            {
+            if (mainGameUIPanel == null) return;
+
+            // bật HUD
+            if (!mainGameUIPanel.gameObject.activeSelf)
                 mainGameUIPanel.gameObject.SetActive(true);
-            }
-        }
-        
-        public void InitHUD(int energy, float archive)
-        {
-            InitHUD();
+
+            // ép refresh 1 phát cho chắc, khỏi phụ thuộc event timing
+            mainGameUIPanel.ForceRefresh();
         }
 
-        // ... (Giữ nguyên ShowPause, ShowSettings...) ...
-
-        // =========================================================
-        // LOGIC MỞ ARCHIVE VỚI HIỆU ỨNG FADE
-        // =========================================================
+        // =========================
+        // Archive (screen swap)
+        // =========================
         public void OpenArchiveUI()
         {
+            if (_isTransitioning) return;
             StartCoroutine(OpenArchiveRoutine());
         }
 
         private IEnumerator OpenArchiveRoutine()
         {
-            // 1. Fade Tối màn hình (Alpha 0 -> 1)
+            _isTransitioning = true;
+
+            // fade tối
             yield return StartCoroutine(FadeCanvasGroup(fadeOverlay, 0f, 1f, fadeDuration));
 
-            // 2. Bật Archive Panel lên (lúc này màn hình đang đen thui nên user không thấy nó bật)
+            // tắt main panel (screen swap)
+            if (mainGameUIPanel != null)
+                mainGameUIPanel.gameObject.SetActive(false);
+
+            // bật archive
             if (archivePanel != null)
-            {
                 archivePanel.Show();
-            }
 
-            // Tạm ẩn HUD đi cho thoáng nếu muốn
-            if (mainGameUIPanel) mainGameUIPanel.gameObject.SetActive(false);
-
-            // 3. Fade Sáng màn hình (Alpha 1 -> 0) để lộ ra Archive Panel
+            // fade sáng
             yield return StartCoroutine(FadeCanvasGroup(fadeOverlay, 1f, 0f, fadeDuration));
+
+            _isTransitioning = false;
         }
 
         public void CloseArchiveUI()
         {
+            if (_isTransitioning) return;
             StartCoroutine(CloseArchiveRoutine());
         }
 
         private IEnumerator CloseArchiveRoutine()
         {
-            // 1. Fade Tối lại
+            _isTransitioning = true;
+
+            // fade tối
             yield return StartCoroutine(FadeCanvasGroup(fadeOverlay, 0f, 1f, fadeDuration));
 
-            // 2. Tắt Archive Panel
+            // tắt archive
             if (archivePanel != null)
-            {
                 archivePanel.Hide();
-            }
 
-            // Bật lại HUD
-            if (mainGameUIPanel) mainGameUIPanel.gameObject.SetActive(true);
+            // bật lại main panel
+            if (mainGameUIPanel != null)
+                mainGameUIPanel.gameObject.SetActive(true);
 
-            // 3. Fade Sáng lại (về Game)
+            // ép refresh luôn cho chắc
+            if (mainGameUIPanel != null)
+                mainGameUIPanel.ForceRefresh();
+
+            // fade sáng
             yield return StartCoroutine(FadeCanvasGroup(fadeOverlay, 1f, 0f, fadeDuration));
+
+            _isTransitioning = false;
         }
 
-        // Helper Fade chung
+        // =========================
+        // Pause lock helpers
+        // =========================
+        private void LockPause()
+        {
+            _timeScaleLockCount++;
+            if (_timeScaleLockCount == 1)
+                Time.timeScale = 0f;
+        }
+
+        private void UnlockPause()
+        {
+            _timeScaleLockCount = Mathf.Max(0, _timeScaleLockCount - 1);
+            if (_timeScaleLockCount == 0)
+                Time.timeScale = 1f;
+        }
+
+        // =========================
+        // Pause Menu (overlay)
+        // =========================
+        public void ShowPause()
+        {
+            if (pauseMenu != null) pauseMenu.SetActive(true);
+            LockPause();
+        }
+
+        public void ClosePause()
+        {
+            if (pauseMenu != null) pauseMenu.SetActive(false);
+            UnlockPause();
+        }
+
+        // =========================
+        // Settings Menu (overlay)
+        // =========================
+        public void ShowSettings()
+        {
+            if (settingsMenu != null) settingsMenu.SetActive(true);
+            LockPause();
+        }
+
+        public void CloseSettings()
+        {
+            if (settingsMenu != null) settingsMenu.SetActive(false);
+            UnlockPause();
+        }
+
+        // =========================
+        // Fade Overlay
+        // =========================
         private IEnumerator FadeCanvasGroup(CanvasGroup cg, float start, float end, float duration)
         {
             if (cg == null) yield break;
-            
+
             cg.gameObject.SetActive(true);
+
+            // overlay bật lên thì block click cho chắc
+            cg.blocksRaycasts = true;
+            cg.interactable = true;
+
             float t = 0f;
             while (t < duration)
             {
-                t += Time.unscaledDeltaTime; // Dùng unscaled để lỡ game có pause vẫn chạy được
+                t += Time.unscaledDeltaTime;
                 cg.alpha = Mathf.Lerp(start, end, t / duration);
                 yield return null;
             }
+
             cg.alpha = end;
-            
-            // Nếu alpha về 0 thì tắt object đi cho nhẹ
-            if (end == 0f) cg.gameObject.SetActive(false);
+
+            // alpha về 0 thì tắt overlay + nhả raycast
+            if (end <= 0f)
+            {
+                cg.blocksRaycasts = false;
+                cg.interactable = false;
+                cg.gameObject.SetActive(false);
+            }
         }
     }
 }

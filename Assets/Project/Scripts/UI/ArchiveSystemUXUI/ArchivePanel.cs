@@ -28,33 +28,25 @@ namespace IronIvy.UI
         public Button closeButton;
 
         [Header("Typewriter (Description)")]
-        [Tooltip("Tốc độ gõ chữ, số càng nhỏ càng nhanh (vd: 0.02)")]
         public float descTypeSpeed = 0.02f;
-
-        [Tooltip("Nếu true thì click vào vùng descText sẽ skip animation")]
         public bool allowClickSkipDesc = true;
 
         [Header("Node Reveal Animation")]
-        [Tooltip("Thời gian anim panel/container (scale-in/fade-in) trước khi node được reveal")]
         public float containerAnimDuration = 0.3f;
-
-        [Tooltip("Delay giữa mỗi node khi reveal (cascade)")]
         public float nodeRevealInterval = 0.04f;
-
-        [Tooltip("Thời gian fade + scale của mỗi node")]
         public float nodeFadeDuration = 0.2f;
-
-        [Tooltip("Scale bắt đầu của node khi reveal (vd 0.9)")]
         public float nodeStartScale = 0.9f;
+
+        [Header("Optional Labels (auto hide when unlocked)")]
+        public GameObject costLabelObject;   // chữ ghi chú cho cost
+        public GameObject totalLabelObject;  // chữ ghi chú cho total
 
         private List<ArchiveNodeUI> _spawnedNodes = new List<ArchiveNodeUI>();
         private ArchiveNodeDefinition _currentSelection;
 
-        // typewriter state
         private Coroutine _descTypeRoutine;
         private bool _isTypingDesc;
 
-        // reveal state
         private Coroutine _revealRoutine;
 
         private void Awake()
@@ -89,6 +81,14 @@ namespace IronIvy.UI
 
         private void OnCloseClicked()
         {
+            // đóng đúng flow (để UIManager bật lại main panel)
+            if (UIManager.HasInstance)
+            {
+                UIManager.Instance.CloseArchiveUI();
+                return;
+            }
+
+            // fallback nếu thiếu UIManager
             Hide();
         }
 
@@ -126,36 +126,62 @@ namespace IronIvy.UI
         private void UpdateUnlockButtonState()
         {
             if (_currentSelection == null) return;
+            if (!ArchiveManager.HasInstance) return;
 
             bool isUnlocked = ArchiveManager.Instance.IsNodeUnlocked(_currentSelection.id);
-            bool canAfford = ArchiveManager.Instance.currentPoints >= _currentSelection.costToUnlock;
+            SetCostTotalVisible(!isUnlocked);
 
-            // cost show dạng %
-            if (costText) costText.text = isUnlocked ? "UNLOCKED" : $"{_currentSelection.costToUnlock}%";
+            if (costText != null) costText.gameObject.SetActive(!isUnlocked);
+            if (totalPointsText != null) totalPointsText.gameObject.SetActive(!isUnlocked);
+
+            if (costText)
+            {
+                if (isUnlocked) costText.gameObject.SetActive(false);
+                else
+                {
+                    costText.gameObject.SetActive(true);
+                    costText.text = $"{_currentSelection.costToUnlock}%";
+                }
+            }
 
             if (unlockButton == null) return;
 
-            unlockButton.interactable = !isUnlocked && canAfford;
+            unlockButton.onClick.RemoveAllListeners();
 
             if (isUnlocked)
             {
+                unlockButton.interactable = false;
                 if (unlockButtonLabel) unlockButtonLabel.text = "Đã sở hữu";
-                unlockButton.onClick.RemoveAllListeners();
                 return;
             }
 
-            if (unlockButtonLabel) unlockButtonLabel.text = canAfford ? "MỞ KHÓA" : "THIẾU DATA";
 
-            unlockButton.onClick.RemoveAllListeners();
-            if (canAfford)
+            bool canUnlock = ArchiveManager.Instance.CanUnlockNode(_currentSelection, out string reason);
+            unlockButton.interactable = canUnlock;
+
+            if (unlockButtonLabel)
+            {
+                if (canUnlock) unlockButtonLabel.text = "MỞ KHÓA";
+                else
+                {
+                    // map reason -> text dễ hiểu
+                    if (reason.StartsWith("Need parent")) unlockButtonLabel.text = "CẦN MỞ NODE TRƯỚC";
+                    else if (reason.Contains("Duplicate id")) unlockButtonLabel.text = "LỖI ID (TRÙNG)";
+                    else if (reason == "Not enough points") unlockButtonLabel.text = "THIẾU DATA";
+                    else unlockButtonLabel.text = "KHÔNG THỂ MỞ";
+                }
+            }
+
+            if (canUnlock)
                 unlockButton.onClick.AddListener(OnUnlockClicked);
         }
 
         private void OnUnlockClicked()
         {
             if (_currentSelection == null) return;
+            if (!ArchiveManager.HasInstance) return;
 
-            ArchiveManager.Instance.UnlockNode(_currentSelection);
+            bool ok = ArchiveManager.Instance.UnlockNode(_currentSelection);
 
             UpdateTotalPoints();
             UpdateUnlockButtonState();
@@ -165,35 +191,31 @@ namespace IronIvy.UI
                 if (_spawnedNodes[i] != null)
                     _spawnedNodes[i].RefreshVisual();
             }
+
+            if (!ok)
+                Debug.Log("[ArchivePanel] Unlock failed (parent/points/duplicate id).");
         }
 
         private void UpdateTotalPoints()
         {
             if (ArchiveManager.HasInstance && totalPointsText)
             {
-                // total show dạng %
                 totalPointsText.text = $"{ArchiveManager.Instance.currentPoints}%";
             }
         }
 
-        // =========================
-        // TYPEWRITER
-        // =========================
+        // ===== typewriter (giữ nguyên) =====
 
         private void PlayDescTypewriter(string content)
         {
             StopDescTyping(resetVisible: true);
-
-            if (descText == null)
-                return;
-
+            if (descText == null) return;
             _descTypeRoutine = StartCoroutine(DescTypeRoutine(content));
         }
 
         private IEnumerator DescTypeRoutine(string content)
         {
-            if (descText == null)
-                yield break;
+            if (descText == null) yield break;
 
             _isTypingDesc = true;
 
@@ -242,7 +264,6 @@ namespace IronIvy.UI
         private void SkipDescTyping()
         {
             if (descText == null) return;
-
             StopDescTyping(resetVisible: false);
             descText.maxVisibleCharacters = int.MaxValue;
         }
@@ -262,13 +283,10 @@ namespace IronIvy.UI
                 eventData.pressEventCamera
             );
 
-            if (inside)
-                SkipDescTyping();
+            if (inside) SkipDescTyping();
         }
 
-        // =========================
-        // NODE REVEAL (FADE + SCALE)
-        // =========================
+        // ===== node reveal (giữ nguyên) =====
 
         private void PrepareNodeHidden(ArchiveNodeUI node)
         {
@@ -296,10 +314,8 @@ namespace IronIvy.UI
 
                 StartCoroutine(RevealSingleNode(node));
 
-                if (nodeRevealInterval > 0f)
-                    yield return new WaitForSeconds(nodeRevealInterval);
-                else
-                    yield return null;
+                if (nodeRevealInterval > 0f) yield return new WaitForSeconds(nodeRevealInterval);
+                else yield return null;
             }
 
             _revealRoutine = null;
@@ -350,5 +366,15 @@ namespace IronIvy.UI
                 _revealRoutine = null;
             }
         }
+
+        private void SetCostTotalVisible(bool visible)
+        {
+            if (costText != null) costText.gameObject.SetActive(visible);
+            if (totalPointsText != null) totalPointsText.gameObject.SetActive(visible);
+
+            if (costLabelObject != null) costLabelObject.SetActive(visible);
+            if (totalLabelObject != null) totalLabelObject.SetActive(visible);
+        }
+
     }
 }

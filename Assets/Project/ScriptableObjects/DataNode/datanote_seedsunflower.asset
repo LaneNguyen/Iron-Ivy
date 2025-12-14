@@ -10,14 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d1e5ba809730b064091d6171efa7a34a, type: 3}
-  m_Name: datanote_seedcarrot
+  m_Name: datanote_seedsunflower
   m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Data.ArchiveNodeDefinition
-  id: datanote_seedcarrot
-  title: PLANT_CARROT
-  description: "M\u1EDF kh\xF3a k\u1EF9 thu\u1EADt tr\u1ED3ng Carrot"
-  icon: {fileID: -2008668290, guid: d08a9b320659e7146beebbd0628da973, type: 3}
+  id: datanote_sunflowerseed
+  title: "PLANT_H\u01AF\u1EDANG D\u01AF\u01A0NG"
+  description: "M\u1EDF kh\xF3a k\u1EF9 thu\u1EADt tr\u1ED3ng Hoa H\u01B0\u1EDBng
+    D\u01B0\u01A1ng."
+  icon: {fileID: -1008744733, guid: 2fd1759916724404aa9b946765bd674b, type: 3}
   costToUnlock: 0
-  requiredParent: {fileID: 0}
+  requiredParent: {fileID: 11400000, guid: ca2259309860920419f0f298ecda7143, type: 2}
   rewardType: 2
   rewardValue: 1
-  rewardObject: {fileID: 11400000, guid: b6b86f439b65a544882e50ea4a6b60dc, type: 2}
+  rewardObject: {fileID: 11400000, guid: cf27867c8e02ea74687a564db0a2ca18, type: 2}
