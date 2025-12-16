@@ -56,5 +56,6 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "IronIvy.sln"
+    "dotnet.defaultSolution": "IronIvy.sln",
+    "dotrush.roslyn.projectOrSolutionFiles": []
 }

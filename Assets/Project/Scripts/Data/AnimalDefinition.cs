@@ -13,6 +13,20 @@ namespace IronIvy.Data
         [Tooltip("Icon đại diện cho Animal này (dùng trong UI Reward Panel)")]
         public Sprite icon;     // >>> NEW FIELD ADDED <<<
 
+        // ===== Camera tuning (Option 1) =====
+        [Header("Camera (Animal Minigame)")]
+        [Tooltip("Khoảng cách orbit quanh animal. (fallback nếu để 0 là dùng default trong CameraManager)")]
+        public float cameraOrbitDistance = 0f;
+
+        [Tooltip("Độ cao camera đứng lên so với pivot chân. (fallback nếu để 0 là dùng default trong CameraManager)")]
+        public float cameraOrbitHeight = 0f;
+
+        [Tooltip("Điểm camera nhìn lên cao bao nhiêu so với pivot chân, để aim vào đầu thay vì chân.")]
+        public float cameraLookAtHeight = 0f;
+
+        [Tooltip("Tốc độ quay orbit. (fallback nếu để 0 là dùng default trong CameraManager)")]
+        public float cameraOrbitRotateSpeed = 0f;
+
         //   Feeding System & Buffs
         [Header("Feeding & Buffs")]
         [Tooltip("Món ăn yêu thích. Nếu cho ăn trước khi chơi -> Kích hoạt Buff.")]

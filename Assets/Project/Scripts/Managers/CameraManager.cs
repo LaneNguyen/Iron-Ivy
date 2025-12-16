@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 using Unity.Cinemachine;
 using IronIvy.Core;
 using IronIvy.Interfaces;
+using IronIvy.Data;
 
 namespace IronIvy.Systems.Camera
 {
@@ -38,6 +40,15 @@ namespace IronIvy.Systems.Camera
             public float fov = 40f;
         }
 
+        [Serializable]
+        private class AnimalCameraTuning
+        {
+            public float orbitDistance;
+            public float orbitHeight;
+            public float lookAtHeight;
+            public float rotateSpeed;
+        }
+
         [Header("Danh sách camera zone / hệ thống")]
         [SerializeField] private List<CameraEntry> cameras = new List<CameraEntry>();
 
@@ -54,10 +65,13 @@ namespace IronIvy.Systems.Camera
         public MinigameCameraProfile plantProfile;
         public MinigameCameraProfile animalProfile;
 
-        [Header("Animal orbit settings")]
+        [Header("Animal orbit default (fallback)")]
         [SerializeField] private float animalOrbitDistance = 7f;
         [SerializeField] private float animalOrbitRotateSpeed = 25f;
-        private const float AnimalOrbitHeight = 2.5f;
+        [SerializeField] private float animalOrbitHeight = 2.5f;
+
+        [Header("Animal LookAt default (fallback)")]
+        [SerializeField] private float animalLookAtHeight = 1.2f;
 
         // state chung cho toàn hệ thống camera
         private readonly Dictionary<string, CinemachineCamera> _cameraMap =
@@ -81,6 +95,9 @@ namespace IronIvy.Systems.Camera
         private Transform _animalFocus;
         private float _animalOrbitAngle;
         private bool _isAnimalOrbitActive;
+
+        // tuning runtime (Option 1)
+        private AnimalCameraTuning _animalTuningRuntime;
 
         // pause world
         private readonly List<Behaviour> _pausedBehaviours = new List<Behaviour>();
@@ -106,7 +123,11 @@ namespace IronIvy.Systems.Camera
                 animalProfile != null &&
                 animalProfile.virtualCamera != null)
             {
-                _animalOrbitAngle += animalOrbitRotateSpeed * Time.unscaledDeltaTime;
+                float speed = (_animalTuningRuntime != null && _animalTuningRuntime.rotateSpeed > 0f)
+                    ? _animalTuningRuntime.rotateSpeed
+                    : animalOrbitRotateSpeed;
+
+                _animalOrbitAngle += speed * Time.unscaledDeltaTime;
                 UpdateAnimalOrbitCameraPosition();
             }
         }
@@ -222,7 +243,10 @@ namespace IronIvy.Systems.Camera
 
             _currentMinigameProfile = plantProfile;
             _hasActiveMinigame = true;
+
             _isAnimalOrbitActive = false;
+            _animalFocus = null;
+            _animalTuningRuntime = null;
 
             InternalSwitch(CurrentCamera, vcam);
             PauseWorldForMinigame(lookAtTarget);
@@ -246,6 +270,8 @@ namespace IronIvy.Systems.Camera
             if (_hasActiveMinigame && _currentMinigameProfile == animalProfile)
             {
                 _animalFocus = focusTarget;
+                _animalTuningRuntime = BuildAnimalTuningFromDefinition(_animalFocus);
+
                 InitAnimalOrbitAngleFromCurrentCamera();
                 UpdateAnimalOrbitCameraPosition();
                 _isAnimalOrbitActive = true;
@@ -256,11 +282,14 @@ namespace IronIvy.Systems.Camera
                 SaveCurrentStateAsPrevious();
 
             _animalFocus = focusTarget;
+            _animalTuningRuntime = BuildAnimalTuningFromDefinition(_animalFocus);
+
             InitAnimalOrbitAngleFromSource(_previousMinigameCamera != null ? _previousMinigameCamera : CurrentCamera);
             UpdateAnimalOrbitCameraPosition();
 
             var vcam = animalProfile.virtualCamera;
             vcam.Priority = activePriority + 5;
+
             if (animalProfile.fov > 0f)
                 vcam.Lens.FieldOfView = animalProfile.fov;
 
@@ -275,49 +304,49 @@ namespace IronIvy.Systems.Camera
         public void ApplyAnimalMinigameProfile() => ApplyAnimalMinigameProfile(null);
 
         // thoát minigame, trả camera + world về normal
-       public void RestoreMinigameCamera()
-{
-    if (!_hasActiveMinigame && !_worldPaused) return;
+        public void RestoreMinigameCamera()
+        {
+            if (!_hasActiveMinigame && !_worldPaused) return;
 
-    // 1. resume world trước
-    ResumeWorldFromMinigame();
+            // 1. resume world trước
+            ResumeWorldFromMinigame();
 
-    // 2. hạ priority của camera minigame
-    if (_currentMinigameProfile != null && _currentMinigameProfile.virtualCamera != null)
-    {
-        _currentMinigameProfile.virtualCamera.Priority = inactivePriority;
-    }
+            // 2. hạ priority của camera minigame
+            if (_currentMinigameProfile != null && _currentMinigameProfile.virtualCamera != null)
+            {
+                _currentMinigameProfile.virtualCamera.Priority = inactivePriority;
+            }
 
-    // 3. nếu có camera trước đó (ví dụ TPS cam) thì switch lại đúng chuẩn
-    if (_hasPreviousMinigameCamera && _previousMinigameCamera != null)
-    {
-        // restore FOV cũ
-        _previousMinigameCamera.Lens.FieldOfView = _previousMinigameFov;
+            // 3. nếu có camera trước đó (ví dụ TPS cam) thì switch lại đúng chuẩn
+            if (_hasPreviousMinigameCamera && _previousMinigameCamera != null)
+            {
+                // restore FOV cũ
+                _previousMinigameCamera.Lens.FieldOfView = _previousMinigameFov;
 
-        // dùng InternalSwitch để:
-        // - set priority
-        // - update CurrentCamera
-        // - bắn OnCameraChanged cho PlayerThirdPersonController
-        var oldCam = CurrentCamera;
-        InternalSwitch(oldCam, _previousMinigameCamera);
+                // dùng InternalSwitch để:
+                // - set priority
+                // - update CurrentCamera
+                // - bắn OnCameraChanged cho PlayerThirdPersonController
+                var oldCam = CurrentCamera;
+                InternalSwitch(oldCam, _previousMinigameCamera);
 
-        _previousMinigameCamera = null;
-        _hasPreviousMinigameCamera = false;
-    }
-    else
-    {
-        // nếu không có previous thì fallback về default + vẫn dùng SwitchCamera (có event)
-        if (defaultCamera != null)
-            SwitchCamera(defaultCamera);
-    }
+                _previousMinigameCamera = null;
+                _hasPreviousMinigameCamera = false;
+            }
+            else
+            {
+                // nếu không có previous thì fallback về default + vẫn dùng SwitchCamera (có event)
+                if (defaultCamera != null)
+                    SwitchCamera(defaultCamera);
+            }
 
-    _currentMinigameProfile = null;
-    _hasActiveMinigame = false;
-    _isAnimalOrbitActive = false;
-    _animalFocus = null;
-}
+            _currentMinigameProfile = null;
+            _hasActiveMinigame = false;
 
-
+            _isAnimalOrbitActive = false;
+            _animalFocus = null;
+            _animalTuningRuntime = null;
+        }
 
         // helper apply profile generic cho minigame
         private void ApplyMinigameProfile(MinigameCameraProfile profile, Transform focusTarget)
@@ -397,7 +426,9 @@ namespace IronIvy.Systems.Camera
         }
 
         // cập nhật vị trí camera orbit quanh animal
-        // - không dùng Follow, chỉ set transform trực tiếp
+        // - orbit quanh pivot chân cho ổn định
+        // - nhưng LookAt lên cao để nhìn vào "đầu"
+        // - tránh Cinemachine LookAt đánh nhau với transform.LookAt
         private void UpdateAnimalOrbitCameraPosition()
         {
             if (_animalFocus == null ||
@@ -406,15 +437,107 @@ namespace IronIvy.Systems.Camera
 
             var cam = animalProfile.virtualCamera;
 
+            float orbitDist = (_animalTuningRuntime != null && _animalTuningRuntime.orbitDistance > 0f)
+                ? _animalTuningRuntime.orbitDistance
+                : animalOrbitDistance;
+
+            float orbitH = (_animalTuningRuntime != null && _animalTuningRuntime.orbitHeight > 0f)
+                ? _animalTuningRuntime.orbitHeight
+                : animalOrbitHeight;
+
+            float lookH = (_animalTuningRuntime != null && _animalTuningRuntime.lookAtHeight > 0f)
+                ? _animalTuningRuntime.lookAtHeight
+                : animalLookAtHeight;
+
             float rad = _animalOrbitAngle * Mathf.Deg2Rad;
-            Vector3 center = _animalFocus.position;
-            Vector3 offset = new Vector3(Mathf.Cos(rad), 0f, Mathf.Sin(rad)) * animalOrbitDistance;
-            Vector3 pos = center + offset + Vector3.up * AnimalOrbitHeight;
+
+            Vector3 footPivot = _animalFocus.position;
+            Vector3 lookPoint = footPivot + Vector3.up * lookH;
+
+            Vector3 offset = new Vector3(Mathf.Cos(rad), 0f, Mathf.Sin(rad)) * orbitDist;
+            Vector3 pos = footPivot + offset + Vector3.up * orbitH;
 
             cam.transform.position = pos;
+
+            // orbit mode: ko follow
             cam.Follow = null;
-            cam.transform.LookAt(center);
-            cam.LookAt = _animalFocus;
+
+            // để 1 nơi aim thôi
+            cam.LookAt = null;
+            cam.transform.LookAt(lookPoint);
+        }
+
+        // ===== Option 1: lấy tuning từ AnimalDefinition =====
+        private AnimalCameraTuning BuildAnimalTuningFromDefinition(Transform animalRoot)
+        {
+            var tuning = new AnimalCameraTuning()
+            {
+                orbitDistance = animalOrbitDistance,
+                orbitHeight = animalOrbitHeight,
+                lookAtHeight = animalLookAtHeight,
+                rotateSpeed = animalOrbitRotateSpeed
+            };
+
+            if (animalRoot == null) return tuning;
+
+            var def = TryFindAnimalDefinitionOnAnimal(animalRoot);
+            if (def == null) return tuning;
+
+            // nếu field trong definition để 0 thì coi như "ko override"
+            if (def.cameraOrbitDistance > 0f) tuning.orbitDistance = def.cameraOrbitDistance;
+            if (def.cameraOrbitHeight > 0f) tuning.orbitHeight = def.cameraOrbitHeight;
+            if (def.cameraLookAtHeight > 0f) tuning.lookAtHeight = def.cameraLookAtHeight;
+            if (def.cameraOrbitRotateSpeed > 0f) tuning.rotateSpeed = def.cameraOrbitRotateSpeed;
+
+            return tuning;
+        }
+
+        private AnimalDefinition TryFindAnimalDefinitionOnAnimal(Transform animalRoot)
+        {
+            // scan MonoBehaviour quanh animal, tìm field/property có chữ "definition"
+            // rồi check đúng type AnimalDefinition
+            var comps = animalRoot.GetComponentsInParent<MonoBehaviour>(true);
+            for (int i = 0; i < comps.Length; i++)
+            {
+                var c = comps[i];
+                if (c == null) continue;
+
+                var type = c.GetType();
+
+                // fields
+                var fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                for (int f = 0; f < fields.Length; f++)
+                {
+                    var fi = fields[f];
+                    if (fi == null) continue;
+                    if (!fi.Name.ToLowerInvariant().Contains("definition")) continue;
+
+                    object val = fi.GetValue(c);
+                    if (val is AnimalDefinition ad) return ad;
+                }
+
+                // properties
+                var props = type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                for (int p = 0; p < props.Length; p++)
+                {
+                    var pi = props[p];
+                    if (pi == null) continue;
+                    if (!pi.CanRead) continue;
+                    if (!pi.Name.ToLowerInvariant().Contains("definition")) continue;
+
+                    try
+                    {
+                        object val = pi.GetValue(c, null);
+                        if (val is AnimalDefinition ad) return ad;
+                    }
+                    catch
+                    {
+                        // ignore getter crash
+                    }
+                }
+            }
+
+            return null;
         }
 
         // tìm camera Cinemachine đang active nhất trong scene
