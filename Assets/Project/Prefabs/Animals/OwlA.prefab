@@ -14,6 +14,8 @@ GameObject:
   - component: {fileID: 971218689236340311}
   - component: {fileID: 1645078286448777200}
   - component: {fileID: 1579180901098357237}
+  - component: {fileID: 1395483138726011434}
+  - component: {fileID: 1209364155379882052}
   m_Layer: 0
   m_Name: OwlA
   m_TagString: Animal
@@ -34,6 +36,7 @@ Transform:
   m_LocalScale: {x: 1.4, y: 1.4, z: 1.4}
   m_ConstrainProportionsScale: 1
   m_Children:
+  - {fileID: 8254730994804694394}
   - {fileID: 8702491454427385882}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 169.38, z: 0}
@@ -126,15 +129,90 @@ MonoBehaviour:
   agent: {fileID: 971218689236340311}
   animator: {fileID: 4043744919540835872}
   visibility: {fileID: 0}
+  highlightController: {fileID: 0}
+  enableRhythmMinigame: 1
+  oneShotMinigame: 1
   speedParam: speed
   idleStateName: idle
   eatTrigger: eat
   jumpTrigger: jump
-  enableRhythmMinigame: 1
-  interactionPanel: {fileID: 0}
-  animalMinigame: {fileID: 0}
+  faceTurnSpeed: 720
+  faceOnlyYaw: 1
+  suppressCuriousAfterCancel: 1.25
+  minigameDespawnVfxOffset: {x: 0, y: 1.2, z: 0}
+  minigameDespawnVfxLifetime: 3
+  successVfxTrustThreshold: 0.75
+  logVfx: 0
+--- !u!114 &1395483138726011434
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 864937970000183537}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48e780fcba9949b4ca09cdef45eaf9bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Gameplay.Animals.AnimalHighlightController
+  renderers: []
+  outlineWidthProperty: _Outline_Width
+  outlineColorProperty: _Outline_Color
+  offWidth: 0
+  onWidth: 0.2
+  changeColorOnHighlight: 1
+  highlightColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+--- !u!114 &1209364155379882052
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 864937970000183537}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 066945f7d7d959848b1a146d130a62f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Gameplay.Interaction.InteractionTrigger
+  interactKey: 102
   playerTag: Player
-  oneShotMinigame: 1
+  interactPrompt: {fileID: 4623484312362694898}
+  onToggleHighlight:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1395483138726011434}
+        m_TargetAssemblyTypeName: IronIvy.Gameplay.Animals.AnimalHighlightController,
+          Assembly-CSharp
+        m_MethodName: SetHighlight
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+  onInteract:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1579180901098357237}
+        m_TargetAssemblyTypeName: IronIvy.Gameplay.Animals.AnimalController, Assembly-CSharp
+        m_MethodName: OnInteractPressed
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  animalToLock: {fileID: 0}
+  ignoreExitWhileInteracting: 1
+  disableTriggerColliderWhileInteracting: 1
+  interactCooldown: 0.25
+  debugLog: 0
 --- !u!1 &950483130030814864
 GameObject:
   m_ObjectHideFlags: 0
@@ -302,6 +380,7 @@ SkinnedMeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   serializedVersion: 2
   m_Quality: 0
   m_UpdateWhenOffscreen: 0
@@ -322,6 +401,108 @@ SkinnedMeshRenderer:
     m_Center: {x: 0, y: 0.03700595, z: 0.018582717}
     m_Extent: {x: 0.06919753, y: 0.068440855, z: 0.0607318}
   m_DirtyAABB: 0
+--- !u!1 &3569062019623553732
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8254730994804694394}
+  - component: {fileID: 4207198851170402994}
+  - component: {fileID: 8712478618785674510}
+  - component: {fileID: 891768094789686647}
+  m_Layer: 0
+  m_Name: Canvas
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &8254730994804694394
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3569062019623553732}
+  m_LocalRotation: {x: -0, y: -0.9957086, z: -0, w: 0.0925444}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.0035714277, y: 0.0035714284, z: 0.0035714277}
+  m_ConstrainProportionsScale: 1
+  m_Children:
+  - {fileID: 6018827376389947510}
+  m_Father: {fileID: 2049998329009685282}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 1.2}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!223 &4207198851170402994
+Canvas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3569062019623553732}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 2
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 0
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
+  m_AdditionalShaderChannelsFlag: 0
+  m_UpdateRectTransformForStandalone: 0
+  m_SortingLayerID: 0
+  m_SortingOrder: 0
+  m_TargetDisplay: 0
+--- !u!114 &8712478618785674510
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3569062019623553732}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.CanvasScaler
+  m_UiScaleMode: 0
+  m_ReferencePixelsPerUnit: 100
+  m_ScaleFactor: 1
+  m_ReferenceResolution: {x: 800, y: 600}
+  m_ScreenMatchMode: 0
+  m_MatchWidthOrHeight: 0
+  m_PhysicalUnit: 3
+  m_FallbackScreenDPI: 96
+  m_DefaultSpriteDPI: 96
+  m_DynamicPixelsPerUnit: 1
+  m_PresetInfoIsWorld: 1
+--- !u!114 &891768094789686647
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3569062019623553732}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.GraphicRaycaster
+  m_IgnoreReversedGraphics: 1
+  m_BlockingObjects: 0
+  m_BlockingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!1 &3997715936728191165
 GameObject:
   m_ObjectHideFlags: 0
@@ -419,6 +600,94 @@ Transform:
   - {fileID: 5830479633012806034}
   m_Father: {fileID: 8702491454427385882}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &4623484312362694898
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6018827376389947510}
+  - component: {fileID: 1867853389913355940}
+  - component: {fileID: 7816672502792673011}
+  - component: {fileID: 5205809370979201535}
+  m_Layer: 0
+  m_Name: InteractPrompt_UI
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &6018827376389947510
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4623484312362694898}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8254730994804694394}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &1867853389913355940
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4623484312362694898}
+  m_CullTransparentMesh: 1
+--- !u!114 &7816672502792673011
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4623484312362694898}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: -1682812148, guid: 9a4a8e7353b3bc547947b56009f7f2c1, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!114 &5205809370979201535
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4623484312362694898}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64c59aac455a03f4c97407d38d7637ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::IronIvy.UI.UIBillboard
 --- !u!1 &4964906037972863900
 GameObject:
   m_ObjectHideFlags: 0

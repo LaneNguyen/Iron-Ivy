@@ -99,6 +99,34 @@ public class AudioManager : BaseManager<AudioManager>
         AttachSESource.PlayOneShot(seDic[nextSEName] as AudioClip);
     }
 
+    // NEW: helper nho, play SE tu AudioClip (minigame UI hay dung)
+    public void PlaySEClip(AudioClip clip, float volumeScale = 1f, float delay = 0.0f)
+    {
+        if (clip == null) return;
+        if (AttachSESource == null) return;
+        if (AttachSESource.mute) return;
+
+        volumeScale = Mathf.Clamp01(volumeScale);
+
+        if (delay > 0f)
+        {
+            StartCoroutine(DelayPlayClipRoutine(clip, volumeScale, delay));
+            return;
+        }
+
+        AttachSESource.PlayOneShot(clip, volumeScale);
+    }
+
+    private IEnumerator DelayPlayClipRoutine(AudioClip clip, float volumeScale, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        if (clip == null) yield break;
+        if (AttachSESource == null) yield break;
+        if (AttachSESource.mute) yield break;
+
+        AttachSESource.PlayOneShot(clip, Mathf.Clamp01(volumeScale));
+    }
+
     public void PlayBGM(string bgmName, float fadeSpeedRate = BGM_FADE_SPEED_RATE_HIGH)
     {
         if (!bgmDic.ContainsKey(bgmName))

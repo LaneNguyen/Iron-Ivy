@@ -1,0 +1,66 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c53fbbe08d2db6e46a3f2ccc74647187, type: 3}
+  m_Name: animal_Duck
+  m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Data.AnimalDefinition
+  id: duck_a
+  displayName: "V\u1ECBt Baby"
+  icon: {fileID: -2119013152, guid: c7466141e66fae54a8e7b6089dae8544, type: 3}
+  cameraOrbitDistance: 2
+  cameraOrbitHeight: -1
+  cameraLookAtHeight: -1
+  cameraOrbitRotateSpeed: 0
+  favoriteFood: {fileID: 11400000, guid: e5b41e7a0209d4e41aef6fe16925bb48, type: 2}
+  buffSafetyNet: 3
+  buffTrustMultiplier: 1.5
+  dropItem: {fileID: 0}
+  dropCount: 1
+  doubleLootOnBuff: 1
+  prefab: {fileID: 1600231042716339702, guid: f69e75671ffd4c143ac67920d4afdfc6, type: 3}
+  maxCountGlobal: 10
+  spawnWeight: 1
+  spawnVfxPrefab: {fileID: 0}
+  despawnVfxPrefab: {fileID: 100018, guid: a40b64bf23366dc42a892af2c6ff6140, type: 3}
+  walkSpeed: 1
+  runSpeed: 2
+  wanderRadius: 6
+  minIdleTime: 2
+  maxIdleTime: 4
+  isNocturnal: 0
+  ambientClips:
+  - {fileID: 8300000, guid: 556877e71eaef1c429ccc04a9ece3c2a, type: 3}
+  ambientMinInterval: 5
+  ambientMaxInterval: 15
+  ambientSoundRadius: 15
+  curiousRadius: 10
+  curiousChancePerCheck: 0.2
+  curiousMinDuration: 2
+  curiousMaxDuration: 4
+  curiousCheckInterval: 5
+  curiousAnimTrigger: 
+  patterns:
+  - {fileID: 11400000, guid: edd23bf8b315d7e4bb892ac3d144d659, type: 2}
+  - {fileID: 11400000, guid: bb2637d1521d97844a123dd9bded3b8b, type: 2}
+  playbackMode: 1
+  useRandomRhythm: 1
+  randomFragments: []
+  minRandomBeats: 8
+  maxRandomBeats: 20
+  minRandomFragments: 2
+  maxRandomFragments: 6
+  goodAnim: Good
+  badAnim: Bad
+  iv17Reactions: []
+  archiveReward: 4
+  minigameMusicLoop: {fileID: 8300000, guid: b72863abd454aa94d93920e2041c08a9, type: 3}
+  loopSfx: {fileID: 0}
+  successVFX: {fileID: 0}

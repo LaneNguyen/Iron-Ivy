@@ -27,8 +27,14 @@ namespace IronIvy.Gameplay.Rhythm
         public float BeatDuration => 60f / Mathf.Max(1f, bpm);
         public float defaultHoldRequiredSeconds = 0.7f;
 
-        [Header("BGM")]
+        [Header("BGM (fallback)")]
         public string bgmKey = "animal_rhythm_bgm";
+
+        [Header("SFX (Hit / Miss)")]
+        public AudioClip hitSfx;
+        public AudioClip missSfx;
+        [Range(0f, 1f)] public float hitSfxVolume = 1f;
+        [Range(0f, 1f)] public float missSfxVolume = 1f;
 
         [Header("Debug")]
         public bool logFlow = true;
@@ -47,7 +53,7 @@ namespace IronIvy.Gameplay.Rhythm
 
         private int _currentStepIndex;
         private int _beatsLeftInStep;
-        private int _globalScorableBeatIndex;     // scorable beats only (Tap/Hold)
+        private int _globalScorableBeatIndex;
 
         private int _totalBeatsForProgress;
         private int _totalBeatsForTimeline;
@@ -61,17 +67,13 @@ namespace IronIvy.Gameplay.Rhythm
         private int _totalMiss;
         private float _trust01;
 
-        // active beat snapshot (IMPORTANT FIX)
         private RhythmPattern.StepType _activeStepType;
         private bool _activeIsScorable;
         private bool _activeIsHold;
         private int _activeStepIndexSnapshot;
         private int _activeBeatIndexSnapshot;
 
-        public void SetSpawnArea(RectTransform area)
-        {
-            spawnArea = area;
-        }
+        public void SetSpawnArea(RectTransform area) => spawnArea = area;
 
         public void RequestPlay(AnimalController animal, bool isFavoriteBuff = false)
         {
@@ -81,8 +83,9 @@ namespace IronIvy.Gameplay.Rhythm
             _hasFavoriteBuff = isFavoriteBuff;
 
             int baseSafety = 3;
-            if (animal != null && animal.Definition != null)
-                baseSafety = animal.Definition.buffSafetyNet;
+            var animalDef = (animal != null) ? animal.Definition : null;
+            if (animalDef != null)
+                baseSafety = animalDef.buffSafetyNet;
 
             _safetyNetRemains = _hasFavoriteBuff ? baseSafety : 0;
 
@@ -95,6 +98,8 @@ namespace IronIvy.Gameplay.Rhythm
 
             if (_currentFocus == null)
                 _currentFocus = defaultRoot != null ? defaultRoot : transform;
+
+            var animalDef = _currentAnimal != null ? _currentAnimal.Definition : null;
 
             BuildPlaylist(_playlist);
             if (_playlist.Count == 0) return;
@@ -122,13 +127,12 @@ namespace IronIvy.Gameplay.Rhythm
             _trust01 = 0f;
 
             bool isRandomMode = false;
-            var def = _currentAnimal != null ? _currentAnimal.Definition : null;
-            if (def != null && def.useRandomRhythm)
+            if (animalDef != null && animalDef.useRandomRhythm)
                 isRandomMode = true;
 
             if (ListenManager.HasInstance)
             {
-                string title = (def != null) ? def.displayName : "Animal Rhythm";
+                string title = (animalDef != null) ? animalDef.displayName : "Animal Rhythm";
                 if (isRandomMode) title += " [Mix]";
                 if (_hasFavoriteBuff) title += " <color=green>[Protected]</color>";
 
@@ -146,8 +150,14 @@ namespace IronIvy.Gameplay.Rhythm
             if (CameraManager.HasInstance)
                 CameraManager.Instance.ApplyAnimalMinigameProfile(_currentFocus);
 
-            if (AudioManager.HasInstance && !string.IsNullOrEmpty(bgmKey))
-                AudioManager.Instance.PlayBGM(bgmKey);
+            // NEW: BGM theo AnimalDefinition (nếu có)
+            if (AudioManager.HasInstance)
+            {
+                if (animalDef != null && animalDef.minigameMusicLoop != null)
+                    AudioManager.Instance.PlayBGM(animalDef.minigameMusicLoop.name);
+                else if (!string.IsNullOrEmpty(bgmKey))
+                    AudioManager.Instance.PlayBGM(bgmKey);
+            }
 
             IsRunning = true;
 
@@ -203,8 +213,8 @@ namespace IronIvy.Gameplay.Rhythm
             {
                 _currentAnimal.MarkMinigamePlayed();
 
-                // FALLBACK: nếu animal one-shot thì despawn luôn
-                _currentAnimal.DespawnAfterMinigame();
+                // IMPORTANT: truyền trust cho SuccessVFX logic
+                _currentAnimal.DespawnAfterMinigame(successRatio);
             }
 
             _currentAnimal = null;
@@ -221,8 +231,6 @@ namespace IronIvy.Gameplay.Rhythm
                 return;
             }
 
-
-            // end pattern
             if (_currentStepIndex >= _currentPattern.sequence.Length)
             {
                 _playlistIndex++;
@@ -233,17 +241,13 @@ namespace IronIvy.Gameplay.Rhythm
                 }
 
                 SetupPattern(_playlist[_playlistIndex]);
-
-                // FIX: phải chạy tiếp beat đầu của pattern mới
                 StartNextBeat();
                 return;
             }
 
-
             var step = _currentPattern.sequence[_currentStepIndex];
             _currentBeatDuration = BeatDuration;
 
-            // snapshot ACTIVE beat (IMPORTANT)
             _activeStepType = step.type;
             _activeIsHold = (step.type == RhythmPattern.StepType.Hold);
             _activeIsScorable = (step.type == RhythmPattern.StepType.Tap || step.type == RhythmPattern.StepType.Hold);
@@ -279,7 +283,6 @@ namespace IronIvy.Gameplay.Rhythm
 
             _restCoroutine = null;
 
-            // rest beat "resolve" tự động
             AdvanceAfterResolve(scored: false);
             StartNextBeat();
         }
@@ -312,8 +315,6 @@ namespace IronIvy.Gameplay.Rhythm
             rt.anchoredPosition = new Vector2(x, y);
 
             _currentTarget = target;
-
-            // FIX: luôn để minigame chủ động destroy sau khi xử lý xong
             _currentTarget.autoDestroyOnResolve = false;
 
             target.Setup(
@@ -339,7 +340,6 @@ namespace IronIvy.Gameplay.Rhythm
 
             KillTarget();
 
-            // only score Tap/Hold
             string statusMsg = "";
             bool statusPositive = false;
 
@@ -349,6 +349,9 @@ namespace IronIvy.Gameplay.Rhythm
             {
                 if (hit)
                 {
+                    if (AudioManager.HasInstance)
+                        AudioManager.Instance.PlaySEClip(hitSfx, hitSfxVolume);
+
                     _totalHit++;
                     statusMsg = _hasFavoriteBuff ? "Perfect! (Buffed)" : "Hit!";
                     statusPositive = true;
@@ -365,6 +368,9 @@ namespace IronIvy.Gameplay.Rhythm
                     }
                     else
                     {
+                        if (AudioManager.HasInstance)
+                            AudioManager.Instance.PlaySEClip(missSfx, missSfxVolume);
+
                         _totalMiss++;
                         statusMsg = "Miss";
                         statusPositive = false;
@@ -379,9 +385,6 @@ namespace IronIvy.Gameplay.Rhythm
             float progress01 = (_totalBeatsForProgress > 0)
                 ? Mathf.Clamp01((float)(_totalHit + _totalMiss) / _totalBeatsForProgress)
                 : 0f;
-
-            if (logFlow)
-                Debug.Log($"[AnimalRhythm] RaiseHUDUpdate hit={_totalHit} miss={_totalMiss} progress01={progress01:0.00} trust01={_trust01:0.00} beat={_activeBeatIndexSnapshot} step={_activeStepType}");
 
             if (ListenManager.HasInstance)
             {
@@ -407,14 +410,11 @@ namespace IronIvy.Gameplay.Rhythm
                 StartNextBeat();
         }
 
-        // ONLY place we advance step/beat
         private void AdvanceAfterResolve(bool scored)
         {
-            // advance scorable beat index only if we just finished Tap/Hold
             if (scored)
                 _globalScorableBeatIndex++;
 
-            // move beats within current step
             _beatsLeftInStep--;
             if (_beatsLeftInStep <= 0)
             {
@@ -436,20 +436,20 @@ namespace IronIvy.Gameplay.Rhythm
         {
             outList.Clear();
 
-            AnimalDefinition def = _currentAnimal != null ? _currentAnimal.Definition : null;
+            var animalDef = _currentAnimal != null ? _currentAnimal.Definition : null;
             bool added = false;
 
-            if (def != null)
+            if (animalDef != null)
             {
-                if (def.useRandomRhythm)
+                if (animalDef.useRandomRhythm)
                 {
-                    added = BuildRandomPlaylistForAnimal(def, outList);
+                    added = BuildRandomPlaylistForAnimal(animalDef, outList);
                     if (!added)
-                        added = BuildFixedPlaylistForAnimal(def, outList);
+                        added = BuildFixedPlaylistForAnimal(animalDef, outList);
                 }
                 else
                 {
-                    added = BuildFixedPlaylistForAnimal(def, outList);
+                    added = BuildFixedPlaylistForAnimal(animalDef, outList);
                 }
             }
 
@@ -607,13 +607,13 @@ namespace IronIvy.Gameplay.Rhythm
             if (_currentAnimal == null) return 0f;
             if (!ArchiveManager.HasInstance) return 0f;
 
-            var def = _currentAnimal.Definition;
-            if (def == null) return 0f;
+            var animalDef = _currentAnimal.Definition;
+            if (animalDef == null) return 0f;
 
-            float baseReward = def.archiveReward;
+            float baseReward = animalDef.archiveReward;
             if (baseReward <= 0f) return 0f;
 
-            float multiplier = _hasFavoriteBuff ? def.buffTrustMultiplier : 1f;
+            float multiplier = _hasFavoriteBuff ? animalDef.buffTrustMultiplier : 1f;
 
             float finalReward = 0f;
             if (successRatio >= 0.99f) finalReward = baseReward * multiplier;
@@ -634,13 +634,13 @@ namespace IronIvy.Gameplay.Rhythm
             if (!InventoryManager.HasInstance) return;
             if (successRatio < 0.5f) return;
 
-            var def = _currentAnimal.Definition;
-            if (def.dropItem == null || def.dropCount <= 0) return;
+            var animalDef = _currentAnimal.Definition;
+            if (animalDef.dropItem == null || animalDef.dropCount <= 0) return;
 
-            item = def.dropItem;
-            count = def.dropCount;
+            item = animalDef.dropItem;
+            count = animalDef.dropCount;
 
-            if (_hasFavoriteBuff && def.doubleLootOnBuff)
+            if (_hasFavoriteBuff && animalDef.doubleLootOnBuff)
                 count *= 2;
 
             InventoryManager.Instance.AddFood(item, count);

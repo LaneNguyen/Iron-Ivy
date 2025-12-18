@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c53fbbe08d2db6e46a3f2ccc74647187, type: 3}
+  m_Name: animal_Turtle
+  m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Data.AnimalDefinition
+  id: turtle_a
+  displayName: "R\xF9a"
+  icon: {fileID: -1048960537, guid: 65e1f9134c8d2674bbadecafced414fb, type: 3}
+  cameraOrbitDistance: 0
+  cameraOrbitHeight: 0
+  cameraLookAtHeight: 0
+  cameraOrbitRotateSpeed: 0
+  favoriteFood: {fileID: 11400000, guid: b5fcee1560a837e4ab047aec13f3ab3d, type: 2}
+  buffSafetyNet: 3
+  buffTrustMultiplier: 1.5
+  dropItem: {fileID: 0}
+  dropCount: 1
+  doubleLootOnBuff: 1
+  prefab: {fileID: 2737210443694036689, guid: 0147fa4f89658f34e99c63dafd968490, type: 3}
+  maxCountGlobal: 10
+  spawnWeight: 1
+  spawnVfxPrefab: {fileID: 0}
+  despawnVfxPrefab: {fileID: 100018, guid: a40b64bf23366dc42a892af2c6ff6140, type: 3}
+  walkSpeed: 0.5
+  runSpeed: 1
+  wanderRadius: 10
+  minIdleTime: 2
+  maxIdleTime: 5
+  isNocturnal: 0
+  ambientClips: []
+  ambientMinInterval: 5
+  ambientMaxInterval: 15
+  ambientSoundRadius: 15
+  curiousRadius: 10
+  curiousChancePerCheck: 0.2
+  curiousMinDuration: 2
+  curiousMaxDuration: 4
+  curiousCheckInterval: 5
+  curiousAnimTrigger: 
+  patterns: []
+  playbackMode: 1
+  useRandomRhythm: 1
+  randomFragments: []
+  minRandomBeats: 12
+  maxRandomBeats: 24
+  minRandomFragments: 2
+  maxRandomFragments: 6
+  goodAnim: Good
+  badAnim: Bad
+  iv17Reactions: []
+  archiveReward: 6
+  minigameMusicLoop: {fileID: 8300000, guid: 412bc15070c07164e83166076b6c1a69, type: 3}
+  loopSfx: {fileID: 0}
+  successVFX: {fileID: 0}

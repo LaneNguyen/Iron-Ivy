@@ -11,41 +11,23 @@ namespace IronIvy.Data
         public string displayName;
 
         [Tooltip("Icon đại diện cho Animal này (dùng trong UI Reward Panel)")]
-        public Sprite icon;     // >>> NEW FIELD ADDED <<<
+        public Sprite icon;
 
         // ===== Camera tuning (Option 1) =====
         [Header("Camera (Animal Minigame)")]
-        [Tooltip("Khoảng cách orbit quanh animal. (fallback nếu để 0 là dùng default trong CameraManager)")]
         public float cameraOrbitDistance = 0f;
-
-        [Tooltip("Độ cao camera đứng lên so với pivot chân. (fallback nếu để 0 là dùng default trong CameraManager)")]
         public float cameraOrbitHeight = 0f;
-
-        [Tooltip("Điểm camera nhìn lên cao bao nhiêu so với pivot chân, để aim vào đầu thay vì chân.")]
         public float cameraLookAtHeight = 0f;
-
-        [Tooltip("Tốc độ quay orbit. (fallback nếu để 0 là dùng default trong CameraManager)")]
         public float cameraOrbitRotateSpeed = 0f;
 
-        //   Feeding System & Buffs
         [Header("Feeding & Buffs")]
-        [Tooltip("Món ăn yêu thích. Nếu cho ăn trước khi chơi -> Kích hoạt Buff.")]
         public FoodItem favoriteFood;
-
-        [Tooltip("Số mạng bảo hiểm được cộng thêm khi có Buff (Safety Net).")]
         public int buffSafetyNet = 3;
-
-        [Tooltip("Hệ số nhân điểm Trust khi có Buff (Trust Multiplier).")]
         public float buffTrustMultiplier = 1.5f;
 
         [Header("Loot (Drops)")]
-        [Tooltip("Vật phẩm rớt ra khi hoàn thành minigame (Ví dụ: Lông, Sữa...).")]
         public FoodItem dropItem;
-
-        [Tooltip("Số lượng rớt ra mặc định.")]
         public int dropCount = 1;
-
-        [Tooltip("Có nhân đôi Loot khi có Buff không?")]
         public bool doubleLootOnBuff = true;
 
         [Header("Prefab")]
@@ -84,22 +66,11 @@ namespace IronIvy.Data
         public RhythmPlaybackMode playbackMode = RhythmPlaybackMode.Sequential;
 
         [Header("Rhythm (random mix)")]
-        [Tooltip("Bật lên để animal dùng random mix thay vì pattern cố định.")]
         public bool useRandomRhythm = false;
-
-        [Tooltip("Pool các pattern nhỏ đại diện style con này.")]
         public RhythmPattern[] randomFragments;
-
-        [Tooltip("Tổng số beat tối thiểu cho bài random.")]
         [Min(1)] public int minRandomBeats = 8;
-
-        [Tooltip("Tổng số beat tối đa cho bài random.")]
         [Min(1)] public int maxRandomBeats = 24;
-
-        [Tooltip("Số fragment tối thiểu trong playlist random.")]
         [Min(1)] public int minRandomFragments = 2;
-
-        [Tooltip("Số fragment tối đa trong playlist random.")]
         [Min(1)] public int maxRandomFragments = 6;
 
         [Header("Animation names")]
@@ -113,7 +84,13 @@ namespace IronIvy.Data
         [Range(0f, 100f)] public float archiveReward = 5f;
 
         [Header("Audio/FX")]
+        [Tooltip("BGM riêng khi chơi minigame với con này (giống PlantDefinition.musicLoop). Nếu null thì dùng fallback trong minigame.")]
+        public AudioClip minigameMusicLoop;
+
+        [Tooltip("Trước đây là loop sfx, giờ đổi sang ambient one-shot (thêm vào pool ambient).")]
         public AudioClip loopSfx;
+
+        [Tooltip("Nếu trust >= ngưỡng, despawn sẽ dùng SuccessVFX thay vì despawnVfxPrefab.")]
         public GameObject successVFX;
     }
 }

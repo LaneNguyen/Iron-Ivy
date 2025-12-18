@@ -15,6 +15,10 @@ MonoBehaviour:
   id: squirrel_a
   displayName: "S\xF3c"
   icon: {fileID: -461429957, guid: ae99b0ba083b2b447ba1a561324e8fa5, type: 3}
+  cameraOrbitDistance: 0
+  cameraOrbitHeight: 0
+  cameraLookAtHeight: 0
+  cameraOrbitRotateSpeed: 0
   favoriteFood: {fileID: 11400000, guid: 00e9e275c37774f4abe494bf5a3f27d9, type: 2}
   buffSafetyNet: 3
   buffTrustMultiplier: 1.5
@@ -25,7 +29,7 @@ MonoBehaviour:
   maxCountGlobal: 10
   spawnWeight: 1
   spawnVfxPrefab: {fileID: 0}
-  despawnVfxPrefab: {fileID: 0}
+  despawnVfxPrefab: {fileID: 100018, guid: a40b64bf23366dc42a892af2c6ff6140, type: 3}
   walkSpeed: 1.5
   runSpeed: 3
   wanderRadius: 6
@@ -50,13 +54,14 @@ MonoBehaviour:
   playbackMode: 1
   useRandomRhythm: 1
   randomFragments: []
-  minRandomBeats: 8
-  maxRandomBeats: 24
+  minRandomBeats: 10
+  maxRandomBeats: 20
   minRandomFragments: 2
   maxRandomFragments: 6
   goodAnim: Good
   badAnim: Bad
   iv17Reactions: []
-  archiveReward: 5
+  archiveReward: 4
+  minigameMusicLoop: {fileID: 8300000, guid: 4c0d8062a8a7de74c98a4cc6741bd3b9, type: 3}
   loopSfx: {fileID: 0}
-  successVFX: {fileID: 0}
+  successVFX: {fileID: 100004, guid: 3af6f68141914ca43ba39b2403757bd0, type: 3}

@@ -623,6 +623,11 @@ MonoBehaviour:
   jumpTrigger: jump
   faceTurnSpeed: 720
   faceOnlyYaw: 1
+  suppressCuriousAfterCancel: 1.25
+  minigameDespawnVfxOffset: {x: 0, y: 1.2, z: 0}
+  minigameDespawnVfxLifetime: 3
+  successVfxTrustThreshold: 0.75
+  logVfx: 1
 --- !u!114 &8501110815201736334
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -694,7 +699,6 @@ MonoBehaviour:
   disableTriggerColliderWhileInteracting: 1
   interactCooldown: 0.25
   debugLog: 0
-  debugUpdateInterval: 0.25
 --- !u!65 &6377033508812778218
 BoxCollider:
   m_ObjectHideFlags: 0

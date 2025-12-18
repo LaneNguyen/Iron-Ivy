@@ -1,7 +1,6 @@
 using System.Collections;
 using IronIvy.Core;
 using IronIvy.Data;
-using IronIvy.Systems.Camera;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -9,11 +8,7 @@ namespace IronIvy.Gameplay.Animals
 {
     public class AnimalController : MonoBehaviour
     {
-        private enum AnimalState
-        {
-            Wandering,
-            Curious
-        }
+        private enum AnimalState { Wandering, Curious }
 
         [Header("Refs")]
         [SerializeField] private AnimalDefinition definition;
@@ -38,16 +33,22 @@ namespace IronIvy.Gameplay.Animals
         [SerializeField] private float faceTurnSpeed = 720f;
         [SerializeField] private bool faceOnlyYaw = true;
 
-        // NEW: sau khi cancel/close panel, thú tạm không được curious lại 1 chút
         [Header("Curious Suppress (Patch)")]
         [SerializeField] private float suppressCuriousAfterCancel = 1.25f;
 
+        [Header("Minigame Despawn VFX (only)")]
+        [SerializeField] private Vector3 minigameDespawnVfxOffset = new Vector3(0f, 1.2f, 0f);
+        [SerializeField] private float minigameDespawnVfxLifetime = 3f;
+
+        [Header("Success VFX Rule")]
+        [Range(0f, 1f)] [SerializeField] private float successVfxTrustThreshold = 0.75f;
+
+        [Header("Debug")]
+        [SerializeField] private bool logVfx = false;
+
         private bool _hasPlayedMinigame;
 
-        // zone con thực tế (spawn)
         public AnimalSpawnZone CurrentZone { get; private set; }
-
-        // zone root (group), nếu không có thì chính là CurrentZone
         public AnimalSpawnZone RootZone { get; private set; }
 
         public AnimalDefinition Definition => definition;
@@ -57,21 +58,21 @@ namespace IronIvy.Gameplay.Animals
         private Coroutine _wanderRoutine;
         private int _speedParamHash = -1;
 
-        // player ref
         private Transform _player;
 
-        // ambient & curious vars
+        // ambient vars
         private bool _hasAmbientConfig;
         private bool _playerIsNearForAmbient;
         private float _ambientNextTime;
         private float _ambientSoundRadiusSqr;
+
+        // curious vars
         private AnimalState _state = AnimalState.Wandering;
         private bool _isCurious;
         private float _curiousRadiusSqr;
         private float _nextCuriousCheckTime;
         private float _curiousEndTime;
 
-        // NEW: suppress timer
         private float _curiousSuppressedUntil;
 
         private bool _interactionLocked;
@@ -96,7 +97,6 @@ namespace IronIvy.Gameplay.Animals
             if (highlightController == null)
                 highlightController = GetComponentInChildren<AnimalHighlightController>();
 
-            // NEW: cache player cho ambient + curious
             CachePlayerRef();
         }
 
@@ -108,10 +108,8 @@ namespace IronIvy.Gameplay.Animals
 
         private void OnEnable()
         {
-            // refresh player ref (đề phòng scene reload / player spawn lại)
             if (_player == null) CachePlayerRef();
 
-            // Case thả tay prefab vào scene
             if (definition != null && CurrentZone == null && RootZone == null)
             {
                 _anchorPosition = transform.position;
@@ -131,7 +129,6 @@ namespace IronIvy.Gameplay.Animals
             }
             else
             {
-                // Case spawn qua AnimalManager
                 SetupAmbientState();
                 SetupCuriousState();
             }
@@ -150,9 +147,7 @@ namespace IronIvy.Gameplay.Animals
             _isCurious = false;
             _state = AnimalState.Wandering;
 
-            // đóng panel nếu animal bị disable giữa chừng (spawn/despawn)
             HideInteractionPanelSoft();
-
             SetHighlighted(false);
         }
 
@@ -190,7 +185,6 @@ namespace IronIvy.Gameplay.Animals
 
             SetHighlighted(false);
 
-            // NEW: refresh player ref (safe)
             if (_player == null) CachePlayerRef();
         }
 
@@ -211,11 +205,8 @@ namespace IronIvy.Gameplay.Animals
             HideInteractionPanelSoft();
             SetHighlighted(false);
 
-            // NEW: reset suppress
             _curiousSuppressedUntil = 0f;
         }
-
-        // Public API cho highlight
 
         public void SetHighlighted(bool on)
         {
@@ -223,28 +214,20 @@ namespace IronIvy.Gameplay.Animals
                 highlightController.SetHighlight(on);
         }
 
-        // Feeding Logic (NEW FLOW)
-        // - Inventory consume giờ nằm ở UIManager gateway
-        // - AnimalController chỉ play anim + phản ứng thôi
         public bool TryFeed(FoodItem food)
         {
-            if (food == null)
-                return false;
+            if (food == null) return false;
 
             if (animator != null && !string.IsNullOrEmpty(eatTrigger))
                 animator.SetTrigger(eatTrigger);
 
-            // sau này hook mood/trust ở đây
             Debug.Log($"[AnimalController] Fed: {food.displayName}");
             return true;
         }
 
-        // Setup helpers
-
         private void SetupAnimatorParamHashes()
         {
-            if (animator == null)
-                return;
+            if (animator == null) return;
 
             if (string.IsNullOrEmpty(speedParam))
             {
@@ -276,8 +259,7 @@ namespace IronIvy.Gameplay.Animals
 
         private void SetupAgentFromDefinition()
         {
-            if (agent == null || definition == null)
-                return;
+            if (agent == null || definition == null) return;
 
             agent.speed = Mathf.Max(0.1f, definition.walkSpeed);
             agent.angularSpeed = 120f;
@@ -292,10 +274,14 @@ namespace IronIvy.Gameplay.Animals
             _ambientNextTime = 0f;
             _ambientSoundRadiusSqr = 0f;
 
-            if (definition == null ||
-                definition.ambientClips == null ||
-                definition.ambientClips.Length == 0 ||
-                definition.ambientSoundRadius <= 0f)
+            if (definition == null || definition.ambientSoundRadius <= 0f)
+                return;
+
+            bool hasAnyClip =
+                (definition.ambientClips != null && definition.ambientClips.Length > 0) ||
+                (definition.loopSfx != null);
+
+            if (!hasAnyClip)
                 return;
 
             _hasAmbientConfig = true;
@@ -319,8 +305,6 @@ namespace IronIvy.Gameplay.Animals
             _curiousRadiusSqr = definition.curiousRadius * definition.curiousRadius;
             _nextCuriousCheckTime = Time.time + Random.Range(0.5f, definition.curiousCheckInterval);
         }
-
-        // Wander & Ambient
 
         private IEnumerator WanderRoutine()
         {
@@ -377,32 +361,27 @@ namespace IronIvy.Gameplay.Animals
 
         private void PlayRandomIdleVariant()
         {
-            if (animator == null)
-                return;
+            if (animator == null) return;
 
             int roll = Random.Range(0, 3);
             if (roll == 1 && !string.IsNullOrEmpty(eatTrigger))
-            {
                 animator.SetTrigger(eatTrigger);
-            }
             else if (roll == 2 && !string.IsNullOrEmpty(jumpTrigger))
-            {
                 animator.SetTrigger(jumpTrigger);
-            }
             else if (!string.IsNullOrEmpty(idleStateName))
-            {
                 animator.CrossFadeInFixedTime(idleStateName, 0.1f);
-            }
         }
 
+        // =========================
+        // Ambient: play ngay khi vào range
+        // =========================
         private void HandleAmbientSound()
         {
             if (!_hasAmbientConfig || _player == null || definition == null)
                 return;
 
             Vector3 diff = _player.position - transform.position;
-            float sqrDist = diff.sqrMagnitude;
-            bool isNear = sqrDist <= _ambientSoundRadiusSqr;
+            bool isNear = diff.sqrMagnitude <= _ambientSoundRadiusSqr;
 
             if (!isNear)
             {
@@ -410,12 +389,16 @@ namespace IronIvy.Gameplay.Animals
                 return;
             }
 
+            // NEW: vừa vào range -> play 1 phát ngay, rồi mới schedule theo interval
             if (!_playerIsNearForAmbient)
             {
+                PlayAmbientClip();
+
                 float min = Mathf.Max(0.1f, definition.ambientMinInterval);
                 float max = Mathf.Max(min, definition.ambientMaxInterval);
                 _ambientNextTime = Time.time + Random.Range(min, max);
                 _playerIsNearForAmbient = true;
+                return;
             }
 
             if (Time.time < _ambientNextTime)
@@ -430,20 +413,123 @@ namespace IronIvy.Gameplay.Animals
 
         private void PlayAmbientClip()
         {
-            if (definition == null || definition.ambientClips == null || definition.ambientClips.Length == 0)
-                return;
+            AudioClip clip = null;
 
-            var clips = definition.ambientClips;
-            AudioClip clip = clips[Random.Range(0, clips.Length)];
+            int ambientCount = (definition.ambientClips != null) ? definition.ambientClips.Length : 0;
+            bool hasExtra = definition.loopSfx != null;
+
+            int total = ambientCount + (hasExtra ? 1 : 0);
+            if (total <= 0) return;
+
+            int pick = Random.Range(0, total);
+
+            if (pick < ambientCount)
+                clip = definition.ambientClips[pick];
+            else
+                clip = definition.loopSfx;
+
             if (clip && AudioManager.HasInstance)
                 AudioManager.Instance.PlaySEAtPosition(clip, transform.position);
         }
 
-        // Curious
+        public void OnInteractPressed()
+        {
+            if (!enableRhythmMinigame) return;
+            if (_hasPlayedMinigame && oneShotMinigame) return;
+
+            if (!UIManager.HasInstance)
+            {
+                Debug.LogWarning("[AnimalController] UIManager missing, cannot open interaction popup.");
+                return;
+            }
+
+            UIManager.Instance.ShowAnimalInteraction(this);
+        }
+
+        public void SetHighlightState(bool state)
+        {
+            if (_hasPlayedMinigame && oneShotMinigame)
+            {
+                SetHighlighted(false);
+                return;
+            }
+
+            SetHighlighted(state);
+        }
+
+        public void MarkMinigamePlayed()
+        {
+            _hasPlayedMinigame = true;
+
+            if (oneShotMinigame)
+                SetHighlighted(false);
+        }
+
+        // backward compatible
+        public void DespawnAfterMinigame()
+        {
+            DespawnAfterMinigame(-1f);
+        }
+
+        public void DespawnAfterMinigame(float trust01)
+        {
+            if (!oneShotMinigame)
+            {
+                HideInteractionPanelSoft();
+                return;
+            }
+
+            HideInteractionPanelSoft();
+
+            PlayMinigameDespawnVfx(trust01);
+
+            if (AnimalManager.HasInstance)
+                AnimalManager.Instance.DespawnAnimalWithFade(this);
+            else
+                gameObject.SetActive(false);
+        }
+
+        private void PlayMinigameDespawnVfx(float trust01)
+        {
+            if (definition == null) return;
+
+            bool isSuccess = (trust01 >= 0.99f) || (trust01 >= successVfxTrustThreshold);
+
+            GameObject prefab = null;
+            if (isSuccess && definition.successVFX != null) prefab = definition.successVFX;
+            else prefab = definition.despawnVfxPrefab;
+
+            if (prefab == null)
+            {
+                if (logVfx)
+                    Debug.Log($"[MinigameDespawnVFX] {definition.displayName} trust={trust01:0.00} prefab=null (success={isSuccess})");
+                return;
+            }
+
+            if (logVfx)
+            {
+                Debug.Log($"[MinigameDespawnVFX] {definition.displayName} trust={trust01:0.00} " +
+                          $"success={isSuccess} usePrefab={prefab.name} oneShot={oneShotMinigame}");
+            }
+
+            Vector3 pos = transform.position + minigameDespawnVfxOffset;
+            var vfx = Instantiate(prefab, pos, Quaternion.identity);
+
+            if (minigameDespawnVfxLifetime > 0f)
+                Destroy(vfx, minigameDespawnVfxLifetime);
+        }
+
+        private void HideInteractionPanelSoft()
+        {
+            if (!UIManager.HasInstance) return;
+
+            var p = UIManager.Instance.popup != null ? UIManager.Instance.popup.animalInteractionPanel : null;
+            if (p != null && p.gameObject.activeInHierarchy)
+                p.Hide();
+        }
 
         private void HandleCuriousBehaviour()
         {
-            // NEW: nếu đang suppress thì không được curious
             if (Time.time < _curiousSuppressedUntil)
                 return;
 
@@ -483,8 +569,7 @@ namespace IronIvy.Gameplay.Animals
 
         private void StartCurious()
         {
-            if (_isCurious)
-                return;
+            if (_isCurious) return;
 
             _isCurious = true;
             _state = AnimalState.Curious;
@@ -518,72 +603,6 @@ namespace IronIvy.Gameplay.Animals
                 _wanderRoutine = StartCoroutine(WanderRoutine());
         }
 
-        // ========= NEW ENTRY POINT =========
-        // InteractionTrigger / input gọi cái này
-        public void OnInteractPressed()
-        {
-            if (!enableRhythmMinigame) return;
-            if (_hasPlayedMinigame && oneShotMinigame) return;
-
-            if (!UIManager.HasInstance)
-            {
-                Debug.LogWarning("[AnimalController] UIManager missing, cannot open interaction popup.");
-                return;
-            }
-
-            UIManager.Instance.ShowAnimalInteraction(this);
-        }
-
-        // event từ trigger để bật outline
-        public void SetHighlightState(bool state)
-        {
-            if (_hasPlayedMinigame && oneShotMinigame)
-            {
-                SetHighlighted(false);
-                return;
-            }
-
-            SetHighlighted(state);
-        }
-
-        // được minigame gọi sau khi player confirm chơi xong 1 lần
-        public void MarkMinigamePlayed()
-        {
-            _hasPlayedMinigame = true;
-
-            if (oneShotMinigame)
-            {
-                SetHighlighted(false);
-            }
-        }
-
-        public void DespawnAfterMinigame()
-        {
-            // nếu không one-shot thì không despawn
-            if (!oneShotMinigame)
-            {
-                HideInteractionPanelSoft();
-                return;
-            }
-
-            HideInteractionPanelSoft();
-
-            if (AnimalManager.HasInstance)
-                AnimalManager.Instance.DespawnAnimalWithFade(this);
-            else
-                gameObject.SetActive(false);
-        }
-
-        private void HideInteractionPanelSoft()
-        {
-            if (!UIManager.HasInstance) return;
-
-            var p = UIManager.Instance.popup != null ? UIManager.Instance.popup.animalInteractionPanel : null;
-            if (p != null && p.gameObject.activeInHierarchy)
-                p.Hide();
-        }
-
-        // NEW: helper suppress
         private void SuppressCurious(float seconds)
         {
             if (seconds <= 0f) return;
@@ -606,11 +625,7 @@ namespace IronIvy.Gameplay.Animals
             else
             {
                 StopFacingPlayer();
-
-                // nếu đang Curious thì end ngay, khỏi nhìn player nữa
                 EndCurious();
-
-                // NEW: suppress để khỏi curious lại liền sau cancel/close panel
                 SuppressCurious(suppressCuriousAfterCancel);
 
                 UnlockAgent();
@@ -664,7 +679,6 @@ namespace IronIvy.Gameplay.Animals
 
         private IEnumerator FacePlayerLoop()
         {
-            // dùng cache trước, nếu null thì mới find
             var player = _player;
             if (player == null)
             {
@@ -695,7 +709,6 @@ namespace IronIvy.Gameplay.Animals
 
         private void StopWanderIfAny()
         {
-            // nếu file của Lane có _wanderRoutine thì stop tại đây
             if (_wanderRoutine != null)
             {
                 StopCoroutine(_wanderRoutine);
@@ -705,14 +718,12 @@ namespace IronIvy.Gameplay.Animals
 
         private void ResumeWanderIfAny()
         {
-            // nếu file Lane có WanderRoutine() thì resume lại
             if (isActiveAndEnabled && _wanderRoutine == null)
                 _wanderRoutine = StartCoroutine(WanderRoutine());
         }
 
         private void StopCuriousIfAny()
         {
-            // nếu file Lane có _isCurious / animator bool curious thì tắt tại đây
             _isCurious = false;
         }
 
@@ -720,10 +731,7 @@ namespace IronIvy.Gameplay.Animals
         {
             StopFacingPlayer();
             EndCurious();
-
-            // NEW: cancel xong thì suppress luôn để khỏi quay lại liền
             SuppressCurious(suppressCuriousAfterCancel);
-
             ResumeWanderIfAny();
         }
     }

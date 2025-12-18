@@ -19,6 +19,12 @@ namespace IronIvy.Gameplay.Rhythm
         public RhythmClickTarget targetPrefab;
         public GameObject disappearVfxPrefab;
 
+        [Header("SFX (Hit / Miss)")]
+        public AudioClip hitSfx;
+        public AudioClip missSfx;
+        [Range(0f, 1f)] public float hitSfxVolume = 1f;
+        [Range(0f, 1f)] public float missSfxVolume = 1f;
+
         [Header("Beat Settings")]
         public float bpm = 90f;
         public float delayBetweenPlots = 0.8f;
@@ -160,17 +166,12 @@ namespace IronIvy.Gameplay.Rhythm
         private void FinishSequence()
         {
             IsRunning = false;
-            if (AudioManager.HasInstance) AudioManager.Instance.FadeOutBGM();
-            if (CameraManager.HasInstance) CameraManager.Instance.RestoreMinigameCamera();
-            
+
+            float totalNotes = _seqTotalHits + _seqTotalMisses;
+            float finalTrust = (totalNotes > 0) ? (float)_seqTotalHits / totalNotes : 0f;
+
             if (ListenManager.HasInstance)
             {
-                ListenManager.Instance.RaiseRhythmHUDHide();
-                
-                // HIỆN REWARD PANEL: Tính toán tỉ lệ thành công tổng quát
-                int totalNotes = _seqTotalHits + _seqTotalMisses;
-                float finalTrust = (totalNotes > 0) ? (float)_seqTotalHits / totalNotes : 0f;
-                
                 ListenManager.Instance.RaiseRhythmPlantResult(new ListenManager.RhythmPlantResultPayload(
                     new Dictionary<FoodItem, int>(_totalRewards), _seqTotalHits, _seqTotalMisses, finalTrust));
             }
@@ -217,19 +218,33 @@ namespace IronIvy.Gameplay.Rhythm
         }
 
         // --- HÀM PHỤ TRỢ ---
+
         private void SpawnTarget(bool isHold, float beatDuration)
         {
             if (targetPrefab == null || spawnArea == null) return;
             _waitResolved = false; _waitHit = false;
             _currentTarget = Instantiate(targetPrefab, spawnArea);
             Vector2 size = spawnArea.rect.size;
-            _currentTarget.GetComponent<RectTransform>().anchoredPosition = new Vector2(Random.Range(-size.x/2+40, size.x/2-40), Random.Range(-size.y/2+40, size.y/2-40));
-            _currentTarget.Setup(isHold, beatDuration, defaultHoldRequiredSeconds, isHold ? "GIỮ CHUỘT" : "CLICK CHUỘT", (hit) => { _waitHit = hit; _waitResolved = true; });
+            _currentTarget.GetComponent<RectTransform>().anchoredPosition = new Vector2(
+                Random.Range(-size.x / 2 + 40, size.x / 2 - 40),
+                Random.Range(-size.y / 2 + 40, size.y / 2 - 40)
+            );
+
+            _currentTarget.Setup(isHold, beatDuration, defaultHoldRequiredSeconds, isHold ? "GIỮ CHUỘT" : "CLICK CHUỘT",
+                (hit) => { _waitHit = hit; _waitResolved = true; });
         }
 
         private IEnumerator WaitPlayerInputRoutine(bool isHoldStep)
         {
             while (!_waitResolved) yield return null;
+
+            // NEW: play sfx ngay lúc chốt hit/miss
+            if (AudioManager.HasInstance)
+            {
+                if (_waitHit) AudioManager.Instance.PlaySEClip(hitSfx, hitSfxVolume);
+                else AudioManager.Instance.PlaySEClip(missSfx, missSfxVolume);
+            }
+
             if (_waitHit) { _totalHitLocal++; _seqTotalHits++; }
             else { _totalMissLocal++; _seqTotalMisses++; }
 
@@ -245,6 +260,16 @@ namespace IronIvy.Gameplay.Rhythm
 
         private void KillTarget() { if (_currentTarget) Destroy(_currentTarget.gameObject); }
         private float BeatDuration() => 60f / Mathf.Max(1f, bpm);
-        private IEnumerator CleanupPlotsRoutine() { yield return new WaitForSeconds(0.25f); if (_seqPlots != null) foreach (var p in _seqPlots) { p?.PlayDisappearVFX(disappearVfxPrefab); p?.Cleanup(); } }
+
+        private IEnumerator CleanupPlotsRoutine()
+        {
+            yield return new WaitForSeconds(0.25f);
+            if (_seqPlots != null)
+                foreach (var p in _seqPlots)
+                {
+                    p?.PlayDisappearVFX(disappearVfxPrefab);
+                    p?.Cleanup();
+                }
+        }
     }
 }

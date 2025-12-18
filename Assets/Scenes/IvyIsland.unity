@@ -467,7 +467,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 546957975}
   m_Father: {fileID: 369943204}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &29158964
@@ -1221,7 +1222,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Hmm, t\u1EB7ng g\xEC \u0111\xE2y ha?"
+  m_text: "\"H\u1ED1i l\u1ED9\" \u0111\u1ED3 \u0103n"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 31f75bd86cf18304d9de20eb51714d8d, type: 2}
   m_sharedMaterial: {fileID: -6860467608867043816, guid: 31f75bd86cf18304d9de20eb51714d8d, type: 2}
@@ -7703,8 +7704,6 @@ Transform:
   - {fileID: 682780276}
   - {fileID: 29158963}
   - {fileID: 1374361984}
-  - {fileID: 776949865}
-  - {fileID: 1695307333}
   - {fileID: 1330785110}
   - {fileID: 938174124}
   - {fileID: 842982696}
@@ -11002,8 +11001,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 546957974}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 81.87502, y: 10.793933, z: -97.94873}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.25805664, y: 4.440843, z: 6.2180557}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -11013,7 +11012,7 @@ Transform:
   - {fileID: 1446677008}
   - {fileID: 2024422875}
   - {fileID: 1247289384}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 29158963}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &548515789
 GameObject:
@@ -16020,37 +16019,6 @@ Transform:
   - {fileID: 1711438288}
   - {fileID: 5320687}
   m_Father: {fileID: 1092140266}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &776949864
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 776949865}
-  m_Layer: 0
-  m_Name: EventBus
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &776949865
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 776949864}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 369943204}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &783468053
 GameObject:
@@ -29178,7 +29146,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "KHO\u1EA2NH KH\u1EAEC QUY\u1EBET \u0110\u1ECANH"
+  m_text: "THU HO\u1EA0CH"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 31f75bd86cf18304d9de20eb51714d8d, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: cda7890e2a8ee8a4088db78f024d6519, type: 2}
@@ -30101,6 +30069,10 @@ MonoBehaviour:
   bpm: 30
   defaultHoldRequiredSeconds: 0.7
   bgmKey: animal_rhythm_bgm
+  hitSfx: {fileID: 8300000, guid: 89d6176ef86364148ac4529ad8bcb494, type: 3}
+  missSfx: {fileID: 8300000, guid: 809268e06b72f094186afdb7cd36d2ef, type: 3}
+  hitSfxVolume: 1
+  missSfxVolume: 1
   logFlow: 1
 --- !u!4 &1289728601 stripped
 Transform:
@@ -38071,7 +38043,7 @@ RectTransform:
   - {fileID: 1218075728}
   - {fileID: 328562657}
   - {fileID: 1495982629}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1695307333}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -39780,11 +39752,14 @@ Transform:
   m_GameObject: {fileID: 1695307332}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 81.61697, y: 6.35309, z: -104.16679}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 369943204}
+  m_Children:
+  - {fileID: 1660676077}
+  - {fileID: 1772204570}
+  - {fileID: 2016871379}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1695307334
 MonoBehaviour:
@@ -44437,17 +44412,17 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1760924200}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 104.16679}
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6658570367047975339}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1695307333}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -81.61697, y: -6.35309}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
 --- !u!224 &1772205924
@@ -50859,17 +50834,17 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2016871375}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 104.16679}
   m_LocalScale: {x: 0.005, y: 0.005, z: 0.005}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 1154692502}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1695307333}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 309.75003, y: 208.62502}
+  m_AnchoredPosition: {x: 228.13306, y: 202.27193}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &2022042486
@@ -56972,9 +56947,13 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 1ff5f45e2a21193488edfe7529b74216, type: 2}
   spawnArea: {fileID: 1523857185}
   targetPrefab: {fileID: 1498861386948161440, guid: 011907322a6fae44c8bdd097d3f2a3bd, type: 3}
-  disappearVfxPrefab: {fileID: 0}
-  bpm: 30
-  delayBetweenPlots: 3
+  disappearVfxPrefab: {fileID: 100018, guid: a40b64bf23366dc42a892af2c6ff6140, type: 3}
+  hitSfx: {fileID: 8300000, guid: 89d6176ef86364148ac4529ad8bcb494, type: 3}
+  missSfx: {fileID: 8300000, guid: 809268e06b72f094186afdb7cd36d2ef, type: 3}
+  hitSfxVolume: 1
+  missSfxVolume: 1
+  bpm: 15
+  delayBetweenPlots: 2
   defaultHoldRequiredSeconds: 0.7
 --- !u!114 &8785595535983932980
 MonoBehaviour:
@@ -57033,13 +57012,10 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 1033634900}
-  - {fileID: 546957975}
   - {fileID: 1148650328}
   - {fileID: 493223563}
   - {fileID: 936658969}
   - {fileID: 565489608}
   - {fileID: 1364288606}
-  - {fileID: 1660676077}
-  - {fileID: 1772204570}
-  - {fileID: 2016871379}
+  - {fileID: 1695307333}
   - {fileID: 694449940}
