@@ -15,9 +15,9 @@ MonoBehaviour:
   id: owl_a
   displayName: "C\xFA"
   icon: {fileID: -2100673098, guid: 7ed772673f6c1d54a81ea30ed5b89299, type: 3}
-  cameraOrbitDistance: 0
+  cameraOrbitDistance: 15
   cameraOrbitHeight: 0
-  cameraLookAtHeight: 0
+  cameraLookAtHeight: 0.5
   cameraOrbitRotateSpeed: 0
   favoriteFood: {fileID: 11400000, guid: e5b41e7a0209d4e41aef6fe16925bb48, type: 2}
   buffSafetyNet: 3
@@ -50,7 +50,9 @@ MonoBehaviour:
   patterns: []
   playbackMode: 1
   useRandomRhythm: 1
-  randomFragments: []
+  randomFragments:
+  - {fileID: 11400000, guid: edd23bf8b315d7e4bb892ac3d144d659, type: 2}
+  - {fileID: 11400000, guid: bb2637d1521d97844a123dd9bded3b8b, type: 2}
   minRandomBeats: 12
   maxRandomBeats: 24
   minRandomFragments: 2

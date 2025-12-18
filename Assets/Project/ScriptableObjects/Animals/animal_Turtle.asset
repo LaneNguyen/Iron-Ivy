@@ -15,7 +15,7 @@ MonoBehaviour:
   id: turtle_a
   displayName: "R\xF9a"
   icon: {fileID: -1048960537, guid: 65e1f9134c8d2674bbadecafced414fb, type: 3}
-  cameraOrbitDistance: 0
+  cameraOrbitDistance: 15
   cameraOrbitHeight: 0
   cameraLookAtHeight: 0
   cameraOrbitRotateSpeed: 0
@@ -49,7 +49,9 @@ MonoBehaviour:
   patterns: []
   playbackMode: 1
   useRandomRhythm: 1
-  randomFragments: []
+  randomFragments:
+  - {fileID: 11400000, guid: edd23bf8b315d7e4bb892ac3d144d659, type: 2}
+  - {fileID: 11400000, guid: bb2637d1521d97844a123dd9bded3b8b, type: 2}
   minRandomBeats: 12
   maxRandomBeats: 24
   minRandomFragments: 2

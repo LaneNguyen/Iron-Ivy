@@ -15,9 +15,9 @@ MonoBehaviour:
   id: zebra_a
   displayName: Zebra
   icon: {fileID: -1382332400, guid: 6006a33d608b9e94fbda69f2ec3b5d61, type: 3}
-  cameraOrbitDistance: 0
-  cameraOrbitHeight: 0
-  cameraLookAtHeight: 0
+  cameraOrbitDistance: 3
+  cameraOrbitHeight: 0.5
+  cameraLookAtHeight: 0.5
   cameraOrbitRotateSpeed: 0
   favoriteFood: {fileID: 11400000, guid: 7dd2cd018801fe04faf983f4df6dc903, type: 2}
   buffSafetyNet: 3
@@ -50,7 +50,9 @@ MonoBehaviour:
   patterns: []
   playbackMode: 1
   useRandomRhythm: 1
-  randomFragments: []
+  randomFragments:
+  - {fileID: 11400000, guid: edd23bf8b315d7e4bb892ac3d144d659, type: 2}
+  - {fileID: 11400000, guid: bb2637d1521d97844a123dd9bded3b8b, type: 2}
   minRandomBeats: 20
   maxRandomBeats: 36
   minRandomFragments: 2

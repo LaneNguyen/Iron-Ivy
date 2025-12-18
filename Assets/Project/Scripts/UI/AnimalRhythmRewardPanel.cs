@@ -53,7 +53,6 @@ namespace IronIvy.UI
             root.SetActive(false);
         }
 
-        // --- FIX: Tự đăng ký lắng nghe sự kiện giống PlantReward ---
         private void OnEnable()
         {
             if (ListenManager.HasInstance)
@@ -70,7 +69,6 @@ namespace IronIvy.UI
         {
             if (payload == null) return;
 
-            // Gọi hàm hiển thị chính với đầy đủ tham số từ payload
             ShowAnimalRhythmResult(
                 payload.animal,
                 payload.successRatio,
@@ -94,10 +92,8 @@ namespace IronIvy.UI
             if (root == null) root = gameObject;
             _currentAnimal = animal;
 
-            // Bật UI
             root.SetActive(true);
 
-            // Cập nhật tên động vật
             if (animalNameText != null && animal != null && animal.Definition != null)
                 animalNameText.text = animal.Definition.displayName;
 
@@ -106,11 +102,9 @@ namespace IronIvy.UI
 
             int percent = Mathf.RoundToInt(successRatio * 100f);
 
-            // Chạy Animation cho Trust và Archive
             if (_trustAnimRoutine != null) StopCoroutine(_trustAnimRoutine);
             _trustAnimRoutine = StartCoroutine(AnimateTrustThenArchive(percent, archiveGained));
 
-            // Xử lý hiển thị phần thưởng (Loot)
             bool hasReward = (lootItem != null && lootCount > 0);
             if (rewardMessageText != null)
                 rewardMessageText.text = hasReward ? hasRewardMessage : noRewardMessage;
@@ -127,7 +121,6 @@ namespace IronIvy.UI
                 }
             }
 
-            // Cập nhật Icon động vật
             if (animalIcon != null)
             {
                 if (animal != null && animal.Definition != null && animal.Definition.icon != null)
@@ -141,7 +134,6 @@ namespace IronIvy.UI
 
         private IEnumerator AnimateTrustThenArchive(int trustPercent, float archiveValue)
         {
-            // Animation Trust
             if (trustText != null)
             {
                 float t = 0f;
@@ -156,7 +148,6 @@ namespace IronIvy.UI
                 trustText.text = trustPercent.ToString() + "%";
             }
 
-            // Animation Archive
             if (archiveGainText != null)
             {
                 if (_archiveAnimRoutine != null) StopCoroutine(_archiveAnimRoutine);
@@ -180,14 +171,16 @@ namespace IronIvy.UI
 
         public void OnConfirmButton()
         {
+            // 1) đóng panel trước
             root.SetActive(false);
 
+            // 2) chỉ lúc này mới despawn + spawn vfx (Success / Despawn) dựa trên trust đã queue
             if (_currentAnimal != null)
-                _currentAnimal.DespawnAfterMinigame();
+                _currentAnimal.ExecuteQueuedDespawnAfterMinigame();
 
             _currentAnimal = null;
 
-            // Quan trọng: Bắn event để hệ thống bật lại nhạc nền môi trường
+            // 3) bắn event để hệ thống bật lại ambience/bgm môi trường
             if (ListenManager.HasInstance)
                 ListenManager.Instance.RaiseRhythmResultClosed();
         }

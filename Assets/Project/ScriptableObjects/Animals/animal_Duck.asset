@@ -15,9 +15,9 @@ MonoBehaviour:
   id: duck_a
   displayName: "V\u1ECBt Baby"
   icon: {fileID: -2119013152, guid: c7466141e66fae54a8e7b6089dae8544, type: 3}
-  cameraOrbitDistance: 2
-  cameraOrbitHeight: -1
-  cameraLookAtHeight: -1
+  cameraOrbitDistance: 15
+  cameraOrbitHeight: 1
+  cameraLookAtHeight: 0.8
   cameraOrbitRotateSpeed: 0
   favoriteFood: {fileID: 11400000, guid: e5b41e7a0209d4e41aef6fe16925bb48, type: 2}
   buffSafetyNet: 3
@@ -52,7 +52,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: bb2637d1521d97844a123dd9bded3b8b, type: 2}
   playbackMode: 1
   useRandomRhythm: 1
-  randomFragments: []
+  randomFragments:
+  - {fileID: 11400000, guid: edd23bf8b315d7e4bb892ac3d144d659, type: 2}
+  - {fileID: 11400000, guid: bb2637d1521d97844a123dd9bded3b8b, type: 2}
   minRandomBeats: 8
   maxRandomBeats: 20
   minRandomFragments: 2

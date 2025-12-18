@@ -48,6 +48,10 @@ namespace IronIvy.Gameplay.Animals
 
         private bool _hasPlayedMinigame;
 
+        // queue despawn until Reward Panel close
+        private bool _queuedMinigameDespawn;
+        private float _queuedMinigameTrust01;
+
         public AnimalSpawnZone CurrentZone { get; private set; }
         public AnimalSpawnZone RootZone { get; private set; }
 
@@ -110,6 +114,9 @@ namespace IronIvy.Gameplay.Animals
         {
             if (_player == null) CachePlayerRef();
 
+            // pooled object -> bật lại phải reset state cũ
+            ResetSpawnRuntimeState();
+
             if (definition != null && CurrentZone == null && RootZone == null)
             {
                 _anchorPosition = transform.position;
@@ -160,6 +167,48 @@ namespace IronIvy.Gameplay.Animals
             HandleCuriousBehaviour();
         }
 
+        // =========================
+        // IMPORTANT: restore old public APIs (UI depends on these)
+        // =========================
+
+        // UIManager needs this (feeding)
+        public bool TryFeed(FoodItem food)
+        {
+            if (food == null) return false;
+
+            if (animator != null && !string.IsNullOrEmpty(eatTrigger))
+                animator.SetTrigger(eatTrigger);
+
+            // nếu sau này em muốn consume food / buff trust thì xử lý ở đây
+            return true;
+        }
+
+        // UI panel + trigger need this (cancel look + unlock)
+        public void CancelLookAtPlayerNow()
+        {
+            // thả lock, stop face coroutine, resume wander
+            SetInteractionLocked(false);
+        }
+
+        // =========================
+
+        // reset all pooling-related flags
+        private void ResetSpawnRuntimeState()
+        {
+            _queuedMinigameDespawn = false;
+            _queuedMinigameTrust01 = 0f;
+
+            // reset minigame "already played" for new spawned instance
+            _hasPlayedMinigame = false;
+
+            // clear locks that might remain from reward flow
+            _interactionLocked = false;
+            StopFacingPlayer();
+            UnlockAgent();
+
+            _curiousSuppressedUntil = 0f;
+        }
+
         public void Init(AnimalDefinition def, AnimalSpawnZone zone, AnimalSpawnZone rootZone)
         {
             if (def != null)
@@ -168,6 +217,9 @@ namespace IronIvy.Gameplay.Animals
             CurrentZone = zone;
             RootZone = rootZone != null ? rootZone : zone;
             _anchorPosition = (zone != null) ? zone.transform.position : transform.position;
+
+            // pooled spawn reset here too
+            ResetSpawnRuntimeState();
 
             SetupAgentFromDefinition();
 
@@ -205,7 +257,12 @@ namespace IronIvy.Gameplay.Animals
             HideInteractionPanelSoft();
             SetHighlighted(false);
 
-            _curiousSuppressedUntil = 0f;
+            _queuedMinigameDespawn = false;
+            _queuedMinigameTrust01 = 0f;
+
+            _interactionLocked = false;
+            StopFacingPlayer();
+            UnlockAgent();
         }
 
         public void SetHighlighted(bool on)
@@ -214,15 +271,119 @@ namespace IronIvy.Gameplay.Animals
                 highlightController.SetHighlight(on);
         }
 
-        public bool TryFeed(FoodItem food)
+        public void OnInteractPressed()
         {
-            if (food == null) return false;
+            if (!enableRhythmMinigame) return;
+            if (_hasPlayedMinigame && oneShotMinigame) return;
 
-            if (animator != null && !string.IsNullOrEmpty(eatTrigger))
-                animator.SetTrigger(eatTrigger);
+            if (!UIManager.HasInstance)
+            {
+                Debug.LogWarning("[AnimalController] UIManager missing, cannot open interaction popup.");
+                return;
+            }
 
-            Debug.Log($"[AnimalController] Fed: {food.displayName}");
-            return true;
+            UIManager.Instance.ShowAnimalInteraction(this);
+        }
+
+        public void SetHighlightState(bool state)
+        {
+            if (_hasPlayedMinigame && oneShotMinigame)
+            {
+                SetHighlighted(false);
+                return;
+            }
+
+            SetHighlighted(state);
+        }
+
+        public void MarkMinigamePlayed()
+        {
+            _hasPlayedMinigame = true;
+
+            if (oneShotMinigame)
+                SetHighlighted(false);
+        }
+
+        // Queue despawn at minigame end (reward panel will execute)
+        public void QueueDespawnAfterMinigame(float trust01)
+        {
+            _queuedMinigameDespawn = true;
+            _queuedMinigameTrust01 = Mathf.Clamp01(trust01);
+
+            SetInteractionLocked(true);
+            SetHighlighted(false);
+
+            if (logVfx && definition != null)
+                Debug.Log($"[AnimalController] QueueDespawnAfterMinigame: {definition.displayName} trust={_queuedMinigameTrust01:0.00} oneShot={oneShotMinigame}");
+        }
+
+        public void ExecuteQueuedDespawnAfterMinigame()
+        {
+            if (!_queuedMinigameDespawn)
+            {
+                SetInteractionLocked(false);
+                return;
+            }
+
+            float trust = _queuedMinigameTrust01;
+            _queuedMinigameDespawn = false;
+
+            if (!oneShotMinigame)
+            {
+                SetInteractionLocked(false);
+                return;
+            }
+
+            HideInteractionPanelSoft();
+            DoDespawnAfterMinigame(trust);
+        }
+
+        // backward compatible
+        public void DespawnAfterMinigame() => DespawnAfterMinigame(-1f);
+
+        public void DespawnAfterMinigame(float trust01)
+        {
+            QueueDespawnAfterMinigame(trust01);
+            ExecuteQueuedDespawnAfterMinigame();
+        }
+
+        private void DoDespawnAfterMinigame(float trust01)
+        {
+            PlayMinigameDespawnVfx(trust01);
+
+            if (AnimalManager.HasInstance)
+                AnimalManager.Instance.DespawnAnimalWithFade(this);
+            else
+                gameObject.SetActive(false);
+        }
+
+        private void PlayMinigameDespawnVfx(float trust01)
+        {
+            if (definition == null) return;
+
+            bool isSuccess = (trust01 >= 0.99f) || (trust01 >= successVfxTrustThreshold);
+
+            GameObject prefab = null;
+            if (isSuccess && definition.successVFX != null) prefab = definition.successVFX;
+            else prefab = definition.despawnVfxPrefab;
+
+            if (prefab == null)
+                return;
+
+            Vector3 pos = transform.position + minigameDespawnVfxOffset;
+            var vfx = Instantiate(prefab, pos, Quaternion.identity);
+
+            if (minigameDespawnVfxLifetime > 0f)
+                Destroy(vfx, minigameDespawnVfxLifetime);
+        }
+
+        private void HideInteractionPanelSoft()
+        {
+            if (!UIManager.HasInstance) return;
+
+            var p = UIManager.Instance.popup != null ? UIManager.Instance.popup.animalInteractionPanel : null;
+            if (p != null && p.gameObject.activeInHierarchy)
+                p.Hide();
         }
 
         private void SetupAnimatorParamHashes()
@@ -288,93 +449,6 @@ namespace IronIvy.Gameplay.Animals
             _ambientSoundRadiusSqr = definition.ambientSoundRadius * definition.ambientSoundRadius;
         }
 
-        private void SetupCuriousState()
-        {
-            _isCurious = false;
-            _state = AnimalState.Wandering;
-            _curiousRadiusSqr = 0f;
-            _nextCuriousCheckTime = 0f;
-            _curiousEndTime = 0f;
-
-            if (definition == null ||
-                definition.curiousRadius <= 0f ||
-                definition.curiousChancePerCheck <= 0f ||
-                definition.curiousCheckInterval <= 0f)
-                return;
-
-            _curiousRadiusSqr = definition.curiousRadius * definition.curiousRadius;
-            _nextCuriousCheckTime = Time.time + Random.Range(0.5f, definition.curiousCheckInterval);
-        }
-
-        private IEnumerator WanderRoutine()
-        {
-            while (true)
-            {
-                if (agent == null || definition == null)
-                {
-                    yield return null;
-                    continue;
-                }
-
-                Vector3 target;
-                if (TryGetRandomPoint(out target))
-                {
-                    if (agent.isOnNavMesh)
-                        agent.SetDestination(target);
-                }
-
-                while (agent != null &&
-                       agent.isOnNavMesh &&
-                       (agent.pathPending || agent.remainingDistance > agent.stoppingDistance + 0.1f))
-                {
-                    yield return null;
-                }
-
-                PlayRandomIdleVariant();
-
-                float wait = Random.Range(definition.minIdleTime, definition.maxIdleTime);
-                yield return new WaitForSeconds(wait);
-            }
-        }
-
-        private bool TryGetRandomPoint(out Vector3 result)
-        {
-            Vector3 center = _anchorPosition;
-            float radius = Mathf.Max(0.1f, definition.wanderRadius);
-
-            for (int i = 0; i < 5; i++)
-            {
-                Vector2 circle = Random.insideUnitCircle * radius;
-                Vector3 candidate = center + new Vector3(circle.x, 0f, circle.y);
-
-                NavMeshHit hit;
-                if (NavMesh.SamplePosition(candidate, out hit, 2f, NavMesh.AllAreas))
-                {
-                    result = hit.position;
-                    return true;
-                }
-            }
-
-            result = center;
-            return false;
-        }
-
-        private void PlayRandomIdleVariant()
-        {
-            if (animator == null) return;
-
-            int roll = Random.Range(0, 3);
-            if (roll == 1 && !string.IsNullOrEmpty(eatTrigger))
-                animator.SetTrigger(eatTrigger);
-            else if (roll == 2 && !string.IsNullOrEmpty(jumpTrigger))
-                animator.SetTrigger(jumpTrigger);
-            else if (!string.IsNullOrEmpty(idleStateName))
-                animator.CrossFadeInFixedTime(idleStateName, 0.1f);
-        }
-
-        // =========================
-        // Ambient: play ngay khi vào range
-        // =========================
         private void HandleAmbientSound()
         {
             if (!_hasAmbientConfig || _player == null || definition == null)
@@ -389,7 +463,6 @@ namespace IronIvy.Gameplay.Animals
                 return;
             }
 
-            // NEW: vừa vào range -> play 1 phát ngay, rồi mới schedule theo interval
             if (!_playerIsNearForAmbient)
             {
                 PlayAmbientClip();
@@ -432,100 +505,22 @@ namespace IronIvy.Gameplay.Animals
                 AudioManager.Instance.PlaySEAtPosition(clip, transform.position);
         }
 
-        public void OnInteractPressed()
+        private void SetupCuriousState()
         {
-            if (!enableRhythmMinigame) return;
-            if (_hasPlayedMinigame && oneShotMinigame) return;
+            _isCurious = false;
+            _state = AnimalState.Wandering;
+            _curiousRadiusSqr = 0f;
+            _nextCuriousCheckTime = 0f;
+            _curiousEndTime = 0f;
 
-            if (!UIManager.HasInstance)
-            {
-                Debug.LogWarning("[AnimalController] UIManager missing, cannot open interaction popup.");
+            if (definition == null ||
+                definition.curiousRadius <= 0f ||
+                definition.curiousChancePerCheck <= 0f ||
+                definition.curiousCheckInterval <= 0f)
                 return;
-            }
 
-            UIManager.Instance.ShowAnimalInteraction(this);
-        }
-
-        public void SetHighlightState(bool state)
-        {
-            if (_hasPlayedMinigame && oneShotMinigame)
-            {
-                SetHighlighted(false);
-                return;
-            }
-
-            SetHighlighted(state);
-        }
-
-        public void MarkMinigamePlayed()
-        {
-            _hasPlayedMinigame = true;
-
-            if (oneShotMinigame)
-                SetHighlighted(false);
-        }
-
-        // backward compatible
-        public void DespawnAfterMinigame()
-        {
-            DespawnAfterMinigame(-1f);
-        }
-
-        public void DespawnAfterMinigame(float trust01)
-        {
-            if (!oneShotMinigame)
-            {
-                HideInteractionPanelSoft();
-                return;
-            }
-
-            HideInteractionPanelSoft();
-
-            PlayMinigameDespawnVfx(trust01);
-
-            if (AnimalManager.HasInstance)
-                AnimalManager.Instance.DespawnAnimalWithFade(this);
-            else
-                gameObject.SetActive(false);
-        }
-
-        private void PlayMinigameDespawnVfx(float trust01)
-        {
-            if (definition == null) return;
-
-            bool isSuccess = (trust01 >= 0.99f) || (trust01 >= successVfxTrustThreshold);
-
-            GameObject prefab = null;
-            if (isSuccess && definition.successVFX != null) prefab = definition.successVFX;
-            else prefab = definition.despawnVfxPrefab;
-
-            if (prefab == null)
-            {
-                if (logVfx)
-                    Debug.Log($"[MinigameDespawnVFX] {definition.displayName} trust={trust01:0.00} prefab=null (success={isSuccess})");
-                return;
-            }
-
-            if (logVfx)
-            {
-                Debug.Log($"[MinigameDespawnVFX] {definition.displayName} trust={trust01:0.00} " +
-                          $"success={isSuccess} usePrefab={prefab.name} oneShot={oneShotMinigame}");
-            }
-
-            Vector3 pos = transform.position + minigameDespawnVfxOffset;
-            var vfx = Instantiate(prefab, pos, Quaternion.identity);
-
-            if (minigameDespawnVfxLifetime > 0f)
-                Destroy(vfx, minigameDespawnVfxLifetime);
-        }
-
-        private void HideInteractionPanelSoft()
-        {
-            if (!UIManager.HasInstance) return;
-
-            var p = UIManager.Instance.popup != null ? UIManager.Instance.popup.animalInteractionPanel : null;
-            if (p != null && p.gameObject.activeInHierarchy)
-                p.Hide();
+            _curiousRadiusSqr = definition.curiousRadius * definition.curiousRadius;
+            _nextCuriousCheckTime = Time.time + Random.Range(0.5f, definition.curiousCheckInterval);
         }
 
         private void HandleCuriousBehaviour()
@@ -603,11 +598,70 @@ namespace IronIvy.Gameplay.Animals
                 _wanderRoutine = StartCoroutine(WanderRoutine());
         }
 
-        private void SuppressCurious(float seconds)
+        private IEnumerator WanderRoutine()
         {
-            if (seconds <= 0f) return;
-            _curiousSuppressedUntil = Mathf.Max(_curiousSuppressedUntil, Time.time + seconds);
-            _isCurious = false;
+            while (true)
+            {
+                if (agent == null || definition == null)
+                {
+                    yield return null;
+                    continue;
+                }
+
+                Vector3 target;
+                if (TryGetRandomPoint(out target))
+                {
+                    if (agent.isOnNavMesh)
+                        agent.SetDestination(target);
+                }
+
+                while (agent != null &&
+                       agent.isOnNavMesh &&
+                       (agent.pathPending || agent.remainingDistance > agent.stoppingDistance + 0.1f))
+                {
+                    yield return null;
+                }
+
+                PlayRandomIdleVariant();
+
+                float wait = Random.Range(definition.minIdleTime, definition.maxIdleTime);
+                yield return new WaitForSeconds(wait);
+            }
+        }
+
+        private bool TryGetRandomPoint(out Vector3 result)
+        {
+            Vector3 center = _anchorPosition;
+            float radius = Mathf.Max(0.1f, definition.wanderRadius);
+
+            for (int i = 0; i < 5; i++)
+            {
+                Vector2 circle = Random.insideUnitCircle * radius;
+                Vector3 candidate = center + new Vector3(circle.x, 0f, circle.y);
+
+                NavMeshHit hit;
+                if (NavMesh.SamplePosition(candidate, out hit, 2f, NavMesh.AllAreas))
+                {
+                    result = hit.position;
+                    return true;
+                }
+            }
+
+            result = center;
+            return false;
+        }
+
+        private void PlayRandomIdleVariant()
+        {
+            if (animator == null) return;
+
+            int roll = Random.Range(0, 3);
+            if (roll == 1 && !string.IsNullOrEmpty(eatTrigger))
+                animator.SetTrigger(eatTrigger);
+            else if (roll == 2 && !string.IsNullOrEmpty(jumpTrigger))
+                animator.SetTrigger(jumpTrigger);
+            else if (!string.IsNullOrEmpty(idleStateName))
+                animator.CrossFadeInFixedTime(idleStateName, 0.1f);
         }
 
         public void SetInteractionLocked(bool locked)
@@ -620,16 +674,16 @@ namespace IronIvy.Gameplay.Animals
                 LockAgent();
                 StartFacingPlayer();
                 StopWanderIfAny();
-                StopCuriousIfAny();
             }
             else
             {
                 StopFacingPlayer();
-                EndCurious();
-                SuppressCurious(suppressCuriousAfterCancel);
-
                 UnlockAgent();
-                ResumeWanderIfAny();
+
+                _curiousSuppressedUntil = Mathf.Max(_curiousSuppressedUntil, Time.time + suppressCuriousAfterCancel);
+
+                if (isActiveAndEnabled && _wanderRoutine == null)
+                    _wanderRoutine = StartCoroutine(WanderRoutine());
             }
         }
 
@@ -658,7 +712,7 @@ namespace IronIvy.Gameplay.Animals
             if (agent == null) return;
             if (!_agentWasEnabled) return;
 
-            agent.speed = _agentSpeed;
+            agent.speed = _agentSpeed <= 0f ? agent.speed : _agentSpeed;
             agent.isStopped = _agentWasStopped;
         }
 
@@ -714,25 +768,6 @@ namespace IronIvy.Gameplay.Animals
                 StopCoroutine(_wanderRoutine);
                 _wanderRoutine = null;
             }
-        }
-
-        private void ResumeWanderIfAny()
-        {
-            if (isActiveAndEnabled && _wanderRoutine == null)
-                _wanderRoutine = StartCoroutine(WanderRoutine());
-        }
-
-        private void StopCuriousIfAny()
-        {
-            _isCurious = false;
-        }
-
-        public void CancelLookAtPlayerNow()
-        {
-            StopFacingPlayer();
-            EndCurious();
-            SuppressCurious(suppressCuriousAfterCancel);
-            ResumeWanderIfAny();
         }
     }
 }

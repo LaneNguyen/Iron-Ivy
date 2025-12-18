@@ -15,9 +15,9 @@ MonoBehaviour:
   id: rabbit_a
   displayName: "Th\u1ECF"
   icon: {fileID: 951384075, guid: d7af28942b656584ab2046b7c656e39c, type: 3}
-  cameraOrbitDistance: 0
-  cameraOrbitHeight: 0
-  cameraLookAtHeight: 0
+  cameraOrbitDistance: 15
+  cameraOrbitHeight: 2
+  cameraLookAtHeight: 0.7
   cameraOrbitRotateSpeed: 0
   favoriteFood: {fileID: 11400000, guid: b5fcee1560a837e4ab047aec13f3ab3d, type: 2}
   buffSafetyNet: 3
@@ -50,7 +50,9 @@ MonoBehaviour:
   patterns: []
   playbackMode: 1
   useRandomRhythm: 1
-  randomFragments: []
+  randomFragments:
+  - {fileID: 11400000, guid: edd23bf8b315d7e4bb892ac3d144d659, type: 2}
+  - {fileID: 11400000, guid: bb2637d1521d97844a123dd9bded3b8b, type: 2}
   minRandomBeats: 12
   maxRandomBeats: 24
   minRandomFragments: 2

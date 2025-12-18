@@ -37,7 +37,7 @@ namespace IronIvy.Gameplay.Rhythm
         [Range(0f, 1f)] public float missSfxVolume = 1f;
 
         [Header("Debug")]
-        public bool logFlow = true;
+        public bool logFlow = false;
 
         public bool IsRunning { get; private set; }
 
@@ -126,9 +126,7 @@ namespace IronIvy.Gameplay.Rhythm
             _totalMiss = 0;
             _trust01 = 0f;
 
-            bool isRandomMode = false;
-            if (animalDef != null && animalDef.useRandomRhythm)
-                isRandomMode = true;
+            bool isRandomMode = (animalDef != null && animalDef.useRandomRhythm);
 
             if (ListenManager.HasInstance)
             {
@@ -150,7 +148,6 @@ namespace IronIvy.Gameplay.Rhythm
             if (CameraManager.HasInstance)
                 CameraManager.Instance.ApplyAnimalMinigameProfile(_currentFocus);
 
-            // NEW: BGM theo AnimalDefinition (nếu có)
             if (AudioManager.HasInstance)
             {
                 if (animalDef != null && animalDef.minigameMusicLoop != null)
@@ -213,8 +210,8 @@ namespace IronIvy.Gameplay.Rhythm
             {
                 _currentAnimal.MarkMinigamePlayed();
 
-                // IMPORTANT: truyền trust cho SuccessVFX logic
-                _currentAnimal.DespawnAfterMinigame(successRatio);
+                // IMPORTANT: chỉ queue, KHÔNG despawn ngay
+                _currentAnimal.QueueDespawnAfterMinigame(successRatio);
             }
 
             _currentAnimal = null;
@@ -254,9 +251,6 @@ namespace IronIvy.Gameplay.Rhythm
             _activeStepIndexSnapshot = _currentStepIndex;
             _activeBeatIndexSnapshot = _globalScorableBeatIndex;
 
-            if (logFlow)
-                Debug.Log($"[AnimalRhythm] SpawnTarget beatIndex={_activeBeatIndexSnapshot} stepIndex={_activeStepIndexSnapshot} type={_activeStepType} isHold={_activeIsHold} beatsLeftInStep={_beatsLeftInStep}");
-
             if (step.type == RhythmPattern.StepType.Rest)
             {
                 KillTarget();
@@ -291,7 +285,6 @@ namespace IronIvy.Gameplay.Rhythm
         {
             if (targetPrefab == null || spawnArea == null)
             {
-                if (logFlow) Debug.LogWarning("[AnimalRhythm] targetPrefab/spawnArea missing -> skip beat");
                 AdvanceAfterResolve(scored: false);
                 StartNextBeat();
                 return;
@@ -328,9 +321,6 @@ namespace IronIvy.Gameplay.Rhythm
 
         private void OnTargetResolved(bool hit)
         {
-            if (logFlow)
-                Debug.Log($"[AnimalRhythm] TargetResolved stepIndex={_activeStepIndexSnapshot} type={_activeStepType} hit={hit}");
-
             ResolveBeat(hit);
         }
 
@@ -436,20 +426,19 @@ namespace IronIvy.Gameplay.Rhythm
         {
             outList.Clear();
 
-            var animalDef = _currentAnimal != null ? _currentAnimal.Definition : null;
+            AnimalDefinition def = _currentAnimal != null ? _currentAnimal.Definition : null;
             bool added = false;
 
-            if (animalDef != null)
+            if (def != null)
             {
-                if (animalDef.useRandomRhythm)
+                if (def.useRandomRhythm)
                 {
-                    added = BuildRandomPlaylistForAnimal(animalDef, outList);
-                    if (!added)
-                        added = BuildFixedPlaylistForAnimal(animalDef, outList);
+                    // IMPORTANT: random OK thì không cần patterns manual nữa
+                    added = BuildRandomPlaylistForAnimal(def, outList);
                 }
                 else
                 {
-                    added = BuildFixedPlaylistForAnimal(animalDef, outList);
+                    added = BuildFixedPlaylistForAnimal(def, outList);
                 }
             }
 
@@ -491,7 +480,10 @@ namespace IronIvy.Gameplay.Rhythm
                 var pat = pool[i];
                 if (pat == null) continue;
                 if (pat.sequence == null || pat.sequence.Length == 0) continue;
-                if (CountBeatsInPattern(pat) <= 0) continue;
+
+                // FIX: đừng dùng GetTotalBeats() vì hay ra 0 khi beats=0
+                if (CountScorableBeatsInPattern(pat) <= 0) continue;
+
                 fragmentPool.Add(pat);
             }
 
@@ -553,8 +545,20 @@ namespace IronIvy.Gameplay.Rhythm
 
         private int CountBeatsInPattern(RhythmPattern pattern)
         {
-            if (pattern == null) return 0;
-            return pattern.GetTotalBeats();
+            if (pattern == null || pattern.sequence == null) return 0;
+
+            // FIX: beats=0 coi như 1 beat, để randomFragments không bị coi "invalid"
+            int total = 0;
+            var seq = pattern.sequence;
+
+            for (int i = 0; i < seq.Length; i++)
+            {
+                int beats = seq[i].beats;
+                if (beats <= 0) beats = 1;
+                total += beats;
+            }
+
+            return total;
         }
 
         private int CountScorableBeatsInPattern(RhythmPattern pattern)

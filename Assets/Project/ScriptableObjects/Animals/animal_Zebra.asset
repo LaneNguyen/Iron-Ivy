@@ -15,9 +15,9 @@ MonoBehaviour:
   id: zebra_a
   displayName: "Ng\u1EF1a V\u1EB1n"
   icon: {fileID: -670004251, guid: 49c4bbe67396ae143bd5a7383b9cf498, type: 3}
-  cameraOrbitDistance: 0
+  cameraOrbitDistance: 15
   cameraOrbitHeight: 0
-  cameraLookAtHeight: 0
+  cameraLookAtHeight: 2
   cameraOrbitRotateSpeed: 0
   favoriteFood: {fileID: 11400000, guid: 00e9e275c37774f4abe494bf5a3f27d9, type: 2}
   buffSafetyNet: 3
@@ -50,7 +50,9 @@ MonoBehaviour:
   patterns: []
   playbackMode: 1
   useRandomRhythm: 1
-  randomFragments: []
+  randomFragments:
+  - {fileID: 11400000, guid: edd23bf8b315d7e4bb892ac3d144d659, type: 2}
+  - {fileID: 11400000, guid: bb2637d1521d97844a123dd9bded3b8b, type: 2}
   minRandomBeats: 16
   maxRandomBeats: 30
   minRandomFragments: 2

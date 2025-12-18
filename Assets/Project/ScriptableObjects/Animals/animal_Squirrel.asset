@@ -53,7 +53,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: bb2637d1521d97844a123dd9bded3b8b, type: 2}
   playbackMode: 1
   useRandomRhythm: 1
-  randomFragments: []
+  randomFragments:
+  - {fileID: 11400000, guid: edd23bf8b315d7e4bb892ac3d144d659, type: 2}
+  - {fileID: 11400000, guid: bb2637d1521d97844a123dd9bded3b8b, type: 2}
   minRandomBeats: 10
   maxRandomBeats: 20
   minRandomFragments: 2

@@ -758,6 +758,7 @@ GameObject:
   - component: {fileID: 6615752863136721970}
   - component: {fileID: 4000910892301266890}
   - component: {fileID: 5967521254376465178}
+  - component: {fileID: 3620310588872192955}
   m_Layer: 0
   m_Name: RabbitA
   m_TagString: Animal
@@ -951,9 +952,30 @@ MonoBehaviour:
   outlineWidthProperty: _Outline_Width
   outlineColorProperty: _Outline_Color
   offWidth: 0
-  onWidth: 0.2
+  onWidth: 0.4
   changeColorOnHighlight: 1
   highlightColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+--- !u!65 &3620310588872192955
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5758860269565473864}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.8, y: 1, z: 1.8}
+  m_Center: {x: 0, y: 0.25, z: 0}
 --- !u!1 &6809555506353463930
 GameObject:
   m_ObjectHideFlags: 0

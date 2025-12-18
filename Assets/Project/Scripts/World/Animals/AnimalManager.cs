@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using IronIvy.Data;
@@ -8,7 +9,6 @@ namespace IronIvy.Core
 {
     public class AnimalManager : BaseManager<AnimalManager>
     {
-        // Legacy encounter giu nguyen...
         [Header("Legacy encounter (zone1/zone2)")]
         public List<AnimalDefinition> zone1Animals = new List<AnimalDefinition>();
         public List<AnimalDefinition> zone2Animals = new List<AnimalDefinition>();
@@ -36,7 +36,7 @@ namespace IronIvy.Core
         [System.Serializable]
         public class ZoneSpawnConfig
         {
-            public AnimalSpawnZone zone;   // co the la SingleZone hoac ParentGroup
+            public AnimalSpawnZone zone;
             public int maxAnimalsInZone = 5;
             public AnimalSpawnEntry[] animals;
         }
@@ -54,6 +54,17 @@ namespace IronIvy.Core
         public float despawnRadius = 40f;
         public float spawnCheckInterval = 2f;
 
+        [Header("Spawn sanity")]
+        [Tooltip("Không spawn animal quá gần player (đỡ xuất hiện ngay dưới chân).")]
+        public float spawnMinDistanceFromPlayer = 10f;
+
+        [Tooltip("Số lần thử random điểm spawn trong zone để tìm điểm đủ xa player.")]
+        public int spawnPickTries = 12;
+
+        [Header("Despawn Fade Fallback (when no AnimalVisibilityController)")]
+        public float fallbackFadeDuration = 0.35f;
+        [Range(0.5f, 1f)] public float fallbackEndScale = 0.85f;
+
         private readonly Dictionary<AnimalDefinition, Queue<AnimalController>> _pools =
             new Dictionary<AnimalDefinition, Queue<AnimalController>>();
 
@@ -63,6 +74,9 @@ namespace IronIvy.Core
         private readonly List<AnimalController> _activeAnimals =
             new List<AnimalController>();
 
+        private readonly HashSet<AnimalController> _despawning =
+            new HashSet<AnimalController>();
+
         private float _checkTimer;
         private bool _initialized;
 
@@ -70,7 +84,6 @@ namespace IronIvy.Core
         {
             InitIfNeeded();
 
-            // Đã đổi EventBus -> ListenManager
             if (ListenManager.HasInstance)
             {
                 ListenManager.Instance.OnDayEnded += HandleDayEnded;
@@ -84,7 +97,6 @@ namespace IronIvy.Core
 
         private void OnDisable()
         {
-            // Đã đổi EventBus -> ListenManager
             if (ListenManager.HasInstance)
             {
                 ListenManager.Instance.OnDayEnded -= HandleDayEnded;
@@ -110,12 +122,10 @@ namespace IronIvy.Core
             {
                 if (def == null) continue;
 
-                // chi tao queue rong, khong Instantiate o day
                 _pools[def] = new Queue<Gameplay.Animals.AnimalController>();
                 _activeCountPerDefinition[def] = 0;
             }
         }
-
 
         private void Update()
         {
@@ -137,7 +147,6 @@ namespace IronIvy.Core
             {
                 if (config == null || config.zone == null) continue;
 
-                // dung ham cua zone de tinh khoang cach
                 float dist = config.zone.GetDistanceTo(playerTransform);
 
                 if (dist <= spawnCheckRadius)
@@ -151,13 +160,11 @@ namespace IronIvy.Core
             }
         }
 
-
         private void TrySpawnInZone(ZoneSpawnConfig config)
         {
             var rootZone = config.zone;
             if (rootZone == null) return;
 
-            // dem so con cua ca nhom (neu la parent) hoac 1 zone don
             if (rootZone.currentCount >= config.maxAnimalsInZone) return;
             if (_activeAnimals.Count >= maxTotalAnimals) return;
 
@@ -167,19 +174,17 @@ namespace IronIvy.Core
             AnimalDefinition chosenDef = RollAnimalDefinition(candidates);
             if (chosenDef == null) return;
 
-            // chon zone con neu root la ParentGroup
             AnimalSpawnZone spawnZone = rootZone.GetRandomConcreteZone();
             if (spawnZone == null) spawnZone = rootZone;
 
-            Vector3 spawnPos = spawnZone.GetRandomPointInside();
-            NavMeshHit hit;
-            if (NavMesh.SamplePosition(spawnPos, out hit, 2f, NavMesh.AllAreas))
+            // NEW: pick spawn pos that is not too close to player
+            if (!TryPickSpawnPositionAvoidPlayer(spawnZone, out Vector3 spawnPos))
             {
-                spawnPos = hit.position;
+                // không tìm được điểm hợp lệ -> skip lần này
+                return;
             }
 
             var controller = GetFromPool(chosenDef, spawnPos, spawnZone, rootZone);
-
             if (controller == null) return;
 
             rootZone.currentCount++;
@@ -189,6 +194,39 @@ namespace IronIvy.Core
             _activeCountPerDefinition[chosenDef] = count + 1;
 
             _activeAnimals.Add(controller);
+        }
+
+        private bool TryPickSpawnPositionAvoidPlayer(AnimalSpawnZone spawnZone, out Vector3 finalPos)
+        {
+            finalPos = spawnZone.transform.position;
+
+            float minDist = Mathf.Max(0f, spawnMinDistanceFromPlayer);
+            float minDistSqr = minDist * minDist;
+
+            Vector3 playerPos = playerTransform != null ? playerTransform.position : Vector3.positiveInfinity;
+
+            for (int i = 0; i < Mathf.Max(1, spawnPickTries); i++)
+            {
+                Vector3 p = spawnZone.GetRandomPointInside();
+
+                // if too close, try again
+                if (playerTransform != null)
+                {
+                    Vector3 d = p - playerPos;
+                    d.y = 0f;
+                    if (d.sqrMagnitude < minDistSqr)
+                        continue;
+                }
+
+                // snap to navmesh
+                if (NavMesh.SamplePosition(p, out NavMeshHit hit, 2f, NavMesh.AllAreas))
+                {
+                    finalPos = hit.position;
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private List<AnimalSpawnEntry> GetSpawnableEntries(AnimalSpawnEntry[] entries)
@@ -218,9 +256,7 @@ namespace IronIvy.Core
 
             float totalWeight = 0f;
             for (int i = 0; i < candidates.Count; i++)
-            {
                 totalWeight += Mathf.Max(0.01f, candidates[i].weight);
-            }
 
             float r = Random.value * totalWeight;
             float acc = 0f;
@@ -229,23 +265,20 @@ namespace IronIvy.Core
             {
                 acc += Mathf.Max(0.01f, candidates[i].weight);
                 if (r <= acc)
-                {
                     return candidates[i].definition;
-                }
             }
 
             return candidates[Random.Range(0, candidates.Count)].definition;
         }
 
         private Gameplay.Animals.AnimalController GetFromPool(
-    AnimalDefinition def,
-    Vector3 position,
-    Gameplay.Animals.AnimalSpawnZone spawnZone,
-    Gameplay.Animals.AnimalSpawnZone rootZone)
+            AnimalDefinition def,
+            Vector3 position,
+            Gameplay.Animals.AnimalSpawnZone spawnZone,
+            Gameplay.Animals.AnimalSpawnZone rootZone)
         {
             if (def == null) return null;
 
-            // lay queue cho loai nay
             if (!_pools.TryGetValue(def, out var queue))
             {
                 queue = new Queue<Gameplay.Animals.AnimalController>();
@@ -257,12 +290,10 @@ namespace IronIvy.Core
 
             if (queue.Count > 0)
             {
-                // lay tu pool co san
                 ctrl = queue.Dequeue();
             }
             else
             {
-                // LAN ĐẦU TIÊN: tao object NGAY TAI spawn position
                 if (def.prefab == null)
                 {
                     Debug.LogWarning($"AnimalManager: prefab null tren AnimalDefinition {def.id}");
@@ -272,35 +303,28 @@ namespace IronIvy.Core
                 var obj = Instantiate(def.prefab, position, Quaternion.identity);
                 ctrl = obj.GetComponent<Gameplay.Animals.AnimalController>();
                 if (ctrl == null)
-                {
                     ctrl = obj.AddComponent<Gameplay.Animals.AnimalController>();
-                }
             }
 
             var go = ctrl.gameObject;
-
-            // set pos truoc, cho chac
             go.transform.position = position;
             go.transform.rotation = Quaternion.identity;
+
+            // IMPORTANT: clear despawning marker if any, before enabling again
+            _despawning.Remove(ctrl);
+
             go.SetActive(true);
 
-            // init zone + wander
+            // IMPORTANT: Init resets pooled states now
             ctrl.Init(def, spawnZone, rootZone);
 
-            // EP agent warp ve dung vi tri spawn (de no nap len NavMesh ngay tai day)
             var agent = go.GetComponent<UnityEngine.AI.NavMeshAgent>();
             if (agent != null)
-            {
-                // Warp se co gang tim NavMesh gan nhat quanh "position"
                 agent.Warp(position);
-            }
 
-            // vfx spawn neu co
             var visibility = ctrl.Visibility;
             if (visibility != null)
-            {
                 visibility.PlaySpawnVFX();
-            }
 
             return ctrl;
         }
@@ -313,22 +337,20 @@ namespace IronIvy.Core
             {
                 var ctrl = _activeAnimals[i];
                 if (ctrl != null && ctrl.RootZone == zone)
-                {
                     DespawnAnimalWithFade(ctrl);
-                }
             }
         }
 
-        // Despawn 1 con animal:
-        // - dùng khi: ra khỏi zone, hết ngày, HOẶC kết thúc minigame one-shot (AnimalController.DespawnAfterMinigame gọi qua)
         public void DespawnAnimalWithFade(AnimalController controller)
         {
             if (controller == null) return;
+            if (_despawning.Contains(controller)) return;
+
+            _despawning.Add(controller);
 
             var visibility = controller.Visibility;
             if (visibility != null)
             {
-                // cho visibility lo VFX + fade, xong mới thật sự disable + trả về pool
                 visibility.PlayDespawnVFXAndFadeOut(() =>
                 {
                     InternalDespawn(controller);
@@ -336,9 +358,70 @@ namespace IronIvy.Core
             }
             else
             {
-                // fallback: không có visibility thì despawn thẳng
-                InternalDespawn(controller);
+                StartCoroutine(FallbackFadeOutThenDespawn(controller));
             }
+        }
+
+        private IEnumerator FallbackFadeOutThenDespawn(AnimalController controller)
+        {
+            if (controller == null) yield break;
+
+            var go = controller.gameObject;
+            if (go == null) yield break;
+
+            float dur = Mathf.Max(0.05f, fallbackFadeDuration);
+
+            Vector3 startScale = go.transform.localScale;
+            Vector3 endScale = startScale * Mathf.Clamp(fallbackEndScale, 0.5f, 1f);
+
+            var renderers = go.GetComponentsInChildren<Renderer>(true);
+
+            var mats = new List<Material>();
+            var matBaseColors = new List<Color>();
+
+            for (int i = 0; i < renderers.Length; i++)
+            {
+                var r = renderers[i];
+                if (r == null) continue;
+
+                var shared = r.materials;
+                for (int m = 0; m < shared.Length; m++)
+                {
+                    var mat = shared[m];
+                    if (mat == null) continue;
+
+                    if (mat.HasProperty("_Color"))
+                    {
+                        mats.Add(mat);
+                        matBaseColors.Add(mat.color);
+                    }
+                }
+            }
+
+            float t = 0f;
+            while (t < dur)
+            {
+                t += Time.deltaTime;
+                float p = Mathf.Clamp01(t / dur);
+
+                go.transform.localScale = Vector3.Lerp(startScale, endScale, p);
+
+                for (int i = 0; i < mats.Count; i++)
+                {
+                    var c = matBaseColors[i];
+                    c.a = Mathf.Lerp(matBaseColors[i].a, 0f, p);
+                    mats[i].color = c;
+                }
+
+                yield return null;
+            }
+
+            go.transform.localScale = startScale;
+
+            for (int i = 0; i < mats.Count; i++)
+                mats[i].color = matBaseColors[i];
+
+            InternalDespawn(controller);
         }
 
         private void InternalDespawn(AnimalController controller)
@@ -348,30 +431,22 @@ namespace IronIvy.Core
             var def = controller.Definition;
             var rootZone = controller.RootZone;
 
-            // cho con thú tự clear state (wander, anim, v.v.)
             controller.OnDespawn();
-
-            // tắt object, để AnimalManager & pool quản lý
             controller.gameObject.SetActive(false);
 
-            // bỏ khỏi list đang active
             _activeAnimals.Remove(controller);
+            _despawning.Remove(controller);
 
-            // trừ count trong zone (để sau này spawn con khác được)
             if (rootZone != null)
-            {
                 rootZone.currentCount = Mathf.Max(0, rootZone.currentCount - 1);
-            }
 
-            // trừ count theo definition + trả về pool
             if (def != null)
             {
                 int count;
                 _activeCountPerDefinition.TryGetValue(def, out count);
                 _activeCountPerDefinition[def] = Mathf.Max(0, count - 1);
 
-                Queue<AnimalController> queue;
-                if (!_pools.TryGetValue(def, out queue))
+                if (!_pools.TryGetValue(def, out var queue))
                 {
                     queue = new Queue<AnimalController>();
                     _pools[def] = queue;
@@ -387,9 +462,7 @@ namespace IronIvy.Core
             {
                 var ctrl = _activeAnimals[i];
                 if (ctrl != null)
-                {
                     DespawnAnimalWithFade(ctrl);
-                }
             }
         }
     }

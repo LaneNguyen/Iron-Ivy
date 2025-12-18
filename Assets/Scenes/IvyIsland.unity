@@ -11355,6 +11355,7 @@ MonoBehaviour:
   animalToLock: {fileID: 0}
   ignoreExitWhileInteracting: 1
   disableTriggerColliderWhileInteracting: 1
+  interactionTriggerCollider: {fileID: 0}
   interactCooldown: 0.35
   debugLog: 0
 --- !u!1 &565407311
@@ -27415,6 +27416,7 @@ MonoBehaviour:
   animalToLock: {fileID: 0}
   ignoreExitWhileInteracting: 1
   disableTriggerColliderWhileInteracting: 1
+  interactionTriggerCollider: {fileID: 0}
   interactCooldown: 0.35
   debugLog: 0
 --- !u!1001 &1163065303
@@ -33140,9 +33142,13 @@ MonoBehaviour:
   maxTotalAnimals: 15
   initialPoolPerAnimal: 4
   playerTransform: {fileID: 1289728601}
-  spawnCheckRadius: 35
-  despawnRadius: 30
+  spawnCheckRadius: 50
+  despawnRadius: 50
   spawnCheckInterval: 1
+  spawnMinDistanceFromPlayer: 10
+  spawnPickTries: 12
+  fallbackFadeDuration: 0.35
+  fallbackEndScale: 0.85
 --- !u!1 &1443744285
 GameObject:
   m_ObjectHideFlags: 0
