@@ -175,6 +175,7 @@ SkinnedMeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   serializedVersion: 2
   m_Quality: 0
   m_UpdateWhenOffscreen: 0
@@ -615,13 +616,13 @@ MonoBehaviour:
   visibility: {fileID: 0}
   highlightController: {fileID: 8501110815201736334}
   enableRhythmMinigame: 1
-  animalMinigame: {fileID: 0}
-  interactionPanel: {fileID: 0}
   oneShotMinigame: 1
   speedParam: speed
   idleStateName: idle
   eatTrigger: eat
   jumpTrigger: jump
+  faceTurnSpeed: 720
+  faceOnlyYaw: 1
 --- !u!114 &8501110815201736334
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -688,6 +689,12 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  animalToLock: {fileID: 0}
+  ignoreExitWhileInteracting: 1
+  disableTriggerColliderWhileInteracting: 1
+  interactCooldown: 0.25
+  debugLog: 0
+  debugUpdateInterval: 0.25
 --- !u!65 &6377033508812778218
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -707,7 +714,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.5, y: 0.5, z: 1.5}
+  m_Size: {x: 1.5, y: 0.97, z: 1.5}
   m_Center: {x: 0, y: 0.25, z: 0}
 --- !u!1 &1361128340010409284
 GameObject:

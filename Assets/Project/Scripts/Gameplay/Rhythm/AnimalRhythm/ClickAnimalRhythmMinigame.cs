@@ -1,12 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using IronIvy.Core;
 using IronIvy.Data;
-using IronIvy.UI;
-using IronIvy.Interfaces;
 using IronIvy.Gameplay.Animals;
+using IronIvy.Interfaces;
 using IronIvy.Systems.Camera;
+using UnityEngine;
 
 namespace IronIvy.Gameplay.Rhythm
 {
@@ -15,13 +14,10 @@ namespace IronIvy.Gameplay.Rhythm
         [Header("Root / Focus")]
         public Transform defaultRoot;
 
-        [Header("UI & Target")]
-        public RhythmHUD hud;
-        public RectTransform spawnArea;
+        [Header("Target")]
+        [Tooltip("Runtime injected from UIManager.Notify.rhythmSpawnArea")]
+        [SerializeField] private RectTransform spawnArea;
         public RhythmClickTarget targetPrefab;
-
-        [Header("Reward Panel")]
-        public AnimalRhythmRewardPanel rewardPanel;
 
         [Header("Playlist / Pattern")]
         public List<RhythmPattern> fallbackPlaylist = new List<RhythmPattern>();
@@ -34,41 +30,49 @@ namespace IronIvy.Gameplay.Rhythm
         [Header("BGM")]
         public string bgmKey = "animal_rhythm_bgm";
 
-        // Runtime state
+        [Header("Debug")]
+        public bool logFlow = true;
+
         public bool IsRunning { get; private set; }
 
         private AnimalController _currentAnimal;
         private Transform _currentFocus;
 
-        // buff / safety net
         private bool _hasFavoriteBuff;
         private int _safetyNetRemains;
 
         private readonly List<RhythmPattern> _playlist = new List<RhythmPattern>();
-        private RhythmPattern _currentPattern;
         private int _playlistIndex;
+        private RhythmPattern _currentPattern;
+
         private int _currentStepIndex;
         private int _beatsLeftInStep;
-        private int _globalBeatIndex;
+        private int _globalScorableBeatIndex;     // scorable beats only (Tap/Hold)
+
         private int _totalBeatsForProgress;
-        private int _totalBeatsForTimeline;   // tổng beat dùng cho thanh timeline liên tục
+        private int _totalBeatsForTimeline;
 
         private RhythmClickTarget _currentTarget;
         private Coroutine _restCoroutine;
         private float _currentBeatDuration;
         private RhythmPattern _runtimeRestPattern;
+
         private int _totalHit;
         private int _totalMiss;
-
-        // trust visual 0–1 cho HUD + dùng luôn làm successRatio
         private float _trust01;
 
-        private void Awake()
+        // active beat snapshot (IMPORTANT FIX)
+        private RhythmPattern.StepType _activeStepType;
+        private bool _activeIsScorable;
+        private bool _activeIsHold;
+        private int _activeStepIndexSnapshot;
+        private int _activeBeatIndexSnapshot;
+
+        public void SetSpawnArea(RectTransform area)
         {
-            if (hud != null) hud.ResetHUD();
+            spawnArea = area;
         }
 
-        // ===== PUBLIC API =====
         public void RequestPlay(AnimalController animal, bool isFavoriteBuff = false)
         {
             _currentAnimal = animal;
@@ -76,48 +80,41 @@ namespace IronIvy.Gameplay.Rhythm
 
             _hasFavoriteBuff = isFavoriteBuff;
 
-            int baseSafety = 0;
+            int baseSafety = 3;
             if (animal != null && animal.Definition != null)
                 baseSafety = animal.Definition.buffSafetyNet;
-            else
-                baseSafety = 3; // fallback
 
             _safetyNetRemains = _hasFavoriteBuff ? baseSafety : 0;
 
-            Debug.Log($"[AnimalRhythm] Start. Buff: {_hasFavoriteBuff}. SafetyNet: {_safetyNetRemains}");
             StartGame();
         }
 
         public void StartGame()
         {
             if (IsRunning) return;
+
             if (_currentFocus == null)
                 _currentFocus = defaultRoot != null ? defaultRoot : transform;
 
             BuildPlaylist(_playlist);
             if (_playlist.Count == 0) return;
 
-            // tổng beat dùng cho progress & trust (chỉ Tap/Hold)
             _totalBeatsForProgress = 0;
             foreach (var pat in _playlist)
                 _totalBeatsForProgress += CountScorableBeatsInPattern(pat);
 
-            // tổng beat timeline: tính cả Rest vì Rest cũng chiếm thời gian
             _totalBeatsForTimeline = 0;
             foreach (var pat in _playlist)
                 _totalBeatsForTimeline += CountBeatsInPattern(pat);
 
             if (_totalBeatsForTimeline <= 0)
-            {
-                // fallback nhẹ nếu pattern có vấn đề
-                _totalBeatsForTimeline = (_totalBeatsForProgress > 0) ? _totalBeatsForProgress : 1;
-            }
+                _totalBeatsForTimeline = Mathf.Max(1, _totalBeatsForProgress);
 
             _playlistIndex = 0;
             _currentPattern = null;
             _currentStepIndex = 0;
             _beatsLeftInStep = 0;
-            _globalBeatIndex = 0;
+            _globalScorableBeatIndex = 0;
             _currentBeatDuration = BeatDuration;
 
             _totalHit = 0;
@@ -129,38 +126,21 @@ namespace IronIvy.Gameplay.Rhythm
             if (def != null && def.useRandomRhythm)
                 isRandomMode = true;
 
-            if (hud != null)
+            if (ListenManager.HasInstance)
             {
-                if (hud.hudRoot != null) hud.hudRoot.SetActive(true);
+                string title = (def != null) ? def.displayName : "Animal Rhythm";
+                if (isRandomMode) title += " [Mix]";
+                if (_hasFavoriteBuff) title += " <color=green>[Protected]</color>";
 
-                string title = (_currentAnimal != null && def != null)
-                    ? def.displayName
-                    : "Animal Rhythm";
-
-                // tag nhỏ cho random mix cho dễ debug
-                if (isRandomMode)
-                    title += " [Mix]";
-
-                // hiện label nếu có buff
-                if (_hasFavoriteBuff)
-                    title += " <color=green>[Protected]</color>";
-
-                if (hud.titleText != null)
-                    hud.titleText.text = title;
-
-                hud.SetStatus("Sẵn sàng", false);
-                hud.SetProgress(0f);
-                hud.SetHitMiss(0, 0);
-                hud.SetHoldVisual(0f);
-                hud.SetTrust01(0f);
-
-                // bật mode timeline: thanh chạy liên tục từ 0 -> 1 theo tổng beat * BeatDuration
-                if (_totalBeatsForTimeline > 0)
-                {
-                    hud.useTimelineProgress = true;
-                    hud.ConfigureTimelineByBeats(_totalBeatsForTimeline, BeatDuration);
-                    hud.StartTimeline();
-                }
+                ListenManager.Instance.RaiseRhythmHUDShow(
+                    new ListenManager.RhythmHUDShowPayload(
+                        title,
+                        false,
+                        _totalBeatsForTimeline,
+                        BeatDuration,
+                        true
+                    )
+                );
             }
 
             if (CameraManager.HasInstance)
@@ -169,10 +149,8 @@ namespace IronIvy.Gameplay.Rhythm
             if (AudioManager.HasInstance && !string.IsNullOrEmpty(bgmKey))
                 AudioManager.Instance.PlayBGM(bgmKey);
 
-            if (ListenManager.HasInstance)
-                ListenManager.Instance.RaiseMinigameStarted();
-
             IsRunning = true;
+
             SetupPattern(_playlist[_playlistIndex]);
             StartNextBeat();
         }
@@ -182,11 +160,7 @@ namespace IronIvy.Gameplay.Rhythm
             if (!IsRunning) return;
             IsRunning = false;
 
-            if (_currentTarget != null)
-            {
-                Destroy(_currentTarget.gameObject);
-                _currentTarget = null;
-            }
+            KillTarget();
 
             if (_restCoroutine != null)
             {
@@ -200,45 +174,264 @@ namespace IronIvy.Gameplay.Rhythm
             if (CameraManager.HasInstance)
                 CameraManager.Instance.RestoreMinigameCamera();
 
-            if (hud != null)
-            {
-                hud.StopTimeline(); // dừng thanh timeline
-                hud.UpdateHitMiss(_totalHit, _totalMiss);
-                hud.ResetHUD();
-            }
+            if (ListenManager.HasInstance)
+                ListenManager.Instance.RaiseRhythmHUDHide();
 
-            // successRatio = trust cuối cùng
-            float successRatio = ComputeSuccessRatio();
-            float finalReward = GrantArchiveReward(successRatio);
+            float successRatio = Mathf.Clamp01(_trust01);
+            float archiveGained = GrantArchiveReward(successRatio);
 
             FoodItem lootItem;
             int lootCount;
             GrantLootReward(successRatio, out lootItem, out lootCount);
 
             if (ListenManager.HasInstance)
-                ListenManager.Instance.RaiseMinigameStopped();
-
-            if (_currentAnimal != null && rewardPanel != null)
             {
-                rewardPanel.ShowAnimalRhythmResult(
-                    _currentAnimal,
-                    successRatio,
-                    finalReward,
-                    lootItem,
-                    lootCount,
-                    _totalHit,
-                    _totalMiss
+                ListenManager.Instance.RaiseRhythmAnimalResult(
+                    new ListenManager.RhythmAnimalResultPayload(
+                        _currentAnimal,
+                        successRatio,
+                        archiveGained,
+                        lootItem,
+                        lootCount,
+                        _totalHit,
+                        _totalMiss
+                    )
                 );
             }
 
             if (_currentAnimal != null)
+            {
                 _currentAnimal.MarkMinigamePlayed();
+
+                // FALLBACK: nếu animal one-shot thì despawn luôn
+                _currentAnimal.DespawnAfterMinigame();
+            }
 
             _currentAnimal = null;
             _currentFocus = null;
         }
 
-        // ===== PLAYLIST / PATTERN =====
+        private void StartNextBeat()
+        {
+            if (!IsRunning) return;
+
+            if (_currentPattern == null || _currentPattern.sequence == null)
+            {
+                StopGame();
+                return;
+            }
+
+
+            // end pattern
+            if (_currentStepIndex >= _currentPattern.sequence.Length)
+            {
+                _playlistIndex++;
+                if (_playlistIndex >= _playlist.Count)
+                {
+                    StopGame();
+                    return;
+                }
+
+                SetupPattern(_playlist[_playlistIndex]);
+
+                // FIX: phải chạy tiếp beat đầu của pattern mới
+                StartNextBeat();
+                return;
+            }
+
+
+            var step = _currentPattern.sequence[_currentStepIndex];
+            _currentBeatDuration = BeatDuration;
+
+            // snapshot ACTIVE beat (IMPORTANT)
+            _activeStepType = step.type;
+            _activeIsHold = (step.type == RhythmPattern.StepType.Hold);
+            _activeIsScorable = (step.type == RhythmPattern.StepType.Tap || step.type == RhythmPattern.StepType.Hold);
+            _activeStepIndexSnapshot = _currentStepIndex;
+            _activeBeatIndexSnapshot = _globalScorableBeatIndex;
+
+            if (logFlow)
+                Debug.Log($"[AnimalRhythm] SpawnTarget beatIndex={_activeBeatIndexSnapshot} stepIndex={_activeStepIndexSnapshot} type={_activeStepType} isHold={_activeIsHold} beatsLeftInStep={_beatsLeftInStep}");
+
+            if (step.type == RhythmPattern.StepType.Rest)
+            {
+                KillTarget();
+
+                if (_restCoroutine != null)
+                    StopCoroutine(_restCoroutine);
+
+                _restCoroutine = StartCoroutine(RestBeatCoroutine(_currentBeatDuration));
+            }
+            else
+            {
+                SpawnTargetForActiveStep();
+            }
+        }
+
+        private IEnumerator RestBeatCoroutine(float duration)
+        {
+            float timer = 0f;
+            while (timer < duration)
+            {
+                timer += Time.deltaTime;
+                yield return null;
+            }
+
+            _restCoroutine = null;
+
+            // rest beat "resolve" tự động
+            AdvanceAfterResolve(scored: false);
+            StartNextBeat();
+        }
+
+        private void SpawnTargetForActiveStep()
+        {
+            if (targetPrefab == null || spawnArea == null)
+            {
+                if (logFlow) Debug.LogWarning("[AnimalRhythm] targetPrefab/spawnArea missing -> skip beat");
+                AdvanceAfterResolve(scored: false);
+                StartNextBeat();
+                return;
+            }
+
+            KillTarget();
+
+            RhythmClickTarget target = Instantiate(targetPrefab, spawnArea);
+            RectTransform rt = target.GetComponent<RectTransform>();
+            if (rt == null)
+            {
+                Destroy(target.gameObject);
+                AdvanceAfterResolve(scored: false);
+                StartNextBeat();
+                return;
+            }
+
+            Vector2 areaSize = spawnArea.rect.size;
+            float x = Random.Range(-areaSize.x * 0.5f, areaSize.x * 0.5f);
+            float y = Random.Range(-areaSize.y * 0.5f, areaSize.y * 0.5f);
+            rt.anchoredPosition = new Vector2(x, y);
+
+            _currentTarget = target;
+
+            // FIX: luôn để minigame chủ động destroy sau khi xử lý xong
+            _currentTarget.autoDestroyOnResolve = false;
+
+            target.Setup(
+                _activeIsHold,
+                _currentBeatDuration,
+                defaultHoldRequiredSeconds,
+                _activeIsHold ? "GIỮ CHUỘT" : "CLICK CHUỘT",
+                OnTargetResolved
+            );
+        }
+
+        private void OnTargetResolved(bool hit)
+        {
+            if (logFlow)
+                Debug.Log($"[AnimalRhythm] TargetResolved stepIndex={_activeStepIndexSnapshot} type={_activeStepType} hit={hit}");
+
+            ResolveBeat(hit);
+        }
+
+        private void ResolveBeat(bool hit)
+        {
+            if (!IsRunning) return;
+
+            KillTarget();
+
+            // only score Tap/Hold
+            string statusMsg = "";
+            bool statusPositive = false;
+
+            float trustStep = (_totalBeatsForProgress > 0) ? (1f / _totalBeatsForProgress) : 0f;
+
+            if (_activeIsScorable)
+            {
+                if (hit)
+                {
+                    _totalHit++;
+                    statusMsg = _hasFavoriteBuff ? "Perfect! (Buffed)" : "Hit!";
+                    statusPositive = true;
+
+                    _trust01 += trustStep;
+                }
+                else
+                {
+                    if (_hasFavoriteBuff && _safetyNetRemains > 0)
+                    {
+                        _safetyNetRemains--;
+                        statusMsg = $"Shield! ({_safetyNetRemains} left)";
+                        statusPositive = true;
+                    }
+                    else
+                    {
+                        _totalMiss++;
+                        statusMsg = "Miss";
+                        statusPositive = false;
+
+                        _trust01 -= trustStep;
+                    }
+                }
+            }
+
+            _trust01 = Mathf.Clamp01(_trust01);
+
+            float progress01 = (_totalBeatsForProgress > 0)
+                ? Mathf.Clamp01((float)(_totalHit + _totalMiss) / _totalBeatsForProgress)
+                : 0f;
+
+            if (logFlow)
+                Debug.Log($"[AnimalRhythm] RaiseHUDUpdate hit={_totalHit} miss={_totalMiss} progress01={progress01:0.00} trust01={_trust01:0.00} beat={_activeBeatIndexSnapshot} step={_activeStepType}");
+
+            if (ListenManager.HasInstance)
+            {
+                ListenManager.Instance.RaiseRhythmHUDUpdate(
+                    new ListenManager.RhythmHUDUpdatePayload(
+                        _totalHit,
+                        _totalMiss,
+                        _trust01,
+                        progress01,
+                        _activeIsScorable ? statusMsg : "",
+                        statusPositive,
+                        0f,
+                        _activeBeatIndexSnapshot,
+                        _activeStepType.ToString(),
+                        _activeIsHold
+                    )
+                );
+            }
+
+            AdvanceAfterResolve(scored: _activeIsScorable);
+
+            if (IsRunning)
+                StartNextBeat();
+        }
+
+        // ONLY place we advance step/beat
+        private void AdvanceAfterResolve(bool scored)
+        {
+            // advance scorable beat index only if we just finished Tap/Hold
+            if (scored)
+                _globalScorableBeatIndex++;
+
+            // move beats within current step
+            _beatsLeftInStep--;
+            if (_beatsLeftInStep <= 0)
+            {
+                _currentStepIndex++;
+                PrepareNextStep();
+            }
+        }
+
+        private void KillTarget()
+        {
+            if (_currentTarget != null)
+            {
+                Destroy(_currentTarget.gameObject);
+                _currentTarget = null;
+            }
+        }
+
         private void BuildPlaylist(List<RhythmPattern> outList)
         {
             outList.Clear();
@@ -246,35 +439,24 @@ namespace IronIvy.Gameplay.Rhythm
             AnimalDefinition def = _currentAnimal != null ? _currentAnimal.Definition : null;
             bool added = false;
 
-            // cố gắng dùng data từ animal definition trước
             if (def != null)
             {
                 if (def.useRandomRhythm)
                 {
-                    // build random playlist cho animal theo style riêng
                     added = BuildRandomPlaylistForAnimal(def, outList);
                     if (!added)
-                    {
-                        Debug.LogWarning($"[AnimalRhythm] Random mix failed for animal {def.id}, fallback fixed patterns.");
                         added = BuildFixedPlaylistForAnimal(def, outList);
-                    }
                 }
                 else
                 {
-                    // chế độ cũ: dùng patterns[] cố định
                     added = BuildFixedPlaylistForAnimal(def, outList);
                 }
             }
 
-            // nếu vẫn chưa có gì thì dùng fallback
             if (!added)
                 BuildFallbackPlaylist(outList);
-
-            if (outList.Count == 0)
-                Debug.LogWarning("[AnimalRhythm] Playlist is empty. Check AnimalDefinition or fallbackPlaylist.");
         }
 
-        // dùng patterns[] như cũ
         private bool BuildFixedPlaylistForAnimal(AnimalDefinition def, List<RhythmPattern> outList)
         {
             if (def == null || def.patterns == null || def.patterns.Length == 0)
@@ -283,54 +465,38 @@ namespace IronIvy.Gameplay.Rhythm
             for (int i = 0; i < def.patterns.Length; i++)
             {
                 var pat = def.patterns[i];
-                if (pat != null)
-                    outList.Add(pat);
+                if (pat != null) outList.Add(pat);
             }
 
             return outList.Count > 0;
         }
 
-        // fallbackPlaylist set tay trên inspector
         private void BuildFallbackPlaylist(List<RhythmPattern> outList)
         {
-            if (fallbackPlaylist == null || fallbackPlaylist.Count == 0)
-                return;
-
+            if (fallbackPlaylist == null) return;
             for (int i = 0; i < fallbackPlaylist.Count; i++)
-            {
-                var pat = fallbackPlaylist[i];
-                if (pat != null)
-                    outList.Add(pat);
-            }
+                if (fallbackPlaylist[i] != null) outList.Add(fallbackPlaylist[i]);
         }
 
-        // build random mix dựa trên pool fragment của animal
         private bool BuildRandomPlaylistForAnimal(AnimalDefinition def, List<RhythmPattern> outList)
         {
             if (def == null) return false;
 
             var pool = def.randomFragments;
-            if (pool == null || pool.Length == 0)
-                return false;
+            if (pool == null || pool.Length == 0) return false;
 
-            // lọc fragment hợp lệ
             List<RhythmPattern> fragmentPool = new List<RhythmPattern>();
             for (int i = 0; i < pool.Length; i++)
             {
                 var pat = pool[i];
                 if (pat == null) continue;
                 if (pat.sequence == null || pat.sequence.Length == 0) continue;
-
-                int beats = CountBeatsInPattern(pat);
-                if (beats <= 0) continue;
-
+                if (CountBeatsInPattern(pat) <= 0) continue;
                 fragmentPool.Add(pat);
             }
 
-            if (fragmentPool.Count == 0)
-                return false;
+            if (fragmentPool.Count == 0) return false;
 
-            // config safe
             int minBeats = Mathf.Max(1, def.minRandomBeats);
             int maxBeats = Mathf.Max(minBeats, def.maxRandomBeats);
             int minFragments = Mathf.Max(1, def.minRandomFragments);
@@ -344,18 +510,11 @@ namespace IronIvy.Gameplay.Rhythm
             ShuffleList(working);
 
             int idx = 0;
-            bool isFirstFragment = true;
-            int restBeatsBetween = 1; // tạm thời cho 1 beat nghỉ giữa 2 fragment
+            bool isFirst = true;
+            int restBeatsBetween = 1;
 
             while (safety-- > 0 && fragmentsUsed < maxFragments && totalBeats < maxBeats)
             {
-                if (working.Count == 0)
-                {
-                    working.AddRange(fragmentPool);
-                    ShuffleList(working);
-                    idx = 0;
-                }
-
                 if (idx >= working.Count)
                 {
                     ShuffleList(working);
@@ -364,43 +523,23 @@ namespace IronIvy.Gameplay.Rhythm
 
                 var pick = working[idx++];
                 int beats = CountScorableBeatsInPattern(pick);
-                if (beats <= 0)
-                    continue;
+                if (beats <= 0) continue;
 
-                // tính thử nếu add fragment này + đoạn rest phía trước (nếu không phải fragment đầu)
-                int extraRestBeats = isFirstFragment ? 0 : restBeatsBetween;
-                int projectedBeats = totalBeats + beats;
+                if (!isFirst && restBeatsBetween > 0)
+                    outList.Add(GetOrCreateRestPattern(restBeatsBetween));
 
-                // nếu vượt max mà đã đủ min thì dừng luôn
-                if (projectedBeats > maxBeats && fragmentsUsed >= minFragments)
-                    break;
-
-                // chèn Rest ở giữa fragment (trừ fragment đầu)
-                if (!isFirstFragment && restBeatsBetween > 0)
-                {
-                    var restPat = GetOrCreateRestPattern(restBeatsBetween);
-                    outList.Add(restPat);
-                    // Rest không cộng vào totalBeats (cho scorable), nhưng vẫn chiếm thời gian timeline
-                }
-
-                // add fragment chính
                 outList.Add(pick);
                 totalBeats += beats;
                 fragmentsUsed++;
-                isFirstFragment = false;
+                isFirst = false;
 
                 if (fragmentsUsed >= minFragments && totalBeats >= minBeats && totalBeats <= maxBeats)
                     break;
             }
 
-            if (outList.Count == 0)
-                return false;
-
-            Debug.Log($"[AnimalRhythm] Random mix built: {fragmentsUsed} fragments, ~{totalBeats} beats (with rests).");
-            return true;
+            return outList.Count > 0;
         }
 
-        // shuffle đơn giản cho list generic
         private void ShuffleList<T>(List<T> list)
         {
             for (int i = 0; i < list.Count; i++)
@@ -418,7 +557,6 @@ namespace IronIvy.Gameplay.Rhythm
             return pattern.GetTotalBeats();
         }
 
-        // chỉ tính beat có thể chấm điểm (Tap / Hold)
         private int CountScorableBeatsInPattern(RhythmPattern pattern)
         {
             if (pattern == null || pattern.sequence == null) return 0;
@@ -448,7 +586,7 @@ namespace IronIvy.Gameplay.Rhythm
 
             if (pattern == null || pattern.sequence == null || pattern.sequence.Length == 0)
             {
-                OnPlaylistComplete();
+                StopGame();
                 return;
             }
 
@@ -458,237 +596,10 @@ namespace IronIvy.Gameplay.Rhythm
         private void PrepareNextStep()
         {
             if (_currentPattern == null || _currentPattern.sequence == null) return;
-
-            if (_currentStepIndex >= _currentPattern.sequence.Length)
-            {
-                _playlistIndex++;
-                if (_playlistIndex >= _playlist.Count)
-                {
-                    OnPlaylistComplete();
-                    return;
-                }
-
-                SetupPattern(_playlist[_playlistIndex]);
-                return;
-            }
+            if (_currentStepIndex >= _currentPattern.sequence.Length) return;
 
             var step = _currentPattern.sequence[_currentStepIndex];
             _beatsLeftInStep = Mathf.Max(1, step.beats <= 0 ? 1 : step.beats);
-        }
-
-        private void StartNextBeat()
-        {
-            if (!IsRunning) return;
-            if (_currentPattern == null || _currentPattern.sequence == null)
-            {
-                OnPlaylistComplete();
-                return;
-            }
-
-            if (_currentStepIndex >= _currentPattern.sequence.Length)
-            {
-                _playlistIndex++;
-                if (_playlistIndex >= _playlist.Count)
-                {
-                    OnPlaylistComplete();
-                    return;
-                }
-
-                SetupPattern(_playlist[_playlistIndex]);
-                return;
-            }
-
-            var step = _currentPattern.sequence[_currentStepIndex];
-            _currentBeatDuration = BeatDuration;
-
-            if (step.type == RhythmPattern.StepType.Rest)
-            {
-                if (_currentTarget != null)
-                {
-                    Destroy(_currentTarget.gameObject);
-                    _currentTarget = null;
-                }
-
-                if (_restCoroutine != null)
-                    StopCoroutine(_restCoroutine);
-
-                _restCoroutine = StartCoroutine(RestBeatCoroutine(_currentBeatDuration));
-            }
-            else
-            {
-                // beat có target thì spawn target
-                SpawnTargetForStep(step);
-            }
-
-            _beatsLeftInStep--;
-            if (_beatsLeftInStep <= 0)
-            {
-                _currentStepIndex++;
-                PrepareNextStep();
-            }
-        }
-
-        private IEnumerator RestBeatCoroutine(float duration)
-        {
-            float timer = 0f;
-            while (timer < duration)
-            {
-                timer += Time.deltaTime;
-                yield return null;
-            }
-
-            _restCoroutine = null;
-
-            // rest chỉ là thời gian chờ, không cộng progress, không ảnh hưởng trust
-            StartNextBeat();
-        }
-
-        private void SpawnTargetForStep(RhythmPattern.Step step)
-        {
-            if (targetPrefab == null || spawnArea == null)
-            {
-                StartNextBeat();
-                return;
-            }
-
-            if (_currentTarget != null)
-            {
-                Destroy(_currentTarget.gameObject);
-                _currentTarget = null;
-            }
-
-            RhythmClickTarget target = Instantiate(targetPrefab, spawnArea);
-            RectTransform rt = target.GetComponent<RectTransform>();
-            if (rt == null)
-            {
-                Destroy(target.gameObject);
-                StartNextBeat();
-                return;
-            }
-
-            Vector2 areaSize = spawnArea.rect.size;
-            float x = Random.Range(-areaSize.x * 0.5f, areaSize.x * 0.5f);
-            float y = Random.Range(-areaSize.y * 0.5f, areaSize.y * 0.5f);
-            rt.anchoredPosition = new Vector2(x, y);
-
-            bool isHold = step.type == RhythmPattern.StepType.Hold;
-            _currentTarget = target;
-            target.Setup(
-                isHold,
-                _currentBeatDuration,
-                defaultHoldRequiredSeconds,
-                isHold ? "HOLD" : "CLICK",
-                OnTargetResolved
-            );
-        }
-
-        private void OnTargetResolved(bool hit)
-        {
-            ResolveBeat(hit);
-        }
-
-        // ===== CORE SCORING + TRUST VISUAL =====
-        private void ResolveBeat(bool? hit)
-        {
-            if (!IsRunning) return;
-
-            if (_currentTarget != null)
-            {
-                Destroy(_currentTarget.gameObject);
-                _currentTarget = null;
-            }
-
-            bool isScorableStep = false;
-            if (_currentPattern != null && _currentStepIndex < _currentPattern.sequence.Length)
-            {
-                var step = _currentPattern.sequence[_currentStepIndex];
-                isScorableStep = (step.type == RhythmPattern.StepType.Tap || step.type == RhythmPattern.StepType.Hold);
-            }
-
-            string statusMsg = "";
-            bool statusPositive = false;
-
-            // mỗi beat scorable sẽ ảnh hưởng tới hit/miss + trust
-            float trustStep = (_totalBeatsForProgress > 0)
-                ? (1f / _totalBeatsForProgress)
-                : 0f;
-
-            if (hit == true && isScorableStep)
-            {
-                _totalHit++;
-                statusMsg = "Hit!";
-
-                if (_hasFavoriteBuff)
-                    statusMsg = "Perfect! (Buffed)";
-
-                statusPositive = true;
-
-                // hit thì cộng trust
-                _trust01 += trustStep;
-            }
-            else if (hit == false && isScorableStep)
-            {
-                // [LOGIC] SAFETY NET (Bảo hiểm)
-                if (_hasFavoriteBuff && _safetyNetRemains > 0)
-                {
-                    // được cứu, không trừ trust
-                    _safetyNetRemains--;
-                    statusMsg = $"Shield! ({_safetyNetRemains} left)";
-                    statusPositive = true;
-                }
-                else
-                {
-                    _totalMiss++;
-                    statusMsg = "Miss";
-                    statusPositive = false;
-
-                    // miss thì trừ trust
-                    _trust01 -= trustStep;
-                }
-            }
-
-            // clamp lại cho an toàn
-            _trust01 = Mathf.Clamp01(_trust01);
-
-            if (hud != null)
-            {
-                hud.SetHitMiss(_totalHit, _totalMiss);
-
-                if (isScorableStep)
-                    hud.SetStatus(statusMsg, statusPositive);
-
-                // trust hiển thị dạng 0–1
-                hud.SetTrust01(_trust01);
-            }
-
-            // beat có target thì tính tiến độ sau khi xử lý
-            if (isScorableStep)
-            {
-                _globalBeatIndex++;
-                UpdateProgressUI();
-            }
-
-            if (IsRunning)
-                StartNextBeat();
-        }
-
-        private void UpdateProgressUI()
-        {
-            if (hud == null || _totalBeatsForProgress <= 0) return;
-            // nếu HUD đang dùng timeline theo tổng beat, SetProgress sẽ tự bỏ qua
-            hud.SetProgress(Mathf.Clamp01((float)_globalBeatIndex / _totalBeatsForProgress));
-        }
-
-        private void OnPlaylistComplete()
-        {
-            StopGame();
-        }
-
-        // ===== REWARD CALC =====
-        private float ComputeSuccessRatio()
-        {
-            // dùng luôn trust cuối game làm successRatio (0–1)
-            return Mathf.Clamp01(_trust01);
         }
 
         private float GrantArchiveReward(float successRatio)
@@ -702,15 +613,11 @@ namespace IronIvy.Gameplay.Rhythm
             float baseReward = def.archiveReward;
             if (baseReward <= 0f) return 0f;
 
+            float multiplier = _hasFavoriteBuff ? def.buffTrustMultiplier : 1f;
+
             float finalReward = 0f;
-
-            float multiplier = 1f;
-            if (_hasFavoriteBuff)
-                multiplier = def.buffTrustMultiplier;
-
             if (successRatio >= 0.99f) finalReward = baseReward * multiplier;
             else if (successRatio >= 0.5f) finalReward = baseReward * 0.5f * multiplier;
-            else finalReward = 0f;
 
             if (finalReward > 0f)
                 ArchiveManager.Instance.AddProgress(finalReward);
@@ -725,8 +632,6 @@ namespace IronIvy.Gameplay.Rhythm
 
             if (_currentAnimal == null || _currentAnimal.Definition == null) return;
             if (!InventoryManager.HasInstance) return;
-
-            // chỉ thưởng loot nếu success >= 50%
             if (successRatio < 0.5f) return;
 
             var def = _currentAnimal.Definition;
@@ -735,14 +640,12 @@ namespace IronIvy.Gameplay.Rhythm
             item = def.dropItem;
             count = def.dropCount;
 
-            // buff có thể nhân đôi loot
             if (_hasFavoriteBuff && def.doubleLootOnBuff)
                 count *= 2;
 
             InventoryManager.Instance.AddFood(item, count);
         }
 
-        // tạo 1 pattern runtime với Step Rest duy nhất
         private RhythmPattern GetOrCreateRestPattern(int beats = 1)
         {
             if (_runtimeRestPattern == null)
@@ -754,18 +657,12 @@ namespace IronIvy.Gameplay.Rhythm
                 _runtimeRestPattern.hitWindowSeconds = 0.2f;
             }
 
-            // step array 1 phần tử Rest
             _runtimeRestPattern.sequence = new RhythmPattern.Step[]
             {
-                new RhythmPattern.Step
-                {
-                    type = RhythmPattern.StepType.Rest,
-                    beats = Mathf.Max(1, beats)
-                }
+                new RhythmPattern.Step { type = RhythmPattern.StepType.Rest, beats = Mathf.Max(1, beats) }
             };
 
             return _runtimeRestPattern;
         }
     }
-
 }

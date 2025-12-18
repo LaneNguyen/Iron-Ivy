@@ -8,10 +8,10 @@ namespace IronIvy.Gameplay.World
         [Header("Settings")]
         public Transform restingPosition;
         public float animDuration = 2f;
-        
+
         [Header("VFX/SFX")]
         public ParticleSystem healEffect;
-        
+
         private bool isResting = false;
 
         public void OnInteract()
@@ -24,22 +24,24 @@ namespace IronIvy.Gameplay.World
         private System.Collections.IEnumerator RestRoutine()
         {
             isResting = true;
-            
-            // 1. Hiệu ứng hồi phục
+
+            // 1) VFX
             if (healEffect != null) healEffect.Play();
             yield return new WaitForSeconds(animDuration);
 
-            // 2. Logic Backend (Hồi máu + Save)
+            // 2) Backend
             if (EnergyManager.HasInstance) EnergyManager.Instance.RestoreFullEnergy();
             if (SaveLoadManager.HasInstance) SaveLoadManager.Instance.SaveGame();
 
+            // 2.5) báo UI refresh (event-driven)
+            if (ListenManager.HasInstance && EnergyManager.HasInstance)
+                ListenManager.Instance.RaiseEnergyChanged(EnergyManager.Instance.Current);
+
             Debug.Log("[ArchiveTree] Da hoi phuc & Save game!");
 
-            // 3. [NEW] Gọi UIManager để chuyển cảnh sang Archive Panel
-            if (UIManager.HasInstance)
-            {
-                UIManager.Instance.OpenArchiveUI();
-            }
+            // 3) Request mở Archive UI bằng event (không gọi UIManager trực tiếp)
+            if (ListenManager.HasInstance)
+                ListenManager.Instance.RaiseArchiveOpenRequested();
 
             isResting = false;
         }

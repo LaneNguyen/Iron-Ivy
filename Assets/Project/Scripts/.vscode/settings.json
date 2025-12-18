@@ -1,0 +1,12 @@
+{
+    "omnisharp.enableRoslynAnalyzers": true,
+    "omnisharp.enableEditorConfigSupport": true,
+    "omnisharp.useModernNet": true,
+    "omnisharp.enableImportCompletion": true,
+    "omnisharp.organizeImportsOnFormat": true,
+    "omnisharp.solution": "${workspaceFolder}/../../../../IronIvy.sln",
+    "files.associations": {
+        "*.cs": "csharp"
+    }
+}
+

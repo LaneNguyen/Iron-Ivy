@@ -57,5 +57,15 @@
         "Temp/": true
     },
     "dotnet.defaultSolution": "IronIvy.sln",
-    "dotrush.roslyn.projectOrSolutionFiles": []
+    "dotrush.roslyn.projectOrSolutionFiles": [
+        "d:\\DuAn3D\\IronIvymain\\IronIvy\\IronIvy.sln"
+    ],
+    "omnisharp.useModernNet": true,
+    "omnisharp.enableEditorConfigSupport": true,
+    "omnisharp.enableRoslynAnalyzers": true,
+    "omnisharp.enableImportCompletion": true,
+    "omnisharp.organizeImportsOnFormat": true,
+    "files.associations": {
+        "*.cs": "csharp"
+    }
 }

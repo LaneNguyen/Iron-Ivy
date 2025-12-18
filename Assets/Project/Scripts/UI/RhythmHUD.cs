@@ -2,18 +2,11 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using IronIvy.Core;
 using IronIvy.Gameplay.Rhythm;
+using IronIvy.Core;
 
 namespace IronIvy.UI
 {
-    // HUD đơn giản cho rhythm
-    // - title minigame
-    // - hint text (CLICK / HOLD)
-    // - trust slider + progress slider
-    // - status + icon màu
-    // - hit / miss
-    // mấy hàm cũ cho engine V3/V4 vẫn giữ lại để không lỗi compile
     public class RhythmHUD : MonoBehaviour
     {
         [Header("Root")]
@@ -23,7 +16,6 @@ namespace IronIvy.UI
         public TextMeshProUGUI titleText;
 
         [Header("Hint")]
-        [Tooltip("Text hướng dẫn đơn giản (CLICK / HOLD...)")]
         public TextMeshProUGUI hintText;
 
         [Header("Trust & Progress")]
@@ -31,22 +23,15 @@ namespace IronIvy.UI
         public Slider progressSlider;
 
         [Header("Timeline Progress (Beat Count)")]
-        [Tooltip("Nếu bật thì thanh chạy liên tục từ 0 -> 1 dựa trên tổng số beat, không phụ thuộc hit")]
         public bool useTimelineProgress = false;
-
-        [Tooltip("Tổng số beat của màn, để map thành 100% timeline. Có thể set tay hoặc set từ code.")]
         public int totalBeatsForTimeline = 0;
-
-        [Tooltip("Thời gian 1 beat (giây). Nếu để 0 thì nên gọi config từ code.")]
         public float secondsPerBeat = 0.5f;
 
-        // internal cho timeline dựa trên beat
-        float _timelineDuration;   // tổng thời gian round = totalBeats * secondsPerBeat
-        float _timelineElapsed;    // thời gian đã trôi qua
-        bool _timelinePlaying;     // flag đang chạy timeline
+        float _timelineDuration;
+        float _timelineElapsed;
+        bool _timelinePlaying;
 
         [Header("Progress Lerp")]
-        [Tooltip("Tốc độ lerp progress (giá trị càng cao càng bám sát target nhanh)")]
         public float progressLerpSpeed = 5f;
 
         [Header("Status")]
@@ -59,48 +44,141 @@ namespace IronIvy.UI
         public TextMeshProUGUI hitText;
         public TextMeshProUGUI missText;
 
-        // engine rhythm cũ, vẫn giữ reference cho ai còn dùng
         private RhythmMinigameBase current;
 
-        // internal progress state cho smooth bar (mode cũ: theo target)
         float _currentProgress01;
         float _targetProgress01;
 
+        // fallback hide mềm nếu em lỡ set hudRoot = gameObject
+        private CanvasGroup _softHideGroup;
+
+        // NEW: subscribe retry state
+        private bool _subscribedToListen;
+        private int _subscribeRetryFrames = 60; // retry ~1s ở 60fps
+
+        private void Awake()
+        {
+            if (hudRoot == null)
+            {
+                if (transform.childCount > 0)
+                    hudRoot = transform.GetChild(0).gameObject;
+            }
+
+            EnsureSoftHideGroupIfNeeded();
+        }
+
+        private void Start()
+        {
+            // NEW: đề phòng ListenManager spawn sau
+            TrySubscribeListen();
+        }
+
+        private void EnsureSoftHideGroupIfNeeded()
+        {
+            if (hudRoot == gameObject)
+            {
+                _softHideGroup = GetComponent<CanvasGroup>();
+                if (_softHideGroup == null)
+                    _softHideGroup = gameObject.AddComponent<CanvasGroup>();
+            }
+        }
+
         private void OnEnable()
         {
-            // đã chuyển qua ListenManager
-            if (ListenManager.HasInstance)
-            {
-                ListenManager.Instance.OnMinigameStarted += OnMinigameStarted;
-                ListenManager.Instance.OnMinigameStopped += OnMinigameStopped;
-            }
+            // NEW: không phụ thuộc timing OnEnable nữa
+            TrySubscribeListen();
         }
 
         private void OnDisable()
         {
-            if (ListenManager.HasInstance)
+            UnsubscribeListen();
+        }
+
+        private void TrySubscribeListen()
+        {
+            if (_subscribedToListen) return;
+            if (!ListenManager.HasInstance) return;
+
+            ListenManager.Instance.OnRhythmHUDShow += HandleShowPayload;
+            ListenManager.Instance.OnRhythmHUDUpdate += HandleUpdatePayload;
+            ListenManager.Instance.OnRhythmHUDHide += HandleHidePayload;
+
+            _subscribedToListen = true;
+            // Debug.Log("[RhythmHUD] Subscribed to ListenManager");
+        }
+
+        private void UnsubscribeListen()
+        {
+            if (!_subscribedToListen) return;
+            if (!ListenManager.HasInstance) { _subscribedToListen = false; return; }
+
+            ListenManager.Instance.OnRhythmHUDShow -= HandleShowPayload;
+            ListenManager.Instance.OnRhythmHUDUpdate -= HandleUpdatePayload;
+            ListenManager.Instance.OnRhythmHUDHide -= HandleHidePayload;
+
+            _subscribedToListen = false;
+        }
+
+        private void HandleShowPayload(ListenManager.RhythmHUDShowPayload payload)
+        {
+            if (payload == null) return;
+
+            Show();
+            SetMinigameTitle(payload.title);
+
+            if (payload.useTimeline)
             {
-                ListenManager.Instance.OnMinigameStarted -= OnMinigameStarted;
-                ListenManager.Instance.OnMinigameStopped -= OnMinigameStopped;
+                useTimelineProgress = true;
+                ConfigureTimelineByBeats(payload.totalBeatsTimeline, payload.beatDuration);
+                StartTimeline();
             }
+            else
+            {
+                useTimelineProgress = false;
+                StopTimeline();
+            }
+
+            UpdateHitMiss(0, 0);
+            SetTrust01(0);
+            SetProgress(0);
+        }
+
+        private void HandleUpdatePayload(ListenManager.RhythmHUDUpdatePayload payload)
+        {
+            if (payload == null) return;
+
+            UpdateHitMiss(payload.hit, payload.miss);
+            SetTrust01(payload.trust01);
+
+            if (!useTimelineProgress)
+                UpdateProgress(payload.progress01);
+
+            SetStatus(payload.statusText, payload.statusPositive);
+        }
+
+        private void HandleHidePayload()
+        {
+            Hide();
         }
 
         private void Update()
         {
+            // NEW: retry subscribe vài frame đầu nếu ListenManager spawn trễ
+            if (!_subscribedToListen && _subscribeRetryFrames > 0)
+            {
+                _subscribeRetryFrames--;
+                TrySubscribeListen();
+            }
+
             if (progressSlider == null) return;
 
-            // nếu bật timeline progress: thanh chạy liên tục theo tổng thời gian (tổng số beat quy đổi)
             if (useTimelineProgress && _timelinePlaying && _timelineDuration > 0f)
             {
                 _timelineElapsed += Time.deltaTime;
-
-                // map thời gian 0..duration sang 0..1
                 _currentProgress01 = Mathf.Clamp01(_timelineElapsed / _timelineDuration);
             }
             else
             {
-                // mode cũ: lerp progress slider mượt mượt từ current -> target
-                // MoveTowards cho ổn định, không bị overshoot
                 _currentProgress01 = Mathf.MoveTowards(
                     _currentProgress01,
                     _targetProgress01,
@@ -111,55 +189,98 @@ namespace IronIvy.UI
             progressSlider.value = _currentProgress01;
         }
 
-        // ListenManager callbacks
-
-        private void OnMinigameStarted()
+        public void Show()
         {
-            // thử tìm engine cũ nếu có (animal / plant bản trước)
-            if (current == null)
-                current = FindObjectOfType<RhythmMinigameBase>();
+            EnsureSoftHideGroupIfNeeded();
 
-            if (hudRoot != null)
+            if (hudRoot == null)
+            {
+                if (_softHideGroup != null)
+                {
+                    _softHideGroup.alpha = 1f;
+                    _softHideGroup.blocksRaycasts = true;
+                    _softHideGroup.interactable = true;
+                }
+                return;
+            }
+
+            if (hudRoot == gameObject)
+            {
+                _softHideGroup.alpha = 1f;
+                _softHideGroup.blocksRaycasts = true;
+                _softHideGroup.interactable = true;
+            }
+            else
+            {
                 hudRoot.SetActive(true);
-
-            // nếu có reference minigame thì lấy tên nó làm title
-            if (titleText != null && current != null)
-                titleText.text = current.name;
+            }
         }
 
-        private void OnMinigameStopped()
+        public void Hide()
         {
-            // không auto tắt HUD ở đây
-            // engine mới tự gọi ResetHUD khi cần
+            EnsureSoftHideGroupIfNeeded();
 
-            // stop timeline luôn cho chắc
+            if (hudRoot == null)
+            {
+                if (_softHideGroup != null)
+                {
+                    _softHideGroup.alpha = 0f;
+                    _softHideGroup.blocksRaycasts = false;
+                    _softHideGroup.interactable = false;
+                }
+                _timelinePlaying = false;
+                return;
+            }
+
+            if (hudRoot == gameObject)
+            {
+                _softHideGroup.alpha = 0f;
+                _softHideGroup.blocksRaycasts = false;
+                _softHideGroup.interactable = false;
+            }
+            else
+            {
+                hudRoot.SetActive(false);
+            }
+
             _timelinePlaying = false;
         }
 
-        // bind thủ công cho engine cũ nếu không muốn rely ListenManager
+        public void ResetHUD()
+        {
+            Hide();
+            SetKeyHints(null);
+            SetTrust01(0f);
+            _currentProgress01 = 0f;
+            _targetProgress01 = 0f;
+            _timelineElapsed = 0f;
+            _timelineDuration = 0f;
+            _timelinePlaying = false;
+            if (progressSlider != null) progressSlider.value = 0f;
+            SetStatus(string.Empty, true);
+            SetHitMiss(0, 0);
+        }
+
         public void BindMinigame(RhythmMinigameBase minigame)
         {
             current = minigame;
-
-            if (hudRoot != null)
-                hudRoot.SetActive(true);
-
-            if (titleText != null && minigame != null)
-                titleText.text = minigame.name;
+            Show();
         }
 
-        // set hint text, ví dụ: CLICK (LMB) / HOLD (LMB)
+        public void SetMinigameTitle(string title)
+        {
+            if (titleText == null) return;
+            titleText.text = title;
+        }
+
         public void SetKeyHints(IList<string> hints)
         {
             if (hintText == null) return;
-
             if (hints == null || hints.Count == 0)
             {
                 hintText.text = string.Empty;
                 return;
             }
-
-            // gộp vài hint lại cho gọn
             hintText.text = string.Join(" / ", hints);
         }
 
@@ -169,23 +290,14 @@ namespace IronIvy.UI
             trustSlider.value = Mathf.Clamp01(value01);
         }
 
-        // đây là API được minigame gọi mỗi beat / mỗi step (mode cũ)
-        // giờ mình không set thẳng slider nữa mà chỉ update target
         public void SetProgress(float value01)
         {
-            // nếu đang dùng timeline thì bỏ qua, để thanh chỉ chạy theo tổng thời gian
-            if (useTimelineProgress)
-                return;
-
             value01 = Mathf.Clamp01(value01);
             _targetProgress01 = value01;
         }
 
-        // giữ cho tương thích engine cũ
-        public void SetHoldVisual(float value01)
-        {
-            // trước đây dùng cho vòng hold chung, giờ target tự lo nên để trống
-        }
+        public void UpdateProgress(float value01) => SetProgress(value01);
+        public void UpdateHitMiss(int hit, int miss) => SetHitMiss(hit, miss);
 
         public void SetStatus(string message, bool isSuccess)
         {
@@ -205,52 +317,6 @@ namespace IronIvy.UI
                 missText.text = miss.ToString();
         }
 
-        // preview beat window cũ, giờ không xài nữa
-        public void SetBeatWindow(float center01, float halfWidth01)
-        {
-            // no-op, để cho code cũ compile
-        }
-
-        // phase 0..1 + inWindow cho hệ cursor cũ trên HUD
-        public void SetBeatPhase(float phase, bool inWindow)
-        {
-            // no-op
-        }
-
-        // highlight 1 key slot (engine cũ)
-        public void PulseKey(int index)
-        {
-            // no-op
-        }
-
-        public void ClearPulseKey(int index)
-        {
-            // no-op
-        }
-
-        // helper cho engine mới
-
-        // set title tay cho minigame click-based
-        public void SetMinigameTitle(string title)
-        {
-            if (titleText == null) return;
-            titleText.text = title;
-        }
-
-        // wrapper cho progress
-        public void UpdateProgress(float value01)
-        {
-            SetProgress(value01);
-        }
-
-        // wrapper cho hit/miss
-        public void UpdateHitMiss(int hit, int miss)
-        {
-            SetHitMiss(hit, miss);
-        }
-
-        // config timeline theo beat
-        // ví dụ: tổng 32 beat, mỗi beat 0.5s => duration = 16s
         public void ConfigureTimelineByBeats(int totalBeats, float beatSeconds)
         {
             if (totalBeats <= 0) totalBeats = 1;
@@ -261,56 +327,30 @@ namespace IronIvy.UI
             _timelineDuration = totalBeatsForTimeline * secondsPerBeat;
         }
 
-        // config timeline nếu đã biết sẵn tổng thời lượng round (giây)
         public void ConfigureTimelineByDuration(float durationSeconds)
         {
             if (durationSeconds <= 0f) durationSeconds = 0.1f;
             _timelineDuration = durationSeconds;
         }
 
-        // được gọi từ minigame khi bắt đầu round
         public void StartTimeline()
         {
             _timelineElapsed = 0f;
             _timelinePlaying = true;
-
-            // reset bar cho chắc
             _currentProgress01 = 0f;
             if (progressSlider != null)
                 progressSlider.value = 0f;
         }
 
-        // được gọi từ minigame khi kết thúc round
         public void StopTimeline()
         {
             _timelinePlaying = false;
         }
 
-        // reset HUD về state default
-        // - tắt root
-        // - clear text
-        public void ResetHUD()
-        {
-            if (hudRoot != null)
-                hudRoot.SetActive(false);
-
-            SetKeyHints(null);
-            SetTrust01(0f);
-
-            // reset progress internal
-            _currentProgress01 = 0f;
-            _targetProgress01 = 0f;
-
-            // reset timeline
-            _timelineElapsed = 0f;
-            _timelineDuration = 0f;
-            _timelinePlaying = false;
-
-            if (progressSlider != null)
-                progressSlider.value = 0f;
-
-            SetStatus(string.Empty, true);
-            SetHitMiss(0, 0);
-        }
+        public void SetBeatWindow(float center01, float halfWidth01) { }
+        public void SetBeatPhase(float phase, bool inWindow) { }
+        public void PulseKey(int index) { }
+        public void ClearPulseKey(int index) { }
+        public void SetHoldVisual(float value01) { }
     }
 }

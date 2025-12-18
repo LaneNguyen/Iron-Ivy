@@ -73,7 +73,6 @@ public class AudioManager : BaseManager<AudioManager>
         AttachSESource.mute = isMuteSe;
 
         // auto play BGM mặc định nếu có set tên và chưa có gì đang chạy
-        // idea: dùng BGM này làm nhạc nền chung cho game, BGM khác sau này gọi PlayBGM sẽ tự fade đổi
         if (!string.IsNullOrEmpty(defaultBGMName))
         {
             if (!AttachBGMSource.isPlaying || AttachBGMSource.clip == null)
@@ -142,13 +141,34 @@ public class AudioManager : BaseManager<AudioManager>
         AttachBGMSource.volume -= Time.deltaTime * bgmFadeSpeedRate;
         if (AttachBGMSource.volume <= 0)
         {
+            // cache clip name trước khi stop để biết mình đang fade cái gì
+            string fadedClipName = (AttachBGMSource.clip != null) ? AttachBGMSource.clip.name : "";
+
             AttachBGMSource.Stop();
             AttachBGMSource.volume = PlayerPrefs.GetFloat(BGM_VOLUME_KEY, BGM_VOLUME_DEFAULT);
             isFadeOut = false;
 
+            // Case 1: có nextBGMName thì play như cũ
             if (!string.IsNullOrEmpty(nextBGMName))
             {
                 PlayBGM(nextBGMName);
+                return;
+            }
+
+            // Case 2 (PATCH): không có next => auto quay về default BGM
+            // Đây là đúng case minigame fade xong rồi "quên" bật lại nhạc nền
+            if (!string.IsNullOrEmpty(defaultBGMName))
+            {
+                // tránh restart vô hạn nếu default đang là cái vừa fade
+                if (fadedClipName != defaultBGMName)
+                {
+                    PlayBGM(defaultBGMName);
+                }
+                else
+                {
+                    // nếu vừa fade đúng default thì play lại cho chắc (tuỳ bạn muốn im luôn hay không)
+                    PlayBGM(defaultBGMName);
+                }
             }
         }
     }

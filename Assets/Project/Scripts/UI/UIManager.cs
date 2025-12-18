@@ -1,184 +1,256 @@
-using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
+using IronIvy.Data;
+using IronIvy.Gameplay;
+using IronIvy.Gameplay.Animals;
+using IronIvy.Gameplay.Interaction;
+using IronIvy.Gameplay.Rhythm;
 using IronIvy.UI;
+using UnityEngine;
 
 namespace IronIvy.Core
 {
     public class UIManager : BaseManager<UIManager>
     {
+        [System.Serializable]
+        public class PopupGroup
+        {
+            public PlantRhythmStartPanel plantRhythmStartPanel;
+            public MinigameInteractionPanel animalInteractionPanel;
 
-        [Header("Main HUD")]
+            public GameObject pauseMenu;
+            public GameObject settingsMenu;
+        }
+
+        [System.Serializable]
+        public class NotifyGroup
+        {
+            public RhythmHUD rhythmHUD;
+            public PlantRhythmRewardPanel plantRewardPanel;
+            public AnimalRhythmRewardPanel animalRewardPanel;
+        }
+
+        [Header("Refs")]
+        public PopupGroup popup;
+        public NotifyGroup notify;
         public MainGameUIPanel mainGameUIPanel;
 
-        [Header("Archive UI")]
-        public ArchivePanel archivePanel;
-
-        [Header("Pause / Settings")]
-        [SerializeField] private GameObject pauseMenu;
-        [SerializeField] private GameObject settingsMenu;
-
-        [Header("Fade Overlay")]
-        public CanvasGroup fadeOverlay;
-        public float fadeDuration = 0.5f;
-
-        private bool _isTransitioning;
-
-        // kiểu mở settings rồi mở thêm pause (hoặc ngược lại) vẫn không bị timeScale bật/tắt sai
-        private int _timeScaleLockCount;
+        private ClickPlantRhythmMinigame _plantRhythmMinigame;
+        private ClickAnimalRhythmMinigame _animalRhythmMinigame;
 
         // =========================
-        // HUD init (GameManager gọi)
+        // LIFECYCLE & EVENT REGISTRATION
         // =========================
-        public void InitHUD(int currentEnergy, float archivePercent)
+        private void Start()
         {
-            if (mainGameUIPanel == null) return;
+            EnsureMinigameRefs();
+        }
 
-            // bật HUD
-            if (!mainGameUIPanel.gameObject.activeSelf)
-                mainGameUIPanel.gameObject.SetActive(true);
+        private void OnEnable()
+        {
+            // Đăng ký lắng nghe sự kiện kết quả từ ListenManager
+            if (ListenManager.HasInstance)
+            {
+                ListenManager.Instance.OnRhythmPlantResult += HandlePlantRhythmResult;
+                ListenManager.Instance.OnRhythmAnimalResult += HandleAnimalRhythmResult;
+            }
+        }
 
-            // ép refresh 1 phát cho chắc, khỏi phụ thuộc event timing
-            mainGameUIPanel.ForceRefresh();
+        private void OnDisable()
+        {
+            // Hủy đăng ký khi Object bị tắt để tránh lỗi bộ nhớ
+            if (ListenManager.HasInstance)
+            {
+                ListenManager.Instance.OnRhythmPlantResult -= HandlePlantRhythmResult;
+                ListenManager.Instance.OnRhythmAnimalResult -= HandleAnimalRhythmResult;
+            }
         }
 
         // =========================
-        // Archive (screen swap)
+        // EVENT HANDLERS
         // =========================
-        public void OpenArchiveUI()
+        private void HandlePlantRhythmResult(ListenManager.RhythmPlantResultPayload payload)
         {
-            if (_isTransitioning) return;
-            StartCoroutine(OpenArchiveRoutine());
+            if (notify.plantRewardPanel != null)
+            {
+                Debug.Log("<color=cyan>[UIManager]</color> Nhận tín hiệu kết quả Plant Rhythm. Đang mở bảng thưởng...");
+                notify.plantRewardPanel.ShowPlantRhythmResult(payload);
+            }
+            else
+            {
+                Debug.LogWarning("[UIManager] notify.plantRewardPanel chưa được gán trong Editor!");
+            }
         }
 
-        private IEnumerator OpenArchiveRoutine()
+        private void HandleAnimalRhythmResult(ListenManager.RhythmAnimalResultPayload payload)
         {
-            _isTransitioning = true;
+            if (notify.animalRewardPanel != null)
+            {
+                Debug.Log("<color=cyan>[UIManager]</color> Đang mở bảng thưởng động vật...");
 
-            // fade tối
-            yield return StartCoroutine(FadeCanvasGroup(fadeOverlay, 0f, 1f, fadeDuration));
+                // SỬA: Không chỉ SetActive, phải gọi hàm Show để nạp data
+                notify.animalRewardPanel.gameObject.SetActive(true);
+                notify.animalRewardPanel.ShowAnimalRhythmResult(payload);
+            }
+        }
 
-            // tắt main panel (screen swap)
+        private void EnsureMinigameRefs()
+        {
+            if (_plantRhythmMinigame == null)
+                _plantRhythmMinigame = FindObjectOfType<ClickPlantRhythmMinigame>(true);
+
+            if (_animalRhythmMinigame == null)
+                _animalRhythmMinigame = FindObjectOfType<ClickAnimalRhythmMinigame>(true);
+        }
+
+        // =========================
+        // START MINIGAME REQUESTS
+        // =========================
+        public bool RequestStartPlantRhythm(PlantArea area, List<PlantDefinition> selectedPlants)
+        {
+            EnsureMinigameRefs();
+
+            if (_plantRhythmMinigame == null)
+            {
+                Debug.LogWarning("[UIManager] ClickPlantRhythmMinigame not found.");
+                return false;
+            }
+
+            if (area == null)
+            {
+                Debug.LogWarning("[UIManager] PlantArea is null.");
+                return false;
+            }
+
+            _plantRhythmMinigame.StartSequence(area.plots, selectedPlants, area);
+
+            CloseAllPopups();
+            if (ListenManager.HasInstance) ListenManager.Instance.RaiseMinigameStarted();
+            return true;
+        }
+
+        public bool RequestStartAnimalRhythm(AnimalController animal, FoodItem selectedFood, int energyCost)
+        {
+            EnsureMinigameRefs();
+
+            if (_animalRhythmMinigame == null)
+            {
+                Debug.LogWarning("[UIManager] ClickAnimalRhythmMinigame not found.");
+                return false;
+            }
+
+            if (animal == null)
+            {
+                Debug.LogWarning("[UIManager] Animal is null.");
+                return false;
+            }
+
+            if (EnergyManager.HasInstance && !EnergyManager.Instance.TrySpend(energyCost))
+            {
+                Debug.LogWarning("[UIManager] Not enough energy for Animal Rhythm.");
+                return false;
+            }
+
+            bool isFavorite = false;
+
+            if (selectedFood != null)
+            {
+                if (InventoryManager.HasInstance && InventoryManager.Instance.Consume(selectedFood, 1))
+                {
+                    if (animal.Definition != null && animal.Definition.favoriteFood == selectedFood)
+                        isFavorite = true;
+
+                    animal.TryFeed(selectedFood);
+                    if (ListenManager.HasInstance) ListenManager.Instance.RaiseInventoryChanged();
+                }
+            }
+
+            _animalRhythmMinigame.RequestPlay(animal, isFavorite);
+
+            CloseAllPopups();
+            if (ListenManager.HasInstance) ListenManager.Instance.RaiseMinigameStarted();
+            return true;
+        }
+
+        // =========================
+        // COMPATIBILITY OVERLOADS
+        // =========================
+        public bool RequestStartPlantRhythm(object plots, List<PlantDefinition> selectedPlants, PlantArea area)
+        {
+            return RequestStartPlantRhythm(area, selectedPlants);
+        }
+
+        public bool RequestStartPlantRhythm(PlantArea area, List<PlantDefinition> selectedPlants, int _unused)
+        {
+            return RequestStartPlantRhythm(area, selectedPlants);
+        }
+
+        public bool RequestStartPlantRhythm(PlantArea area)
+        {
+            return RequestStartPlantRhythm(area, new List<PlantDefinition>());
+        }
+
+        public bool RequestStartAnimalRhythm(AnimalController animal, int energyCost)
+        {
+            return RequestStartAnimalRhythm(animal, null, energyCost);
+        }
+
+        public bool RequestStartAnimalRhythm(AnimalController animal)
+        {
+            return RequestStartAnimalRhythm(animal, null, 1);
+        }
+
+        public bool RequestStartAnimalRhythm(AnimalController animal, FoodItem selectedFood)
+        {
+            return RequestStartAnimalRhythm(animal, selectedFood, 1);
+        }
+
+        // =========================
+        // UI CONTROL
+        // =========================
+        public void CloseAllPopups()
+        {
+            if (popup.plantRhythmStartPanel != null) popup.plantRhythmStartPanel.Hide();
+            if (popup.animalInteractionPanel != null) popup.animalInteractionPanel.Hide();
+
+            // Đóng bảng thưởng nếu nó đang mở
+
+            if (notify.plantRewardPanel != null) notify.plantRewardPanel.Hide();
+
+            ShowMainHUD();
+        }
+
+        private void HideMainHUD()
+        {
             if (mainGameUIPanel != null)
                 mainGameUIPanel.gameObject.SetActive(false);
-
-            // bật archive
-            if (archivePanel != null)
-                archivePanel.Show();
-
-            // fade sáng
-            yield return StartCoroutine(FadeCanvasGroup(fadeOverlay, 1f, 0f, fadeDuration));
-
-            _isTransitioning = false;
         }
 
-        public void CloseArchiveUI()
+        private void ShowMainHUD()
         {
-            if (_isTransitioning) return;
-            StartCoroutine(CloseArchiveRoutine());
-        }
-
-        private IEnumerator CloseArchiveRoutine()
-        {
-            _isTransitioning = true;
-
-            // fade tối
-            yield return StartCoroutine(FadeCanvasGroup(fadeOverlay, 0f, 1f, fadeDuration));
-
-            // tắt archive
-            if (archivePanel != null)
-                archivePanel.Hide();
-
-            // bật lại main panel
             if (mainGameUIPanel != null)
                 mainGameUIPanel.gameObject.SetActive(true);
-
-            // ép refresh luôn cho chắc
-            if (mainGameUIPanel != null)
-                mainGameUIPanel.ForceRefresh();
-
-            // fade sáng
-            yield return StartCoroutine(FadeCanvasGroup(fadeOverlay, 1f, 0f, fadeDuration));
-
-            _isTransitioning = false;
         }
 
-        // =========================
-        // Pause lock helpers
-        // =========================
-        private void LockPause()
+        public void ShowAnimalInteraction(AnimalController animal, InteractionTrigger sourceTrigger = null)
         {
-            _timeScaleLockCount++;
-            if (_timeScaleLockCount == 1)
-                Time.timeScale = 0f;
+            if (popup == null || popup.animalInteractionPanel == null) return;
+            ShowMainHUD();
+            popup.animalInteractionPanel.ShowForAnimal(animal, sourceTrigger);
         }
 
-        private void UnlockPause()
+        public void OpenSettings()
         {
-            _timeScaleLockCount = Mathf.Max(0, _timeScaleLockCount - 1);
-            if (_timeScaleLockCount == 0)
-                Time.timeScale = 1f;
-        }
-
-        // =========================
-        // Pause Menu (overlay)
-        // =========================
-        public void ShowPause()
-        {
-            if (pauseMenu != null) pauseMenu.SetActive(true);
-            LockPause();
-        }
-
-        public void ClosePause()
-        {
-            if (pauseMenu != null) pauseMenu.SetActive(false);
-            UnlockPause();
-        }
-
-        // =========================
-        // Settings Menu (overlay)
-        // =========================
-        public void ShowSettings()
-        {
-            if (settingsMenu != null) settingsMenu.SetActive(true);
-            LockPause();
+            if (popup.settingsMenu != null) popup.settingsMenu.SetActive(true);
         }
 
         public void CloseSettings()
         {
-            if (settingsMenu != null) settingsMenu.SetActive(false);
-            UnlockPause();
+            if (popup.settingsMenu != null) popup.settingsMenu.SetActive(false);
         }
 
-        // =========================
-        // Fade Overlay
-        // =========================
-        private IEnumerator FadeCanvasGroup(CanvasGroup cg, float start, float end, float duration)
+        public void CloseArchiveUI()
         {
-            if (cg == null) yield break;
-
-            cg.gameObject.SetActive(true);
-
-            // overlay bật lên thì block click cho chắc
-            cg.blocksRaycasts = true;
-            cg.interactable = true;
-
-            float t = 0f;
-            while (t < duration)
-            {
-                t += Time.unscaledDeltaTime;
-                cg.alpha = Mathf.Lerp(start, end, t / duration);
-                yield return null;
-            }
-
-            cg.alpha = end;
-
-            // alpha về 0 thì tắt overlay + nhả raycast
-            if (end <= 0f)
-            {
-                cg.blocksRaycasts = false;
-                cg.interactable = false;
-                cg.gameObject.SetActive(false);
-            }
+            CloseAllPopups();
         }
     }
 }

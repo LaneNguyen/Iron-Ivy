@@ -2,92 +2,119 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
-using IronIvy.Gameplay.Rhythm;
 using IronIvy.Gameplay.Animals;
 using IronIvy.Core;
 using IronIvy.Data;
+using IronIvy.Gameplay;
+using IronIvy.Gameplay.Interaction;
 
 namespace IronIvy.UI
 {
     public class MinigameInteractionPanel : MonoBehaviour
     {
-        public static MinigameInteractionPanel Instance { get; private set; }
-
         [Header("Root")]
         public GameObject panelRoot;
+
+        [Header("Buttons")]
+        public Button playButton; // NEW: kéo nút Start/Play vào đây (optional nhưng recommended)
+        public Button cancelButton;
 
         [Header("Texts")]
         public TextMeshProUGUI titleText;
         public TextMeshProUGUI questionText;
-        [Tooltip("Text hiển thị thông báo buff (ví dụ: 'Favorite Food!')")]
-        public TextMeshProUGUI buffInfoText; 
+        public TextMeshProUGUI buffInfoText;
 
         [TextArea]
         public string defaultQuestion = "Chơi với bạn nhỏ này?";
 
         [Header("Feeding UI")]
-        public GameObject feedingSectionRoot; // Parent chứa UI chọn đồ ăn
-        public Transform foodContainer;       // Grid layout
-        public GameObject foodSlotPrefab;     // Prefab slot
+        public GameObject feedingSectionRoot;
+        public Transform foodContainer;
+        public GameObject foodSlotPrefab;
         public Color selectedColor = Color.green;
         public Color normalColor = Color.white;
 
         [Header("Config")]
-        [SerializeField] int animalEnergyCost = 1;
-        [SerializeField] int plantDirectCost = 1; 
+        [SerializeField] private int animalEnergyCost = 1;
 
-        // context
+        [Header("Debug")]
+        public bool debugLog = true;
+
         private AnimalController _currentAnimal;
-        private ClickAnimalRhythmMinigame _currentAnimalMinigame;
-        private ClickPlantRhythmMinigame _currentPlantMinigame;
-        private PlantRhythmStartPanel _currentPlantStartPanel;
-
-        // Feeding State
         private FoodItem _selectedFood;
-        private Dictionary<FoodItem, GameObject> _spawnedSlots = new Dictionary<FoodItem, GameObject>();
+        private Dictionary<FoodItem, Image> _slotBackgrounds = new Dictionary<FoodItem, Image>();
 
-        // Dictionary lưu FoodItem và cái Image nền để đổi màu
-private Dictionary<FoodItem, Image> _slotBackgrounds = new Dictionary<FoodItem, Image>();
+        // sticky owner
+        private InteractionTrigger _sourceTrigger;
+
+        // NEW: chống trường hợp panel bị tắt ngoài luồng
+        private bool _isOpen;
 
         private void Awake()
         {
-            Instance = this;
             if (panelRoot != null) panelRoot.SetActive(false);
             if (buffInfoText) buffInfoText.text = "";
+
+            // optional: auto hook buttons nếu em muốn
+            if (playButton != null)
+            {
+                playButton.onClick.RemoveListener(OnPlayButton);
+                playButton.onClick.AddListener(OnPlayButton);
+            }
+
+            if (cancelButton != null)
+            {
+                cancelButton.onClick.RemoveListener(OnCancelButton);
+                cancelButton.onClick.AddListener(OnCancelButton);
+            }
         }
 
-        // --- SETUP ---
-        public void ShowForAnimal(AnimalController animal, ClickAnimalRhythmMinigame minigame)
+        private void Update()
         {
+            // Nếu panelRoot bị SetActive(false) trực tiếp từ inspector/button/animator
+            // thì coi như "close" và phải complete sticky để không kẹt trigger.
+            if (_isOpen && panelRoot != null && !panelRoot.activeInHierarchy)
+            {
+                if (debugLog)
+                    Debug.Log("[MinigameInteractionPanel] panelRoot was closed externally -> force cleanup");
+
+                ForceCloseFromExternal();
+            }
+        }
+
+        // NEW overload: nhận trigger nguồn
+        public void ShowForAnimal(AnimalController animal, InteractionTrigger sourceTrigger)
+        {
+            _sourceTrigger = sourceTrigger;
+            ShowForAnimal(animal);
+        }
+
+        // Existing API
+        public void ShowForAnimal(AnimalController animal)
+        {
+            if (!gameObject.activeSelf)
+                gameObject.SetActive(true);
+
             _currentAnimal = animal;
-            _currentAnimalMinigame = minigame;
-            
-            _currentPlantMinigame = null;
-            _currentPlantStartPanel = null;
-            _selectedFood = null; // Reset selection
+            _selectedFood = null;
             if (buffInfoText) buffInfoText.text = "";
 
-            ShowPanel("Play Animal Rhythm?", $"{defaultQuestion}\n(-{animalEnergyCost} năng lượng)");
+            ShowPanel(
+                "Play Animal Rhythm?",
+                $"{defaultQuestion}\n(-{animalEnergyCost} năng lượng)"
+            );
 
-            // Bật UI Feeding
             if (feedingSectionRoot) feedingSectionRoot.SetActive(true);
             RenderFoodList();
-        }
 
-        public void ShowForPlant(ClickPlantRhythmMinigame minigame, PlantRhythmStartPanel startPanel)
-        {
-            _currentPlantMinigame = minigame;
-            _currentPlantStartPanel = startPanel;
-            
-            _currentAnimal = null;
-            _currentAnimalMinigame = null;
-            _selectedFood = null;
+            // NEW: đảm bảo nút Start không bị disabled vĩnh viễn
+            if (playButton != null)
+                playButton.interactable = true;
 
-            int displayCost = (startPanel != null) ? startPanel.baseEnergyCost : plantDirectCost;
-            ShowPanel("Play Plant Rhythm?", $"{defaultQuestion}\n(-{displayCost} năng lượng)");
+            _isOpen = true;
 
-            // Tắt UI Feeding cho Plant
-            if (feedingSectionRoot) feedingSectionRoot.SetActive(false);
+            if (debugLog)
+                Debug.Log("[MinigameInteractionPanel] ShowForAnimal OK");
         }
 
         private void ShowPanel(string title, string question)
@@ -97,29 +124,66 @@ private Dictionary<FoodItem, Image> _slotBackgrounds = new Dictionary<FoodItem, 
             if (questionText != null) questionText.text = question;
         }
 
-        public void HideIfCurrentAnimal(AnimalController animal)
-        {
-            if (animal == _currentAnimal) Hide();
-        }
-
         public void Hide()
         {
+            if (!_isOpen) return;
+
             if (panelRoot != null) panelRoot.SetActive(false);
+
+            _isOpen = false;
+
+            // IMPORTANT: panel đóng thì complete sticky
+            if (_sourceTrigger != null)
+            {
+                _sourceTrigger.CompleteStickyInteraction();
+                _sourceTrigger = null;
+            }
+            else
+            {
+                // fallback safety
+                if (_currentAnimal != null)
+                {
+                    _currentAnimal.SetInteractionLocked(false);
+                    _currentAnimal.CancelLookAtPlayerNow();
+                }
+            }
+
             _currentAnimal = null;
-            _currentAnimalMinigame = null;
-            _currentPlantMinigame = null;
-            _currentPlantStartPanel = null;
+            _selectedFood = null;
+
+            if (debugLog)
+                Debug.Log("[MinigameInteractionPanel] Hide -> complete sticky");
+        }
+
+        // NEW: dùng khi panelRoot bị đóng ngoài luồng
+        private void ForceCloseFromExternal()
+        {
+            // đừng bật/tắt root nữa, vì nó đã off rồi
+            _isOpen = false;
+
+            if (_sourceTrigger != null)
+            {
+                _sourceTrigger.CompleteStickyInteraction();
+                _sourceTrigger = null;
+            }
+            else
+            {
+                if (_currentAnimal != null)
+                {
+                    _currentAnimal.SetInteractionLocked(false);
+                    _currentAnimal.CancelLookAtPlayerNow();
+                }
+            }
+
+            _currentAnimal = null;
             _selectedFood = null;
         }
 
-        // render danh sách đồ ăn từ inventory
         private void RenderFoodList()
         {
             if (!foodContainer || !foodSlotPrefab) return;
 
-            // xóa hết slot cũ trước đã
             foreach (Transform child in foodContainer) Destroy(child.gameObject);
-            _spawnedSlots.Clear();
             _slotBackgrounds.Clear();
 
             if (!InventoryManager.HasInstance) return;
@@ -130,45 +194,34 @@ private Dictionary<FoodItem, Image> _slotBackgrounds = new Dictionary<FoodItem, 
             {
                 FoodItem food = kvp.Key;
                 int count = kvp.Value;
-
                 if (count <= 0) continue;
 
-                // tạo slot từ prefab
                 GameObject slotObj = Instantiate(foodSlotPrefab, foodContainer);
-                
-                // setup icon và số lượng
-                var slotScript = slotObj.GetComponent<UIItemSlot>(); 
+
+                var slotScript = slotObj.GetComponent<UIItemSlot>();
                 if (slotScript) slotScript.Setup(food.icon, count);
-                
-                // prefab có thể chưa có Button, nên tự add vào luôn
+
                 Button btn = slotObj.GetComponent<Button>();
                 if (btn == null) btn = slotObj.AddComponent<Button>();
-
-                // tắt transition mặc định vì tự đổi màu
                 btn.transition = Selectable.Transition.None;
-                btn.onClick.AddListener(() => OnFoodSelected(food));
 
-                // lấy background image để đổi màu khi chọn
-                // giả sử Image nằm ở root, nếu không thì dùng GetComponentInChildren
-                Image bgImage = slotObj.GetComponent<Image>();
-                
-                if (bgImage)
+                FoodItem captured = food;
+                btn.onClick.AddListener(() => OnFoodSelected(captured));
+
+                Image bg = slotObj.GetComponent<Image>();
+                if (bg)
                 {
-                    _slotBackgrounds.Add(food, bgImage);
-                    bgImage.color = normalColor;
+                    _slotBackgrounds[captured] = bg;
+                    bg.color = normalColor;
                 }
-
-                _spawnedSlots.Add(food, slotObj);
             }
         }
-
-
 
         private void OnFoodSelected(FoodItem food)
         {
             if (_selectedFood == food)
             {
-                _selectedFood = null; // Toggle off
+                _selectedFood = null;
                 UpdateSlotHighlights();
                 if (buffInfoText) buffInfoText.text = "";
                 return;
@@ -177,12 +230,11 @@ private Dictionary<FoodItem, Image> _slotBackgrounds = new Dictionary<FoodItem, 
             _selectedFood = food;
             UpdateSlotHighlights();
 
-            // Check favorite
             if (_currentAnimal != null && _currentAnimal.Definition != null)
             {
                 if (_currentAnimal.Definition.favoriteFood == food)
                 {
-                    if (buffInfoText) buffInfoText.text = "<color=green> Trúng gu trúng gu!(Buffs Active)</color>";
+                    if (buffInfoText) buffInfoText.text = "<color=green>Trúng gu trúng gu! (Buff Active)</color>";
                 }
                 else
                 {
@@ -191,59 +243,42 @@ private Dictionary<FoodItem, Image> _slotBackgrounds = new Dictionary<FoodItem, 
             }
         }
 
-        // đổi màu highlight cho slot đang chọn
         private void UpdateSlotHighlights()
         {
             foreach (var kvp in _slotBackgrounds)
             {
-                FoodItem thisFood = kvp.Key;
-                Image bgImage = kvp.Value;
-
-        if (bgImage == null) continue;
-
-                if (thisFood == _selectedFood)
-                    bgImage.color = selectedColor;
-                else
-                    bgImage.color = normalColor;
+                if (kvp.Value == null) continue;
+                kvp.Value.color = (kvp.Key == _selectedFood) ? selectedColor : normalColor;
             }
         }
-        // --- ACTIONS ---
+
         public void OnPlayButton()
         {
-            // CASE ANIMAL
-            if (_currentAnimal != null && _currentAnimalMinigame != null)
+            if (_currentAnimal == null)
             {
-                if (EnergyManager.HasInstance && !EnergyManager.Instance.TrySpend(animalEnergyCost))
-                {
-                    Debug.LogWarning("Not enough energy.");
-                    return; 
-                }
-
-                // Xử lý Feeding
-                bool isFavorite = false;
-                if (_selectedFood != null)
-                {
-                    if (InventoryManager.HasInstance && InventoryManager.Instance.Consume(_selectedFood, 1))
-                    {
-                        if (_currentAnimal.Definition.favoriteFood == _selectedFood) isFavorite = true;
-                        _currentAnimal.TryFeed(_selectedFood);
-                    }
-                }
-
-                // Gọi Play kèm cờ Buff (Chưa có logic tính toán bên trong)
-                _currentAnimalMinigame.RequestPlay(_currentAnimal, isFavorite);
-            }
-            // CASE PLANT
-            else if (_currentPlantStartPanel != null) _currentPlantStartPanel.Show();
-            else if (_currentPlantMinigame != null)
-            {
-                if (EnergyManager.HasInstance && !EnergyManager.Instance.TrySpend(plantDirectCost)) return;
-                _currentPlantMinigame.StartGame();
+                Debug.LogWarning("[MinigameInteractionPanel] No animal context.");
+                return;
             }
 
-            Hide();
+            if (!UIManager.HasInstance)
+            {
+                Debug.LogWarning("[MinigameInteractionPanel] UIManager missing.");
+                return;
+            }
+
+            if (debugLog)
+                Debug.Log("[MinigameInteractionPanel] OnPlayButton -> RequestStartAnimalRhythm");
+
+            UIManager.Instance.RequestStartAnimalRhythm(_currentAnimal, _selectedFood, animalEnergyCost);
         }
 
-        public void OnCancelButton() => Hide();
+        public void OnCancelButton()
+        {
+            Hide();
+
+            // optional: bật main UI lại nếu em muốn
+            if (UIManager.HasInstance)
+                UIManager.Instance.CloseAllPopups();
+        }
     }
 }

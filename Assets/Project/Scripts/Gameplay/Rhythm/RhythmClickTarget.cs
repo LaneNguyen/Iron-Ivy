@@ -1,8 +1,8 @@
 ﻿using System;
-using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
+using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace IronIvy.Gameplay.Rhythm
 {
@@ -32,6 +32,10 @@ namespace IronIvy.Gameplay.Rhythm
         private float holdTimer = 0f;           // thời gian đang giữ chuột
         private bool pointerDown = false;
         private bool resolved = false;
+        private bool wasHit = false;            // kết quả hit hay miss
+
+        public bool HasResult => resolved;
+        public bool WasHit => wasHit;
 
         // setup mỗi lần spawn target
         // - isHoldStep: true nếu là hold note
@@ -72,6 +76,7 @@ namespace IronIvy.Gameplay.Rhythm
             holdTimer = 0f;
             pointerDown = false;
             resolved = false;
+            wasHit = false;
         }
 
         private void Update()
@@ -123,7 +128,7 @@ namespace IronIvy.Gameplay.Rhythm
         {
             if (resolved) return;
             if (eventData.button != PointerEventData.InputButton.Left) return;
-
+            Debug.Log("Có click trúng");
             if (isHold)
             {
                 pointerDown = true;
@@ -149,7 +154,7 @@ namespace IronIvy.Gameplay.Rhythm
         {
             if (resolved) return;
             if (eventData.button != PointerEventData.InputButton.Left) return;
-
+            Debug.Log("Có click trúng");
             if (!isHold)
             {
                 // tap step: click 1 cái là xong
@@ -164,6 +169,7 @@ namespace IronIvy.Gameplay.Rhythm
         {
             if (resolved) return;
             resolved = true;
+            wasHit = hit;
 
             try
             {

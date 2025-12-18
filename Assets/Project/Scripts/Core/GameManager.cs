@@ -24,11 +24,27 @@ namespace IronIvy.Core
 
         private void Start()
         {
-            // Khởi tạo các logic game
-            energy.ResetDaily();
-            if (zone) zone.InitAtArchive(archive ? archive.CurrentPercent : 0);
-            if (ui) ui.InitHUD(energy.Current, archive ? archive.CurrentPercent : 0);
-            
+            // 1) Core init (giữ như cũ)
+            if (energy) energy.ResetDaily();
+
+            if (zone)
+                zone.InitAtArchive(archive ? archive.CurrentPercent : 0f);
+
+            // 2) UI không init trực tiếp nữa
+            // UI sẽ tự update bằng event
+            if (ListenManager.HasInstance)
+            {
+                if (energy)
+                    ListenManager.Instance.RaiseEnergyChanged(energy.Current);
+
+                if (archive)
+                    ListenManager.Instance.RaiseArchiveChanged(archive.CurrentPercent);
+
+                if (inventory)
+                    ListenManager.Instance.RaiseInventoryChanged();
+            }
+
+            // 3) Báo hệ thống sẵn sàng (UIManager sẽ inject spawnArea, bind event, v.v.)
             if (ListenManager.HasInstance)
             {
                 ListenManager.Instance.RaiseSystemsReady();
