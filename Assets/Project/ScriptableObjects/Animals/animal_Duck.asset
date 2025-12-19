@@ -63,6 +63,6 @@ MonoBehaviour:
   badAnim: Bad
   iv17Reactions: []
   archiveReward: 4
-  minigameMusicLoop: {fileID: 8300000, guid: b72863abd454aa94d93920e2041c08a9, type: 3}
+  minigameMusicLoop: {fileID: 8300000, guid: 5095e63fe74681a4ea42e0b182803b58, type: 3}
   loopSfx: {fileID: 0}
-  successVFX: {fileID: 0}
+  successVFX: {fileID: 100004, guid: 3af6f68141914ca43ba39b2403757bd0, type: 3}

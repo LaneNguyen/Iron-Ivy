@@ -16,8 +16,8 @@ MonoBehaviour:
   displayName: "H\u1ED5"
   icon: {fileID: -1365671756, guid: ba345775ab9ce6846af2d011d01e47e6, type: 3}
   cameraOrbitDistance: 15
-  cameraOrbitHeight: 8
-  cameraLookAtHeight: 0
+  cameraOrbitHeight: 7
+  cameraLookAtHeight: 0.3
   cameraOrbitRotateSpeed: 0
   favoriteFood: {fileID: 0}
   buffSafetyNet: 3
@@ -61,6 +61,6 @@ MonoBehaviour:
   badAnim: Bad
   iv17Reactions: []
   archiveReward: 15
-  minigameMusicLoop: {fileID: 8300000, guid: 1aa8cffa2005c40439ec88fdf5e27359, type: 3}
+  minigameMusicLoop: {fileID: 8300000, guid: b02a2789e37bdd04a816d1b94fb5b15e, type: 3}
   loopSfx: {fileID: 0}
-  successVFX: {fileID: 0}
+  successVFX: {fileID: 100004, guid: 3af6f68141914ca43ba39b2403757bd0, type: 3}

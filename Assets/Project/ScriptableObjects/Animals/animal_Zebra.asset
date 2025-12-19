@@ -17,7 +17,7 @@ MonoBehaviour:
   icon: {fileID: -670004251, guid: 49c4bbe67396ae143bd5a7383b9cf498, type: 3}
   cameraOrbitDistance: 15
   cameraOrbitHeight: 5
-  cameraLookAtHeight: 2
+  cameraLookAtHeight: 0.7
   cameraOrbitRotateSpeed: 0
   favoriteFood: {fileID: 11400000, guid: 00e9e275c37774f4abe494bf5a3f27d9, type: 2}
   buffSafetyNet: 3
@@ -63,4 +63,4 @@ MonoBehaviour:
   archiveReward: 10
   minigameMusicLoop: {fileID: 8300000, guid: e347fd514bf207d42bbfdbc598876712, type: 3}
   loopSfx: {fileID: 0}
-  successVFX: {fileID: 0}
+  successVFX: {fileID: 100004, guid: 3af6f68141914ca43ba39b2403757bd0, type: 3}

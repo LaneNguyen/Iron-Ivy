@@ -63,4 +63,4 @@ MonoBehaviour:
   archiveReward: 15
   minigameMusicLoop: {fileID: 8300000, guid: 68969fd44827e3d449c015edd26822ad, type: 3}
   loopSfx: {fileID: 0}
-  successVFX: {fileID: 0}
+  successVFX: {fileID: 100004, guid: 3af6f68141914ca43ba39b2403757bd0, type: 3}
