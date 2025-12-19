@@ -170,6 +170,12 @@ namespace IronIvy.Core
         public class RhythmAnimalResultPayload
         {
             public AnimalController animal;
+
+            // Fallbacks: giữ data UI kể cả khi AnimalController bị despawn/pooled trước khi panel consume event
+            public AnimalDefinition animalDefinition;
+            public string animalDisplayName;
+            public Sprite animalIcon;
+
             public float successRatio;
             public float archiveGained;
 
@@ -179,6 +185,7 @@ namespace IronIvy.Core
             public int hit;
             public int miss;
 
+            // Constructor cũ: giữ nguyên để không phá compile
             public RhythmAnimalResultPayload(
                 AnimalController animal,
                 float successRatio,
@@ -196,6 +203,35 @@ namespace IronIvy.Core
                 this.lootCount = lootCount;
                 this.hit = hit;
                 this.miss = miss;
+
+                // snapshot ngay lúc raise event
+                this.animalDefinition = (animal != null) ? animal.Definition : null;
+                this.animalDisplayName = (this.animalDefinition != null) ? this.animalDefinition.displayName : string.Empty;
+                this.animalIcon = (this.animalDefinition != null) ? this.animalDefinition.icon : null;
+            }
+
+            // Optional: hệ thống có thể raise mà không cần live AnimalController
+            public RhythmAnimalResultPayload(
+                AnimalDefinition animalDefinition,
+                float successRatio,
+                float archiveGained,
+                FoodItem lootItem,
+                int lootCount,
+                int hit,
+                int miss
+            )
+            {
+                this.animal = null;
+                this.successRatio = successRatio;
+                this.archiveGained = archiveGained;
+                this.lootItem = lootItem;
+                this.lootCount = lootCount;
+                this.hit = hit;
+                this.miss = miss;
+
+                this.animalDefinition = animalDefinition;
+                this.animalDisplayName = (animalDefinition != null) ? animalDefinition.displayName : string.Empty;
+                this.animalIcon = (animalDefinition != null) ? animalDefinition.icon : null;
             }
         }
     }

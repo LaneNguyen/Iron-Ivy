@@ -40,8 +40,11 @@ namespace IronIvy.UI
         public float trustAnimDuration = 0.6f;
         public float trustStartScale = 0.6f;
 
-        [Header("Icon (optional)")]
+        [Header("Icon (animal)")]
         public Image animalIcon;
+
+        [Header("Debug")]
+        [SerializeField] private bool logIconDebug = true;
 
         private AnimalController _currentAnimal;
         private Coroutine _trustAnimRoutine;
@@ -50,6 +53,21 @@ namespace IronIvy.UI
         private void Awake()
         {
             if (root == null) root = gameObject;
+
+            // auto-find nhẹ nếu quên assign (không bắt buộc)
+            if (animalIcon == null)
+            {
+                var imgs = GetComponentsInChildren<Image>(true);
+                for (int i = 0; i < imgs.Length; i++)
+                {
+                    if (imgs[i] != null && imgs[i].name.ToLowerInvariant().Contains("animal") && imgs[i].name.ToLowerInvariant().Contains("icon"))
+                    {
+                        animalIcon = imgs[i];
+                        break;
+                    }
+                }
+            }
+
             root.SetActive(false);
         }
 
@@ -69,6 +87,7 @@ namespace IronIvy.UI
         {
             if (payload == null) return;
 
+            // mở panel + fill các số liệu
             ShowAnimalRhythmResult(
                 payload.animal,
                 payload.successRatio,
@@ -78,6 +97,21 @@ namespace IronIvy.UI
                 payload.hit,
                 payload.miss
             );
+
+            // --- ICON: ưu tiên snapshot từ payload (đã chụp từ AnimalDefinition.icon ở ListenManager) ---
+            Sprite icon = payload.animalIcon;
+
+            if (icon == null && payload.animalDefinition != null)
+                icon = payload.animalDefinition.icon;
+
+            if (icon == null && payload.animal != null && payload.animal.Definition != null)
+                icon = payload.animal.Definition.icon;
+
+            ApplyAnimalIcon(icon, payload);
+
+            // name snapshot (chống animal despawn trước khi UI ăn event)
+            if (animalNameText != null && !string.IsNullOrEmpty(payload.animalDisplayName))
+                animalNameText.text = payload.animalDisplayName;
         }
 
         public void ShowAnimalRhythmResult(
@@ -93,6 +127,9 @@ namespace IronIvy.UI
             _currentAnimal = animal;
 
             root.SetActive(true);
+
+            // reset icon mỗi lần mở để tránh giữ state cũ
+            ApplyAnimalIcon(null, null);
 
             if (animalNameText != null && animal != null && animal.Definition != null)
                 animalNameText.text = animal.Definition.displayName;
@@ -120,15 +157,59 @@ namespace IronIvy.UI
                     if (uiSlot != null) uiSlot.Setup(lootItem.icon, lootCount);
                 }
             }
+        }
 
-            if (animalIcon != null)
+        private void ApplyAnimalIcon(Sprite sprite, ListenManager.RhythmAnimalResultPayload payload)
+        {
+            if (animalIcon == null)
             {
-                if (animal != null && animal.Definition != null && animal.Definition.icon != null)
-                {
-                    animalIcon.sprite = animal.Definition.icon;
-                    animalIcon.enabled = true;
-                }
-                else animalIcon.enabled = false;
+                if (logIconDebug)
+                    Debug.LogWarning("[AnimalRhythmRewardPanel] animalIcon reference is NULL. Assign it in prefab/panel.");
+                return;
+            }
+
+            // detect assign nhầm: animalIcon nằm dưới rewardContainer => slot UI có thể override
+            if (rewardContainer != null && animalIcon.transform.IsChildOf(rewardContainer))
+            {
+                Debug.LogWarning("[AnimalRhythmRewardPanel] animalIcon is under rewardContainer. This is likely WRONG reference (item slot may override). Please assign a dedicated Image for animal icon.");
+            }
+
+            if (sprite != null)
+            {
+                animalIcon.sprite = sprite;
+                animalIcon.enabled = true;
+
+                // fix “set rồi nhưng không thấy”
+                if (!animalIcon.gameObject.activeInHierarchy)
+                    animalIcon.gameObject.SetActive(true);
+
+                var c = animalIcon.color;
+                if (c.a <= 0.01f) c.a = 1f;
+                animalIcon.color = c;
+
+                var rt = animalIcon.rectTransform;
+                if (rt != null && rt.localScale.sqrMagnitude < 0.0001f)
+                    rt.localScale = Vector3.one;
+
+                var cg = animalIcon.GetComponentInParent<CanvasGroup>();
+                if (cg != null && cg.alpha <= 0.01f)
+                    cg.alpha = 1f;
+            }
+            else
+            {
+                animalIcon.sprite = null;
+                animalIcon.enabled = false;
+            }
+
+            if (logIconDebug)
+            {
+                string name = payload != null ? payload.animalDisplayName : "(no payload)";
+                string src =
+                    (payload != null && payload.animalIcon != null) ? "payload.animalIcon" :
+                    (payload != null && payload.animalDefinition != null && payload.animalDefinition.icon != null) ? "payload.animalDefinition.icon" :
+                    "payload.animal.Definition.icon";
+
+                Debug.Log($"[AnimalRhythmRewardPanel] ApplyAnimalIcon name='{name}' sprite={(sprite != null ? sprite.name : "NULL")} source={src} iconGO={animalIcon.gameObject.name} enabled={animalIcon.enabled} alpha={animalIcon.color.a}");
             }
         }
 
@@ -171,16 +252,13 @@ namespace IronIvy.UI
 
         public void OnConfirmButton()
         {
-            // 1) đóng panel trước
             root.SetActive(false);
 
-            // 2) chỉ lúc này mới despawn + spawn vfx (Success / Despawn) dựa trên trust đã queue
             if (_currentAnimal != null)
                 _currentAnimal.ExecuteQueuedDespawnAfterMinigame();
 
             _currentAnimal = null;
 
-            // 3) bắn event để hệ thống bật lại ambience/bgm môi trường
             if (ListenManager.HasInstance)
                 ListenManager.Instance.RaiseRhythmResultClosed();
         }

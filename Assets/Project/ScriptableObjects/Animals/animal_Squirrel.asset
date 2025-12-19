@@ -16,8 +16,8 @@ MonoBehaviour:
   displayName: "S\xF3c"
   icon: {fileID: -461429957, guid: ae99b0ba083b2b447ba1a561324e8fa5, type: 3}
   cameraOrbitDistance: 0
-  cameraOrbitHeight: 0
-  cameraLookAtHeight: 0
+  cameraOrbitHeight: 0.3
+  cameraLookAtHeight: 0.3
   cameraOrbitRotateSpeed: 0
   favoriteFood: {fileID: 11400000, guid: 00e9e275c37774f4abe494bf5a3f27d9, type: 2}
   buffSafetyNet: 3
