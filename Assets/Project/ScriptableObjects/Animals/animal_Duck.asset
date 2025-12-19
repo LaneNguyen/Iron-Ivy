@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: "V\u1ECBt Baby"
   icon: {fileID: -2119013152, guid: c7466141e66fae54a8e7b6089dae8544, type: 3}
   cameraOrbitDistance: 15
-  cameraOrbitHeight: 1
+  cameraOrbitHeight: 8
   cameraLookAtHeight: 0.8
   cameraOrbitRotateSpeed: 0
   favoriteFood: {fileID: 11400000, guid: e5b41e7a0209d4e41aef6fe16925bb48, type: 2}

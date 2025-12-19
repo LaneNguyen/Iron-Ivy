@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: "H\u1ED5"
   icon: {fileID: -1365671756, guid: ba345775ab9ce6846af2d011d01e47e6, type: 3}
   cameraOrbitDistance: 15
-  cameraOrbitHeight: 0
+  cameraOrbitHeight: 8
   cameraLookAtHeight: 0
   cameraOrbitRotateSpeed: 0
   favoriteFood: {fileID: 0}

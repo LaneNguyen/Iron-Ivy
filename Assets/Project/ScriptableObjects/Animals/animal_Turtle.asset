@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: "R\xF9a"
   icon: {fileID: -1048960537, guid: 65e1f9134c8d2674bbadecafced414fb, type: 3}
   cameraOrbitDistance: 15
-  cameraOrbitHeight: 0
+  cameraOrbitHeight: 8
   cameraLookAtHeight: 0
   cameraOrbitRotateSpeed: 0
   favoriteFood: {fileID: 11400000, guid: b5fcee1560a837e4ab047aec13f3ab3d, type: 2}

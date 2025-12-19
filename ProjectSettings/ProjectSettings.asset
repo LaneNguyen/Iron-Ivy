@@ -14,7 +14,7 @@ PlayerSettings:
   accelerometerFrequency: 60
   companyName: DefaultCompany
   productName: IronIvy
-  defaultCursor: {fileID: 2800000, guid: 605df60301b6c054caaa93dd396d4224, type: 3}
+  defaultCursor: {fileID: 2800000, guid: 260fee01e758ae64da3bc2d722d4363d, type: 3}
   cursorHotspot: {x: 0, y: 0}
   m_SplashScreenBackgroundColor: {r: 0.13725491, g: 0.12156863, b: 0.1254902, a: 1}
   m_ShowUnitySplashScreen: 1

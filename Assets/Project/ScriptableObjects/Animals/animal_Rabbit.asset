@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: "Th\u1ECF"
   icon: {fileID: 951384075, guid: d7af28942b656584ab2046b7c656e39c, type: 3}
   cameraOrbitDistance: 15
-  cameraOrbitHeight: 2
+  cameraOrbitHeight: 8
   cameraLookAtHeight: 0.7
   cameraOrbitRotateSpeed: 0
   favoriteFood: {fileID: 11400000, guid: b5fcee1560a837e4ab047aec13f3ab3d, type: 2}

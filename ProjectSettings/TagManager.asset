@@ -9,6 +9,7 @@ TagManager:
   - PW - Building
   - Animal
   - Synty Tree
+  - FxTemporaire
   layers:
   - Default
   - TransparentFX
@@ -24,7 +25,7 @@ TagManager:
   - PW_Object_Large
   - Ground
   - Interactable
-  - 
+  - ObjectToBeTransparent
   - 
   - 
   - 

@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: "Ng\u1EF1a V\u1EB1n"
   icon: {fileID: -670004251, guid: 49c4bbe67396ae143bd5a7383b9cf498, type: 3}
   cameraOrbitDistance: 15
-  cameraOrbitHeight: 0
+  cameraOrbitHeight: 5
   cameraLookAtHeight: 2
   cameraOrbitRotateSpeed: 0
   favoriteFood: {fileID: 11400000, guid: 00e9e275c37774f4abe494bf5a3f27d9, type: 2}

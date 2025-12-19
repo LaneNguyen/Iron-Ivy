@@ -194,11 +194,11 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
-    - _GustAmount: 0
+    - _GustAmount: 0.159
     - _GustFreq: 0.224
-    - _GustLargeFreq: 0
+    - _GustLargeFreq: 0.077
     - _GustScale: 0.311
-    - _GustSmallFreq: 0
+    - _GustSmallFreq: 0.073
     - _JitterAmount: 0.15
     - _JitterFreq: 0.124
     - _LOD_FADE_CROSSFADE: 1
@@ -207,12 +207,12 @@ Material:
     - _LOD_FADE_CROSSFADE_in: 0
     - _LOD_FADE_CROSSFADE_out: 0
     - _LeafBigNoiseAmount: 0.016
-    - _LeafBigNoiseScale: 4.43
+    - _LeafBigNoiseScale: 1.25
     - _LeafFlatColourSwitch: 0
     - _LeafMetallic: 0
     - _LeafNoiseAmount: 0.371
     - _LeafNoiseScale: 1
-    - _LeafNormalAmount: 0.5
+    - _LeafNormalAmount: 0.38
     - _LeafSmoothness: 0.2
     - _Metallic: 0.132
     - _Mode: 0
@@ -232,15 +232,15 @@ Material:
     - _SrcBlend: 1
     - _Tiling: 1
     - _Tint_Tiling: 0.5
-    - _TotalWindAmount: 0
+    - _TotalWindAmount: 0.219
     - _TrunkFlatColourSwitch: 0
     - _TrunkMetallic: 0
     - _TrunkNormalAmount: 0.5
     - _TrunkSmoothness: 0.2
     - _UVSec: 0
     - _WindAmount: 1
-    - _WindBaseline: 0
-    - _WindDirection: 0
+    - _WindBaseline: 0.26
+    - _WindDirection: 0.129
     - _WindDirection1: 0
     - _WindNoiseScale: 1
     - _WindNoiseScale1: 14.76

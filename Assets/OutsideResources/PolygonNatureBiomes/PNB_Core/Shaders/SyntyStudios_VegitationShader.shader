@@ -86,6 +86,28 @@ Shader "SyntyStudios/VegitationShader"
 		HLSLINCLUDE
 		#pragma target 2.0
 
+		// =======================
+		// Iron & Ivy Focus Fade (GLOBAL)
+		// =======================
+		float  _FocusEnabled;
+		float3 _FocusPos;
+		float  _FocusRadius;
+		float  _FocusAlpha;
+
+		inline float IIVY_IGN( float2 pixelXY )
+		{
+			return frac( 52.9829189 * frac( dot( pixelXY, float2(0.06711056, 0.00583715) ) ) );
+		}
+
+		inline float IIVY_FocusFactor( float3 posWS )
+		{
+			if( _FocusEnabled <= 0.5 ) return 1.0;
+			float dist = distance( posWS, _FocusPos );
+			float t = smoothstep( _FocusRadius * 0.7, _FocusRadius * 1.05, dist );
+			return lerp( _FocusAlpha, 1.0, t );
+		}
+
+
 		#ifndef ASE_TESS_FUNCS
 		#define ASE_TESS_FUNCS
 		float4 FixedTess( float tessValue )
@@ -800,7 +822,16 @@ Shader "SyntyStudios/VegitationShader"
 				#endif
 
 				#ifdef _ALPHATEST_ON
-					clip(Alpha - AlphaClipThreshold);
+					
+					// ===== Iron & Ivy Focus Fade (dither clip) =====
+					{
+						float __iivy_focus = IIVY_FocusFactor( WorldPosition );
+						// screen pos normalized is available in this pass
+						float2 __iivy_pixel = ase_screenPosNorm.xy * _ScreenParams.xy;
+						float __iivy_noise = IIVY_IGN( __iivy_pixel );
+						clip( __iivy_focus - __iivy_noise );
+					}
+clip(Alpha - AlphaClipThreshold);
 				#endif
 
 				InputData inputData;
@@ -1397,9 +1428,27 @@ Shader "SyntyStudios/VegitationShader"
 
 				#ifdef _ALPHATEST_ON
 					#ifdef _ALPHATEST_SHADOW_ON
-						clip(Alpha - AlphaClipThresholdShadow);
+						
+					// ===== Iron & Ivy Focus Fade (dither clip) =====
+					{
+						float __iivy_focus = IIVY_FocusFactor( WorldPosition );
+						// screen pos normalized is available in this pass
+						float2 __iivy_pixel = ase_screenPosNorm.xy * _ScreenParams.xy;
+						float __iivy_noise = IIVY_IGN( __iivy_pixel );
+						clip( __iivy_focus - __iivy_noise );
+					}
+clip(Alpha - AlphaClipThresholdShadow);
 					#else
-						clip(Alpha - AlphaClipThreshold);
+						
+					// ===== Iron & Ivy Focus Fade (dither clip) =====
+					{
+						float __iivy_focus = IIVY_FocusFactor( WorldPosition );
+						// screen pos normalized is available in this pass
+						float2 __iivy_pixel = ase_screenPosNorm.xy * _ScreenParams.xy;
+						float __iivy_noise = IIVY_IGN( __iivy_pixel );
+						clip( __iivy_focus - __iivy_noise );
+					}
+clip(Alpha - AlphaClipThreshold);
 					#endif
 				#endif
 
@@ -1859,7 +1908,16 @@ Shader "SyntyStudios/VegitationShader"
 				#endif
 
 				#ifdef _ALPHATEST_ON
-					clip(Alpha - AlphaClipThreshold);
+					
+					// ===== Iron & Ivy Focus Fade (dither clip) =====
+					{
+						float __iivy_focus = IIVY_FocusFactor( WorldPosition );
+						// screen pos normalized is available in this pass
+						float2 __iivy_pixel = ase_screenPosNorm.xy * _ScreenParams.xy;
+						float __iivy_noise = IIVY_IGN( __iivy_pixel );
+						clip( __iivy_focus - __iivy_noise );
+					}
+clip(Alpha - AlphaClipThreshold);
 				#endif
 
 				#ifdef LOD_FADE_CROSSFADE
@@ -2381,7 +2439,16 @@ Shader "SyntyStudios/VegitationShader"
 				float AlphaClipThreshold = 0.5;
 
 				#ifdef _ALPHATEST_ON
-					clip(Alpha - AlphaClipThreshold);
+					
+					// ===== Iron & Ivy Focus Fade (dither clip) =====
+					{
+						float __iivy_focus = IIVY_FocusFactor( WorldPosition );
+						// screen pos normalized is available in this pass
+						float2 __iivy_pixel = ase_screenPosNorm.xy * _ScreenParams.xy;
+						float __iivy_noise = IIVY_IGN( __iivy_pixel );
+						clip( __iivy_focus - __iivy_noise );
+					}
+clip(Alpha - AlphaClipThreshold);
 				#endif
 
 				MetaInput metaInput = (MetaInput)0;
@@ -2881,7 +2948,16 @@ Shader "SyntyStudios/VegitationShader"
 				half4 color = half4( Albedo, Alpha );
 
 				#ifdef _ALPHATEST_ON
-					clip(Alpha - AlphaClipThreshold);
+					
+					// ===== Iron & Ivy Focus Fade (dither clip) =====
+					{
+						float __iivy_focus = IIVY_FocusFactor( WorldPosition );
+						// screen pos normalized is available in this pass
+						float2 __iivy_pixel = ase_screenPosNorm.xy * _ScreenParams.xy;
+						float __iivy_noise = IIVY_IGN( __iivy_pixel );
+						clip( __iivy_focus - __iivy_noise );
+					}
+clip(Alpha - AlphaClipThreshold);
 				#endif
 
 				return color;
@@ -3338,7 +3414,16 @@ Shader "SyntyStudios/VegitationShader"
 				#endif
 
 				#ifdef _ALPHATEST_ON
-					clip(Alpha - AlphaClipThreshold);
+					
+					// ===== Iron & Ivy Focus Fade (dither clip) =====
+					{
+						float __iivy_focus = IIVY_FocusFactor( WorldPosition );
+						// screen pos normalized is available in this pass
+						float2 __iivy_pixel = ase_screenPosNorm.xy * _ScreenParams.xy;
+						float __iivy_noise = IIVY_IGN( __iivy_pixel );
+						clip( __iivy_focus - __iivy_noise );
+					}
+clip(Alpha - AlphaClipThreshold);
 				#endif
 
 				#ifdef LOD_FADE_CROSSFADE
@@ -3940,7 +4025,16 @@ Shader "SyntyStudios/VegitationShader"
 				#endif
 
 				#ifdef _ALPHATEST_ON
-					clip(Alpha - AlphaClipThreshold);
+					
+					// ===== Iron & Ivy Focus Fade (dither clip) =====
+					{
+						float __iivy_focus = IIVY_FocusFactor( WorldPosition );
+						// screen pos normalized is available in this pass
+						float2 __iivy_pixel = ase_screenPosNorm.xy * _ScreenParams.xy;
+						float __iivy_noise = IIVY_IGN( __iivy_pixel );
+						clip( __iivy_focus - __iivy_noise );
+					}
+clip(Alpha - AlphaClipThreshold);
 				#endif
 
 				InputData inputData;

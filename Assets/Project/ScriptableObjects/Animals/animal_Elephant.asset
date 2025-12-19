@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: Zebra
   icon: {fileID: -1382332400, guid: 6006a33d608b9e94fbda69f2ec3b5d61, type: 3}
   cameraOrbitDistance: 3
-  cameraOrbitHeight: 0.5
+  cameraOrbitHeight: 6
   cameraLookAtHeight: 0.5
   cameraOrbitRotateSpeed: 0
   favoriteFood: {fileID: 11400000, guid: 7dd2cd018801fe04faf983f4df6dc903, type: 2}

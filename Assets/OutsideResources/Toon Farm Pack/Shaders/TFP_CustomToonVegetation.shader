@@ -39,6 +39,40 @@ Shader "Toon/TFP_CustomToonVegetation"
 		HLSLINCLUDE
 		#pragma target 3.0
 
+// =======================
+// Iron & Ivy Focus Fade (GLOBAL)
+// Reads from Shader.SetGlobal* in C#
+// _FocusEnabled, _FocusPos, _FocusRadius, _FocusAlpha
+// Safe for instancing + terrain trees (alpha-test dither)
+// =======================
+float  _FocusEnabled;
+float3 _FocusPos;
+float  _FocusRadius;
+float  _FocusAlpha;
+
+// Interleaved Gradient Noise (cheap stable dither in screen space)
+inline float IIVY_IGN(float2 pixelXY)
+{
+    // pixelXY should be in pixel units (0..ScreenParams.xy)
+    // This is a common IGN hash
+    return frac(52.9829189 * frac(dot(pixelXY, float2(0.06711056, 0.00583715))));
+}
+
+// 0..1 focus factor. Near focusPos -> _FocusAlpha, far -> 1
+inline float IIVY_FocusFactor(float3 posWS)
+{
+    // disabled => no fade
+    if (_FocusEnabled <= 0.5) return 1.0;
+
+    float dist = distance(posWS, _FocusPos);
+
+    // smooth band: start fading around 0.7R, back to normal around 1.05R
+    float t = smoothstep(_FocusRadius * 0.7, _FocusRadius * 1.05, dist);
+
+    return lerp(_FocusAlpha, 1.0, t);
+}
+
+
 		#pragma prefer_hlslcc gles
 		
 
@@ -467,6 +501,27 @@ Shader "Toon/TFP_CustomToonVegetation"
 				float AlphaClipThresholdShadow = 0.5;
 
 				#ifdef _ALPHATEST_ON
+
+				// ===== Iron & Ivy Focus Fade (dither clip) =====
+float3 iivy_posWS;
+#if defined(ASE_NEEDS_FRAG_WORLD_POSITION)
+    iivy_posWS = WorldPosition;
+#else
+    // fallback from clipPos if world pos isn't available
+    iivy_posWS = ComputeWorldSpacePosition(IN.clipPos, UNITY_MATRIX_I_VP);
+#endif
+
+float iivy_focus = IIVY_FocusFactor(iivy_posWS);
+
+// Dither in screen space (no transparent sorting issues)
+float2 iivy_ndc   = (IN.clipPos.xy / IN.clipPos.w);
+float2 iivy_uv01  = iivy_ndc * 0.5 + 0.5;
+float2 iivy_pixel = iivy_uv01 * _ScreenParams.xy;
+float  iivy_noise = IIVY_IGN(iivy_pixel);
+
+// clip by focus first (keeps alpha-test pipeline)
+clip(iivy_focus - iivy_noise);
+
 					clip( Alpha - AlphaClipThreshold );
 				#endif
 
@@ -750,6 +805,26 @@ Shader "Toon/TFP_CustomToonVegetation"
 					#ifdef _ALPHATEST_SHADOW_ON
 						clip(Alpha - AlphaClipThresholdShadow);
 					#else
+					// ===== Iron & Ivy Focus Fade (dither clip) =====
+float3 iivy_posWS;
+#if defined(ASE_NEEDS_FRAG_WORLD_POSITION)
+    iivy_posWS = WorldPosition;
+#else
+    // fallback from clipPos if world pos isn't available
+    iivy_posWS = ComputeWorldSpacePosition(IN.clipPos, UNITY_MATRIX_I_VP);
+#endif
+
+float iivy_focus = IIVY_FocusFactor(iivy_posWS);
+
+// Dither in screen space (no transparent sorting issues)
+float2 iivy_ndc   = (IN.clipPos.xy / IN.clipPos.w);
+float2 iivy_uv01  = iivy_ndc * 0.5 + 0.5;
+float2 iivy_pixel = iivy_uv01 * _ScreenParams.xy;
+float  iivy_noise = IIVY_IGN(iivy_pixel);
+
+// clip by focus first (keeps alpha-test pipeline)
+clip(iivy_focus - iivy_noise);
+
 						clip(Alpha - AlphaClipThreshold);
 					#endif
 				#endif
@@ -993,6 +1068,26 @@ Shader "Toon/TFP_CustomToonVegetation"
 				float AlphaClipThreshold = 0.5;
 
 				#ifdef _ALPHATEST_ON
+				// ===== Iron & Ivy Focus Fade (dither clip) =====
+float3 iivy_posWS;
+#if defined(ASE_NEEDS_FRAG_WORLD_POSITION)
+    iivy_posWS = WorldPosition;
+#else
+    // fallback from clipPos if world pos isn't available
+    iivy_posWS = ComputeWorldSpacePosition(IN.clipPos, UNITY_MATRIX_I_VP);
+#endif
+
+float iivy_focus = IIVY_FocusFactor(iivy_posWS);
+
+// Dither in screen space (no transparent sorting issues)
+float2 iivy_ndc   = (IN.clipPos.xy / IN.clipPos.w);
+float2 iivy_uv01  = iivy_ndc * 0.5 + 0.5;
+float2 iivy_pixel = iivy_uv01 * _ScreenParams.xy;
+float  iivy_noise = IIVY_IGN(iivy_pixel);
+
+// clip by focus first (keeps alpha-test pipeline)
+clip(iivy_focus - iivy_noise);
+
 					clip(Alpha - AlphaClipThreshold);
 				#endif
 
@@ -1325,6 +1420,26 @@ Shader "Toon/TFP_CustomToonVegetation"
 				float AlphaClipThresholdShadow = 0.5;
 
 				#ifdef _ALPHATEST_ON
+				// ===== Iron & Ivy Focus Fade (dither clip) =====
+float3 iivy_posWS;
+#if defined(ASE_NEEDS_FRAG_WORLD_POSITION)
+    iivy_posWS = WorldPosition;
+#else
+    // fallback from clipPos if world pos isn't available
+    iivy_posWS = ComputeWorldSpacePosition(IN.clipPos, UNITY_MATRIX_I_VP);
+#endif
+
+float iivy_focus = IIVY_FocusFactor(iivy_posWS);
+
+// Dither in screen space (no transparent sorting issues)
+float2 iivy_ndc   = (IN.clipPos.xy / IN.clipPos.w);
+float2 iivy_uv01  = iivy_ndc * 0.5 + 0.5;
+float2 iivy_pixel = iivy_uv01 * _ScreenParams.xy;
+float  iivy_noise = IIVY_IGN(iivy_pixel);
+
+// clip by focus first (keeps alpha-test pipeline)
+clip(iivy_focus - iivy_noise);
+
 					clip( Alpha - AlphaClipThreshold );
 				#endif
 

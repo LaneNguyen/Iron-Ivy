@@ -414,6 +414,7 @@ MonoBehaviour:
   animalToLock: {fileID: 0}
   ignoreExitWhileInteracting: 1
   disableTriggerColliderWhileInteracting: 1
+  interactionTriggerCollider: {fileID: 0}
   interactCooldown: 0.25
   debugLog: 0
 --- !u!114 &524155973437512584

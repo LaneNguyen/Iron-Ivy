@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6595619631898599985}
   - component: {fileID: 6595619631914186385}
   - component: {fileID: 3086157174859472865}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: TFP_Bush_01A
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -100,7 +100,7 @@ GameObject:
   - component: {fileID: 6595619631898599987}
   - component: {fileID: 6595619631897829905}
   - component: {fileID: 6595619631896830161}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: TFP_Bush_01A_LOD0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -150,6 +150,8 @@ MeshRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -171,9 +173,11 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &6595619631899033109
 GameObject:
@@ -186,7 +190,7 @@ GameObject:
   - component: {fileID: 6595619631898599989}
   - component: {fileID: 6595619631897829907}
   - component: {fileID: 6595619631896830163}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: TFP_Bush_01A_LOD1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -236,6 +240,8 @@ MeshRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -257,9 +263,11 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &6595619631899033111
 GameObject:
@@ -272,7 +280,7 @@ GameObject:
   - component: {fileID: 6595619631898599991}
   - component: {fileID: 6595619631897829909}
   - component: {fileID: 6595619631896830165}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: TFP_Bush_01A_LOD2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -322,6 +330,8 @@ MeshRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -343,9 +353,11 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &6595619631899033113
 GameObject:
@@ -358,7 +370,7 @@ GameObject:
   - component: {fileID: 6595619631898599993}
   - component: {fileID: 6595619631897829911}
   - component: {fileID: 6595619631896830167}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: TFP_Bush_01A_LOD3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -408,6 +420,8 @@ MeshRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -429,7 +443,9 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}

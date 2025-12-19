@@ -72,6 +72,25 @@ Shader "TriForge/Fantasy Forest/TreeWind2"
 		#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
 		#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Filtering.hlsl"
 
+float  _FocusEnabled;
+float3 _FocusPos;
+float  _FocusRadius;
+float  _FocusAlpha;
+
+inline float IIVY_IGN(float2 pixelXY)
+{
+    return frac(52.9829189 * frac(dot(pixelXY, float2(0.06711056, 0.00583715))));
+}
+
+inline float IIVY_FocusFactor(float3 posWS)
+{
+    if (_FocusEnabled <= 0.5) return 1.0;
+    float dist = distance(posWS, _FocusPos);
+    float t = smoothstep(_FocusRadius * 0.7, _FocusRadius * 1.05, dist);
+    return lerp(_FocusAlpha, 1.0, t);
+}
+
+
 		#ifndef ASE_TESS_FUNCS
 		#define ASE_TESS_FUNCS
 		float4 FixedTess( float tessValue )
@@ -603,7 +622,20 @@ Shader "TriForge/Fantasy Forest/TreeWind2"
 				#endif
 
 				float3 WorldPosition = float3(input.tSpace0.w,input.tSpace1.w,input.tSpace2.w);
-				float3 WorldViewDirection = _WorldSpaceCameraPos.xyz  - WorldPosition;
+// ===== Iron & Ivy Focus Fade (dither clip) =====
+{
+    float3 __iivy_posWS = ComputeWorldSpacePosition(input.positionCS, UNITY_MATRIX_I_VP);
+    float  __iivy_focus = IIVY_FocusFactor(__iivy_posWS);
+
+    float2 __iivy_ndc   = (input.positionCS.xy / input.positionCS.w);
+    float2 __iivy_uv01  = __iivy_ndc * 0.5 + 0.5;
+    float2 __iivy_pixel = __iivy_uv01 * _ScreenParams.xy;
+    float  __iivy_noise = IIVY_IGN(__iivy_pixel);
+
+    clip(__iivy_focus - __iivy_noise);
+}
+
+float3 WorldViewDirection = _WorldSpaceCameraPos.xyz  - WorldPosition;
 				float4 ShadowCoords = float4( 0, 0, 0, 0 );
 
 				float4 ClipPos = input.clipPosV;
@@ -651,7 +683,21 @@ Shader "TriForge/Fantasy Forest/TreeWind2"
 				#endif
 
 				#ifdef _ALPHATEST_ON
-					clip(Alpha - AlphaClipThreshold);
+
+// ===== Iron & Ivy Focus Fade (dither clip) =====
+{
+    float3 __iivy_posWS = ComputeWorldSpacePosition(input.positionCS, UNITY_MATRIX_I_VP);
+    float  __iivy_focus = IIVY_FocusFactor(__iivy_posWS);
+
+    float2 __iivy_ndc   = (input.positionCS.xy / input.positionCS.w);
+    float2 __iivy_uv01  = __iivy_ndc * 0.5 + 0.5;
+    float2 __iivy_pixel = __iivy_uv01 * _ScreenParams.xy;
+    float  __iivy_noise = IIVY_IGN(__iivy_pixel);
+
+    clip(__iivy_focus - __iivy_noise);
+}
+
+clip(Alpha - AlphaClipThreshold);
 				#endif
 
 				InputData inputData = (InputData)0;
@@ -1260,9 +1306,37 @@ Shader "TriForge/Fantasy Forest/TreeWind2"
 
 				#ifdef _ALPHATEST_ON
 					#ifdef _ALPHATEST_SHADOW_ON
-						clip(Alpha - AlphaClipThresholdShadow);
+
+// ===== Iron & Ivy Focus Fade (dither clip) =====
+{
+    float3 __iivy_posWS = ComputeWorldSpacePosition(input.positionCS, UNITY_MATRIX_I_VP);
+    float  __iivy_focus = IIVY_FocusFactor(__iivy_posWS);
+
+    float2 __iivy_ndc   = (input.positionCS.xy / input.positionCS.w);
+    float2 __iivy_uv01  = __iivy_ndc * 0.5 + 0.5;
+    float2 __iivy_pixel = __iivy_uv01 * _ScreenParams.xy;
+    float  __iivy_noise = IIVY_IGN(__iivy_pixel);
+
+    clip(__iivy_focus - __iivy_noise);
+}
+
+clip(Alpha - AlphaClipThresholdShadow);
 					#else
-						clip(Alpha - AlphaClipThreshold);
+
+// ===== Iron & Ivy Focus Fade (dither clip) =====
+{
+    float3 __iivy_posWS = ComputeWorldSpacePosition(input.positionCS, UNITY_MATRIX_I_VP);
+    float  __iivy_focus = IIVY_FocusFactor(__iivy_posWS);
+
+    float2 __iivy_ndc   = (input.positionCS.xy / input.positionCS.w);
+    float2 __iivy_uv01  = __iivy_ndc * 0.5 + 0.5;
+    float2 __iivy_pixel = __iivy_uv01 * _ScreenParams.xy;
+    float  __iivy_noise = IIVY_IGN(__iivy_pixel);
+
+    clip(__iivy_focus - __iivy_noise);
+}
+
+clip(Alpha - AlphaClipThreshold);
 					#endif
 				#endif
 
@@ -1635,7 +1709,21 @@ Shader "TriForge/Fantasy Forest/TreeWind2"
 				#endif
 
 				#ifdef _ALPHATEST_ON
-					clip(Alpha - AlphaClipThreshold);
+
+				// ===== Iron & Ivy Focus Fade (dither clip) =====
+{
+    float3 __iivy_posWS = ComputeWorldSpacePosition(input.positionCS, UNITY_MATRIX_I_VP);
+    float  __iivy_focus = IIVY_FocusFactor(__iivy_posWS);
+
+    float2 __iivy_ndc   = (input.positionCS.xy / input.positionCS.w);
+    float2 __iivy_uv01  = __iivy_ndc * 0.5 + 0.5;
+    float2 __iivy_pixel = __iivy_uv01 * _ScreenParams.xy;
+    float  __iivy_noise = IIVY_IGN(__iivy_pixel);
+
+    clip(__iivy_focus - __iivy_noise);
+}
+
+clip(Alpha - AlphaClipThreshold);
 				#endif
 
 				#if defined(LOD_FADE_CROSSFADE)
@@ -2002,7 +2090,21 @@ Shader "TriForge/Fantasy Forest/TreeWind2"
 				float AlphaClipThreshold = 0.5;
 
 				#ifdef _ALPHATEST_ON
-					clip(Alpha - AlphaClipThreshold);
+
+// ===== Iron & Ivy Focus Fade (dither clip) =====
+{
+    float3 __iivy_posWS = ComputeWorldSpacePosition(input.positionCS, UNITY_MATRIX_I_VP);
+    float  __iivy_focus = IIVY_FocusFactor(__iivy_posWS);
+
+    float2 __iivy_ndc   = (input.positionCS.xy / input.positionCS.w);
+    float2 __iivy_uv01  = __iivy_ndc * 0.5 + 0.5;
+    float2 __iivy_pixel = __iivy_uv01 * _ScreenParams.xy;
+    float  __iivy_noise = IIVY_IGN(__iivy_pixel);
+
+    clip(__iivy_focus - __iivy_noise);
+}
+
+clip(Alpha - AlphaClipThreshold);
 				#endif
 
 				MetaInput metaInput = (MetaInput)0;
@@ -2354,7 +2456,21 @@ Shader "TriForge/Fantasy Forest/TreeWind2"
 				half4 color = half4(BaseColor, Alpha );
 
 				#ifdef _ALPHATEST_ON
-					clip(Alpha - AlphaClipThreshold);
+
+// ===== Iron & Ivy Focus Fade (dither clip) =====
+{
+    float3 __iivy_posWS = ComputeWorldSpacePosition(input.positionCS, UNITY_MATRIX_I_VP);
+    float  __iivy_focus = IIVY_FocusFactor(__iivy_posWS);
+
+    float2 __iivy_ndc   = (input.positionCS.xy / input.positionCS.w);
+    float2 __iivy_uv01  = __iivy_ndc * 0.5 + 0.5;
+    float2 __iivy_pixel = __iivy_uv01 * _ScreenParams.xy;
+    float  __iivy_noise = IIVY_IGN(__iivy_pixel);
+
+    clip(__iivy_focus - __iivy_noise);
+}
+
+clip(Alpha - AlphaClipThreshold);
 				#endif
 
 				return color;
@@ -2742,7 +2858,21 @@ Shader "TriForge/Fantasy Forest/TreeWind2"
 				#endif
 
 				#ifdef _ALPHATEST_ON
-					clip(Alpha - AlphaClipThreshold);
+
+// ===== Iron & Ivy Focus Fade (dither clip) =====
+{
+    float3 __iivy_posWS = ComputeWorldSpacePosition(input.positionCS, UNITY_MATRIX_I_VP);
+    float  __iivy_focus = IIVY_FocusFactor(__iivy_posWS);
+
+    float2 __iivy_ndc   = (input.positionCS.xy / input.positionCS.w);
+    float2 __iivy_uv01  = __iivy_ndc * 0.5 + 0.5;
+    float2 __iivy_pixel = __iivy_uv01 * _ScreenParams.xy;
+    float  __iivy_noise = IIVY_IGN(__iivy_pixel);
+
+    clip(__iivy_focus - __iivy_noise);
+}
+
+clip(Alpha - AlphaClipThreshold);
 				#endif
 
 				#if defined(LOD_FADE_CROSSFADE)
@@ -3199,7 +3329,21 @@ Shader "TriForge/Fantasy Forest/TreeWind2"
 				#endif
 
 				float3 WorldPosition = float3(input.tSpace0.w,input.tSpace1.w,input.tSpace2.w);
-				float3 WorldViewDirection = _WorldSpaceCameraPos.xyz  - WorldPosition;
+
+// ===== Iron & Ivy Focus Fade (dither clip) =====
+{
+    float3 __iivy_posWS = ComputeWorldSpacePosition(input.positionCS, UNITY_MATRIX_I_VP);
+    float  __iivy_focus = IIVY_FocusFactor(__iivy_posWS);
+
+    float2 __iivy_ndc   = (input.positionCS.xy / input.positionCS.w);
+    float2 __iivy_uv01  = __iivy_ndc * 0.5 + 0.5;
+    float2 __iivy_pixel = __iivy_uv01 * _ScreenParams.xy;
+    float  __iivy_noise = IIVY_IGN(__iivy_pixel);
+
+    clip(__iivy_focus - __iivy_noise);
+}
+
+float3 WorldViewDirection = _WorldSpaceCameraPos.xyz  - WorldPosition;
 				float4 ShadowCoords = float4( 0, 0, 0, 0 );
 
 				float4 ClipPos = input.clipPosV;
@@ -3244,7 +3388,21 @@ Shader "TriForge/Fantasy Forest/TreeWind2"
 				#endif
 
 				#ifdef _ALPHATEST_ON
-					clip(Alpha - AlphaClipThreshold);
+
+// ===== Iron & Ivy Focus Fade (dither clip) =====
+{
+    float3 __iivy_posWS = ComputeWorldSpacePosition(input.positionCS, UNITY_MATRIX_I_VP);
+    float  __iivy_focus = IIVY_FocusFactor(__iivy_posWS);
+
+    float2 __iivy_ndc   = (input.positionCS.xy / input.positionCS.w);
+    float2 __iivy_uv01  = __iivy_ndc * 0.5 + 0.5;
+    float2 __iivy_pixel = __iivy_uv01 * _ScreenParams.xy;
+    float  __iivy_noise = IIVY_IGN(__iivy_pixel);
+
+    clip(__iivy_focus - __iivy_noise);
+}
+
+clip(Alpha - AlphaClipThreshold);
 				#endif
 
 				InputData inputData = (InputData)0;
@@ -4262,7 +4420,21 @@ Shader "TriForge/Fantasy Forest/TreeWind2"
 				float AlphaClipThreshold = 0.5;
 
 				#ifdef _ALPHATEST_ON
-					clip(Alpha - AlphaClipThreshold);
+
+// ===== Iron & Ivy Focus Fade (dither clip) =====
+{
+    float3 __iivy_posWS = ComputeWorldSpacePosition(input.positionCS, UNITY_MATRIX_I_VP);
+    float  __iivy_focus = IIVY_FocusFactor(__iivy_posWS);
+
+    float2 __iivy_ndc   = (input.positionCS.xy / input.positionCS.w);
+    float2 __iivy_uv01  = __iivy_ndc * 0.5 + 0.5;
+    float2 __iivy_pixel = __iivy_uv01 * _ScreenParams.xy;
+    float  __iivy_noise = IIVY_IGN(__iivy_pixel);
+
+    clip(__iivy_focus - __iivy_noise);
+}
+
+clip(Alpha - AlphaClipThreshold);
 				#endif
 
 				#if defined(LOD_FADE_CROSSFADE)

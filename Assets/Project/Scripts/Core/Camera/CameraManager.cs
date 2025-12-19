@@ -73,6 +73,9 @@ namespace IronIvy.Systems.Camera
         [Header("Animal LookAt default (fallback)")]
         [SerializeField] private float animalLookAtHeight = 1.2f;
 
+        [Header("Animal Focus Alpha (optional)")]
+        [SerializeField] private FocusAlphaFader focusAlphaFader;
+
         // state chung cho toàn hệ thống camera
         private readonly Dictionary<string, CinemachineCamera> _cameraMap =
             new Dictionary<string, CinemachineCamera>(StringComparer.OrdinalIgnoreCase);
@@ -209,6 +212,7 @@ namespace IronIvy.Systems.Camera
             OnCameraChanged?.Invoke(oldRef, newCam);
 
             // blink nhẹ khi chuyển camera cho đỡ gắt
+            // (fadeCanvas là một CanvasGroup phủ màn hình, alpha lên 1 rồi về 0 nhanh để làm transition)
             if (fadeCanvas != null)
             {
                 if (_fadeRoutine != null)
@@ -248,6 +252,10 @@ namespace IronIvy.Systems.Camera
             _animalFocus = null;
             _animalTuningRuntime = null;
 
+            // chắc chắn tắt focus alpha (nếu đang bật từ animal)
+            if (focusAlphaFader != null)
+                focusAlphaFader.Deactivate();
+
             InternalSwitch(CurrentCamera, vcam);
             PauseWorldForMinigame(lookAtTarget);
         }
@@ -262,6 +270,15 @@ namespace IronIvy.Systems.Camera
             // nếu không có target cụ thể thì xài profile chung
             if (focusTarget == null)
             {
+                // PATCH: nếu vào animal mode mà không có focus target,
+                // thì đảm bảo tắt focusAlphaFader để tránh kẹt mờ từ lần trước
+                if (focusAlphaFader != null)
+                    focusAlphaFader.Deactivate();
+
+                _isAnimalOrbitActive = false;
+                _animalFocus = null;
+                _animalTuningRuntime = null;
+
                 ApplyMinigameProfile(animalProfile, null);
                 return;
             }
@@ -275,6 +292,11 @@ namespace IronIvy.Systems.Camera
                 InitAnimalOrbitAngleFromCurrentCamera();
                 UpdateAnimalOrbitCameraPosition();
                 _isAnimalOrbitActive = true;
+
+                // bật focus alpha theo con animal mới
+                if (focusAlphaFader != null)
+                    focusAlphaFader.Activate(_animalFocus);
+
                 return;
             }
 
@@ -297,6 +319,10 @@ namespace IronIvy.Systems.Camera
             _hasActiveMinigame = true;
             _isAnimalOrbitActive = true;
 
+            // bật focus alpha khi vào animal camera
+            if (focusAlphaFader != null)
+                focusAlphaFader.Activate(_animalFocus);
+
             InternalSwitch(CurrentCamera, vcam);
             PauseWorldForMinigame(focusTarget);
         }
@@ -307,6 +333,10 @@ namespace IronIvy.Systems.Camera
         public void RestoreMinigameCamera()
         {
             if (!_hasActiveMinigame && !_worldPaused) return;
+
+            // tắt focus alpha trước để tránh kẹt mờ
+            if (focusAlphaFader != null)
+                focusAlphaFader.Deactivate();
 
             // 1. resume world trước
             ResumeWorldFromMinigame();
@@ -604,6 +634,8 @@ namespace IronIvy.Systems.Camera
             if (behaviour == null) return true;
 
             if (behaviour is CameraManager) return true;
+            if (behaviour is FocusAlphaFader) return true;
+
             if (behaviour is CinemachineBrain) return true;
             if (behaviour is CinemachineCamera) return true;
             if (behaviour is AudioManager) return true;

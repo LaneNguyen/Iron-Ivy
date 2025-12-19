@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: 030ab402ca8c97447807145eedf5d1a1
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures:
+  - FFE_Wind_Mask: {fileID: 2800000, guid: 8132ffd5113818049a1b7ec588afbab3, type: 3}
+  nonModifiableTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
