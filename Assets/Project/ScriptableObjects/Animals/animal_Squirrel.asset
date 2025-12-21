@@ -19,12 +19,21 @@ MonoBehaviour:
   cameraOrbitHeight: 3
   cameraLookAtHeight: 0.5
   cameraOrbitRotateSpeed: 0
+  animalOrbitDistance: 2.8
+  animalOrbitPitch: 25
+  animalOrbitYaw: 30
+  animalOrbitHeight: 1.2
+  cameraBlendSeconds: 0.35
   favoriteFood: {fileID: 11400000, guid: 00e9e275c37774f4abe494bf5a3f27d9, type: 2}
-  buffSafetyNet: 3
   buffTrustMultiplier: 1.5
+  hasFavoriteBuff: 0
+  buffSafetyNet: 3
   dropItem: {fileID: 11400000, guid: e5b41e7a0209d4e41aef6fe16925bb48, type: 2}
   dropCount: 1
   doubleLootOnBuff: 1
+  rewardItem: {fileID: 0}
+  rewardMinCount: 1
+  rewardMaxCount: 1
   prefab: {fileID: 1261419133072088562, guid: b4c6ac88d9c75ef4f8863377c10ad6b9, type: 3}
   maxCountGlobal: 10
   spawnWeight: 1
@@ -36,11 +45,6 @@ MonoBehaviour:
   minIdleTime: 1
   maxIdleTime: 4.32
   isNocturnal: 0
-  ambientClips:
-  - {fileID: 8300000, guid: 9c64b9a1cbb9279408205179e9bf587d, type: 3}
-  ambientMinInterval: 3
-  ambientMaxInterval: 15
-  ambientSoundRadius: 10
   curiousRadius: 10
   curiousChancePerCheck: 0.994
   curiousMinDuration: 3
@@ -60,10 +64,26 @@ MonoBehaviour:
   maxRandomBeats: 20
   minRandomFragments: 2
   maxRandomFragments: 6
+  playlist: []
   goodAnim: Good
   badAnim: Bad
   iv17Reactions: []
+  reactionVisuals:
+    neutral: {fileID: -1170074810, guid: ae99b0ba083b2b447ba1a561324e8fa5, type: 3}
+    sad: {fileID: -722731048, guid: ae99b0ba083b2b447ba1a561324e8fa5, type: 3}
+    angry: {fileID: -1926573914, guid: ae99b0ba083b2b447ba1a561324e8fa5, type: 3}
+    happy: {fileID: -461429957, guid: ae99b0ba083b2b447ba1a561324e8fa5, type: 3}
+    happyStreakThreshold: 3
+    missReactionSeconds: 0
+    happyHoldSeconds: 0
+    streakDecaySeconds: 0
+    alternateSadAngry: 0
   archiveReward: 4
   minigameMusicLoop: {fileID: 8300000, guid: 4c0d8062a8a7de74c98a4cc6741bd3b9, type: 3}
   loopSfx: {fileID: 0}
   successVFX: {fileID: 100004, guid: 3af6f68141914ca43ba39b2403757bd0, type: 3}
+  ambientClips:
+  - {fileID: 8300000, guid: 9c64b9a1cbb9279408205179e9bf587d, type: 3}
+  ambientMinInterval: 3
+  ambientMaxInterval: 15
+  ambientSoundRadius: 10

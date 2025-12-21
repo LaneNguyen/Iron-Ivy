@@ -19,12 +19,21 @@ MonoBehaviour:
   cameraOrbitHeight: 8
   cameraLookAtHeight: 0.7
   cameraOrbitRotateSpeed: 0
+  animalOrbitDistance: 2.8
+  animalOrbitPitch: 25
+  animalOrbitYaw: 30
+  animalOrbitHeight: 1.2
+  cameraBlendSeconds: 0.35
   favoriteFood: {fileID: 11400000, guid: b5fcee1560a837e4ab047aec13f3ab3d, type: 2}
-  buffSafetyNet: 3
   buffTrustMultiplier: 1.5
+  hasFavoriteBuff: 0
+  buffSafetyNet: 3
   dropItem: {fileID: 0}
   dropCount: 1
   doubleLootOnBuff: 1
+  rewardItem: {fileID: 0}
+  rewardMinCount: 1
+  rewardMaxCount: 1
   prefab: {fileID: 5758860269565473864, guid: 31a6bb64e3b79cc4b851105bc670d7a7, type: 3}
   maxCountGlobal: 10
   spawnWeight: 1
@@ -36,11 +45,6 @@ MonoBehaviour:
   minIdleTime: 1
   maxIdleTime: 2
   isNocturnal: 0
-  ambientClips:
-  - {fileID: 8300000, guid: 0d183ce53bae3fa4e887365baa98ea4f, type: 3}
-  ambientMinInterval: 3
-  ambientMaxInterval: 6
-  ambientSoundRadius: 10
   curiousRadius: 5
   curiousChancePerCheck: 1
   curiousMinDuration: 3
@@ -57,10 +61,26 @@ MonoBehaviour:
   maxRandomBeats: 24
   minRandomFragments: 2
   maxRandomFragments: 6
+  playlist: []
   goodAnim: Good
   badAnim: Bad
   iv17Reactions: []
+  reactionVisuals:
+    neutral: {fileID: -757605254, guid: d7af28942b656584ab2046b7c656e39c, type: 3}
+    sad: {fileID: -1382513597, guid: d7af28942b656584ab2046b7c656e39c, type: 3}
+    angry: {fileID: -1693159222, guid: d7af28942b656584ab2046b7c656e39c, type: 3}
+    happy: {fileID: 454222051, guid: d7af28942b656584ab2046b7c656e39c, type: 3}
+    happyStreakThreshold: 2
+    missReactionSeconds: 0
+    happyHoldSeconds: 0
+    streakDecaySeconds: 0
+    alternateSadAngry: 0
   archiveReward: 6
   minigameMusicLoop: {fileID: 8300000, guid: 74258ba130e122742982e98804175e8d, type: 3}
   loopSfx: {fileID: 0}
   successVFX: {fileID: 100004, guid: 3af6f68141914ca43ba39b2403757bd0, type: 3}
+  ambientClips:
+  - {fileID: 8300000, guid: 0d183ce53bae3fa4e887365baa98ea4f, type: 3}
+  ambientMinInterval: 3
+  ambientMaxInterval: 6
+  ambientSoundRadius: 10
