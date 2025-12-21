@@ -27,12 +27,16 @@ namespace IronIvy.Core
             public RhythmHUD rhythmHUD;
             public PlantRhythmRewardPanel plantRewardPanel;
             public AnimalRhythmRewardPanel animalRewardPanel;
+
+
         }
 
         [Header("Refs")]
         public PopupGroup popup;
         public NotifyGroup notify;
         public MainGameUIPanel mainGameUIPanel;
+
+        public ArchivePanel archivePanel;
 
         private ClickPlantRhythmMinigame _plantRhythmMinigame;
         private ClickAnimalRhythmMinigame _animalRhythmMinigame;
@@ -52,6 +56,9 @@ namespace IronIvy.Core
             {
                 ListenManager.Instance.OnRhythmPlantResult += HandlePlantRhythmResult;
                 ListenManager.Instance.OnRhythmAnimalResult += HandleAnimalRhythmResult;
+
+                ListenManager.Instance.OnArchiveOpenRequested += HandleArchiveOpenRequested;
+
             }
         }
 
@@ -62,6 +69,8 @@ namespace IronIvy.Core
             {
                 ListenManager.Instance.OnRhythmPlantResult -= HandlePlantRhythmResult;
                 ListenManager.Instance.OnRhythmAnimalResult -= HandleAnimalRhythmResult;
+
+                ListenManager.Instance.OnArchiveOpenRequested -= HandleArchiveOpenRequested;
             }
         }
 
@@ -105,19 +114,16 @@ namespace IronIvy.Core
         // =========================
         // START MINIGAME REQUESTS
         // =========================
-        public bool RequestStartPlantRhythm(PlantArea area, List<PlantDefinition> selectedPlants)
+        public bool RequestStartPlantRhythm(PlantArea area, List<PlantDefinition> selectedPlants, int energyCost)
         {
             EnsureMinigameRefs();
 
-            if (_plantRhythmMinigame == null)
-            {
-                Debug.LogWarning("[UIManager] ClickPlantRhythmMinigame not found.");
-                return false;
-            }
+            if (_plantRhythmMinigame == null || area == null) return false;
 
-            if (area == null)
+            // THÊM LOGIC TRỪ ENERGY GIỐNG ANIMAL
+            if (EnergyManager.HasInstance && !EnergyManager.Instance.TrySpend(energyCost))
             {
-                Debug.LogWarning("[UIManager] PlantArea is null.");
+                Debug.LogWarning("[UIManager] Not enough energy for Plant Rhythm.");
                 return false;
             }
 
@@ -174,15 +180,14 @@ namespace IronIvy.Core
         // =========================
         // COMPATIBILITY OVERLOADS
         // =========================
+
+
+
         public bool RequestStartPlantRhythm(object plots, List<PlantDefinition> selectedPlants, PlantArea area)
         {
             return RequestStartPlantRhythm(area, selectedPlants);
         }
 
-        public bool RequestStartPlantRhythm(PlantArea area, List<PlantDefinition> selectedPlants, int _unused)
-        {
-            return RequestStartPlantRhythm(area, selectedPlants);
-        }
 
         public bool RequestStartPlantRhythm(PlantArea area)
         {
@@ -202,6 +207,10 @@ namespace IronIvy.Core
         public bool RequestStartAnimalRhythm(AnimalController animal, FoodItem selectedFood)
         {
             return RequestStartAnimalRhythm(animal, selectedFood, 1);
+        }
+        public bool RequestStartPlantRhythm(PlantArea area, List<PlantDefinition> selectedPlants)
+        {
+            return RequestStartPlantRhythm(area, selectedPlants, 0);
         }
 
         // =========================
@@ -246,6 +255,31 @@ namespace IronIvy.Core
         public void CloseSettings()
         {
             if (popup.settingsMenu != null) popup.settingsMenu.SetActive(false);
+        }
+
+
+        public void OpenArchiveUI()
+        {
+            CloseAllPopups();
+
+            if (archivePanel != null)
+            {
+                archivePanel.Show();
+            }
+            else
+            {
+                Debug.LogWarning("[UIManager] archivePanel is NULL");
+            }
+        }
+
+        private void HandleArchiveOpenRequested()
+        {
+            // Close popups nhưng KHÔNG được dập luôn ArchivePanel
+            // => sẽ chỉnh CloseAllPopups nếu cần
+            CloseAllPopups();
+
+            // gọi đúng panel show
+            if (archivePanel != null) archivePanel.Show();
         }
 
         public void CloseArchiveUI()

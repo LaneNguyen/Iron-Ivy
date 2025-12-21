@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using IronIvy.Core;
 using IronIvy.Data;
@@ -14,33 +14,33 @@ namespace IronIvy.Gameplay.Rhythm
 
         [Header("UI Spawn")]
         [SerializeField] private RectTransform spawnArea;
+        [SerializeField] private RhythmClickTarget targetPrefab;
 
-        [Header("Prefabs")]
-        public RhythmClickTarget targetPrefab;
-        public GameObject disappearVfxPrefab;
+        [Header("Config")]
+        [SerializeField] private float bpm = 75f;
+        [SerializeField] private float delayBetweenPlots = 0.7f;
+        [SerializeField] private float defaultHoldRequiredSeconds = 0.35f;
 
-        [Header("SFX (Hit / Miss)")]
-        public AudioClip hitSfx;
-        public AudioClip missSfx;
-        [Range(0f, 1f)] public float hitSfxVolume = 1f;
-        [Range(0f, 1f)] public float missSfxVolume = 1f;
+        [Header("SFX")]
+        [SerializeField] private AudioClip hitSfx;
+        [SerializeField] private float hitSfxVolume = 0.8f;
+        [SerializeField] private AudioClip missSfx;
+        [SerializeField] private float missSfxVolume = 0.8f;
 
-        [Header("Beat Settings")]
-        public float bpm = 90f;
-        public float delayBetweenPlots = 0.8f;
-
-        [Header("Hold Settings")]
-        public float defaultHoldRequiredSeconds = 0.7f;
+        [Header("VFX")]
+        [SerializeField] private GameObject disappearVfxPrefab;
 
         public bool IsRunning { get; private set; }
 
         private List<PlantPlot> _seqPlots;
         private List<PlantDefinition> _seqPlants;
-        private Dictionary<FoodItem, int> _totalRewards = new Dictionary<FoodItem, int>();
+        private PlantArea _seqArea;
 
+        private RhythmClickTarget _currentTarget;
+
+        private Dictionary<FoodItem, int> _totalRewards = new Dictionary<FoodItem, int>();
         private int _seqTotalHits;
         private int _seqTotalMisses;
-        private RhythmClickTarget _currentTarget;
 
         private int _totalBeatsTimeline;
         private int _totalBeatsScorable;
@@ -52,6 +52,9 @@ namespace IronIvy.Gameplay.Rhythm
         private bool _waitResolved;
         private bool _waitHit;
 
+        private Coroutine _sequenceCoroutine;
+        private bool _isStopping;
+
         public void SetSpawnArea(RectTransform area) => spawnArea = area;
 
         public void StartSequence(List<PlantPlot> plots, List<PlantDefinition> plants, PlantArea area = null)
@@ -59,14 +62,18 @@ namespace IronIvy.Gameplay.Rhythm
             if (IsRunning) return;
             if (plots == null || plants == null || plots.Count == 0 || plants.Count == 0) return;
 
-            IsRunning = true;
             _seqPlots = plots;
             _seqPlants = plants;
+            _seqArea = area;
+
             _totalRewards.Clear();
             _seqTotalHits = 0;
             _seqTotalMisses = 0;
 
-            StartCoroutine(SequenceRoutine());
+            IsRunning = true;
+            _isStopping = false;
+
+            _sequenceCoroutine = StartCoroutine(SequenceRoutine());
         }
 
         private IEnumerator SequenceRoutine()
@@ -92,7 +99,7 @@ namespace IronIvy.Gameplay.Rhythm
                 yield return StartCoroutine(PlayOnePlantRoutine(plot, plant));
 
                 if (i < _seqPlots.Count - 1)
-                    yield return new WaitForSeconds(delayBetweenPlots);
+                    yield return new WaitForSecondsRealtime(delayBetweenPlots);
             }
 
             FinishSequence();
@@ -113,14 +120,22 @@ namespace IronIvy.Gameplay.Rhythm
             // 3. Cập nhật HUD ngay lập tức về 0%
             if (ListenManager.HasInstance)
             {
-                ListenManager.Instance.RaiseRhythmHUDShow(new ListenManager.RhythmHUDShowPayload(plant.displayName, true, _totalBeatsTimeline, BeatDuration(), true));
-                ListenManager.Instance.RaiseRhythmHUDUpdate(new ListenManager.RhythmHUDUpdatePayload(_seqTotalHits, _seqTotalMisses, 0f, 0f, "Bắt đầu!", true, 0f));
+                ListenManager.Instance.RaiseRhythmHUDShow(new ListenManager.RhythmHUDShowPayload(plant.displayName, true,
+                    _totalBeatsTimeline, BeatDuration(), false));
+                ListenManager.Instance.RaiseRhythmHUDUpdate(new ListenManager.RhythmHUDUpdatePayload(
+                    _seqTotalHits, _seqTotalMisses, _trust01, 0f, "", true, 0f));
+            }
+            // SỬA LỖI NHẠC: Kiểm tra kỹ hơn ScriptableObject
+            if (plant.musicLoop != null && AudioManager.HasInstance)
+            {
+                Debug.Log($"[PlantMinigame] Playing music: {plant.musicLoop.name}");
+                //AudioManager.Instance.PlayBGM(plant.musicLoop.name);
+                //LOGIC mới lưu nhạc: 
+                 AudioManager.Instance.PushBGM(plant.musicLoop.name);
             }
 
-            if (plant.musicLoop && AudioManager.HasInstance)
-                AudioManager.Instance.PlayBGM(plant.musicLoop.name);
-
-            if (plant.stages == null || plant.stages.Count == 0) yield break;
+            // 4. Chạy qua stages/patterns/sequence
+            if (plant.stages == null) yield break;
 
             for (int s = 0; s < plant.stages.Count; s++)
             {
@@ -139,7 +154,8 @@ namespace IronIvy.Gameplay.Rhythm
                         int beatCount = Mathf.Max(1, step.beats);
                         if (step.type == RhythmPattern.StepType.Rest)
                         {
-                            yield return new WaitForSeconds(beatCount * BeatDuration());
+                            // IMPORTANT: dùng realtime để không bị kẹt khi PauseWorld (timeScale = 0)
+                            yield return new WaitForSecondsRealtime(beatCount * BeatDuration());
                             continue;
                         }
 
@@ -154,91 +170,48 @@ namespace IronIvy.Gameplay.Rhythm
                 }
             }
 
-            // Tính toán Reward dựa trên kết quả cuối cùng của cây này
-            int yieldCount = (_trust01 >= 0.9f) ? 3 : (_trust01 >= 0.7f) ? 2 : (_trust01 >= 0.4f) ? 1 : 0;
-            if (plant.yieldItem != null && yieldCount > 0)
+            // 5. Tính reward cho plant này
+            if (plant.yieldItem != null)
             {
-                if (!_totalRewards.ContainsKey(plant.yieldItem)) _totalRewards[plant.yieldItem] = 0;
+                int yieldCount = Mathf.RoundToInt(Mathf.Lerp(1f, 3f, Mathf.Clamp01(_trust01)));
+                yieldCount = Mathf.Max(0, yieldCount);
+
+                if (!_totalRewards.ContainsKey(plant.yieldItem))
+                    _totalRewards[plant.yieldItem] = 0;
+
                 _totalRewards[plant.yieldItem] += yieldCount;
             }
         }
-
-        private void FinishSequence()
-        {
-            IsRunning = false;
-
-            float totalNotes = _seqTotalHits + _seqTotalMisses;
-            float finalTrust = (totalNotes > 0) ? (float)_seqTotalHits / totalNotes : 0f;
-
-            if (ListenManager.HasInstance)
-            {
-                ListenManager.Instance.RaiseRhythmPlantResult(new ListenManager.RhythmPlantResultPayload(
-                    new Dictionary<FoodItem, int>(_totalRewards), _seqTotalHits, _seqTotalMisses, finalTrust));
-            }
-
-            if (InventoryManager.HasInstance)
-            {
-                foreach (var kv in _totalRewards) InventoryManager.Instance.AddFood(kv.Key, kv.Value);
-            }
-
-            StartCoroutine(CleanupPlotsRoutine());
-        }
-
-        // --- HÀM TÍNH TOÁN AN TOÀN (SỬA LỖI 100% VÀ CRASH) ---
-
-        private int CalculateTotalBeatsForTimeline(PlantDefinition plant)
-        {
-            if (plant == null || plant.stages == null) return 1;
-            int total = 0;
-            foreach (var st in plant.stages)
-            {
-                if (st?.patterns == null) continue;
-                foreach (var pat in st.patterns) if (pat != null) total += pat.GetTotalBeats();
-            }
-            return Mathf.Max(1, total);
-        }
-
-        private int CalculateTotalBeatsScorable(PlantDefinition plant)
-        {
-            if (plant == null || plant.stages == null) return 1;
-            int total = 0;
-            foreach (var st in plant.stages)
-            {
-                if (st?.patterns == null) continue;
-                foreach (var pat in st.patterns)
-                {
-                    if (pat?.sequence == null) continue;
-                    foreach (var s in pat.sequence)
-                    {
-                        if (s.type != RhythmPattern.StepType.Rest) total += Mathf.Max(1, s.beats);
-                    }
-                }
-            }
-            return Mathf.Max(1, total);
-        }
-
-        // --- HÀM PHỤ TRỢ ---
-
         private void SpawnTarget(bool isHold, float beatDuration)
         {
-            if (targetPrefab == null || spawnArea == null) return;
-            _waitResolved = false; _waitHit = false;
-            _currentTarget = Instantiate(targetPrefab, spawnArea);
-            Vector2 size = spawnArea.rect.size;
-            _currentTarget.GetComponent<RectTransform>().anchoredPosition = new Vector2(
-                Random.Range(-size.x / 2 + 40, size.x / 2 - 40),
-                Random.Range(-size.y / 2 + 40, size.y / 2 - 40)
-            );
+            if (spawnArea == null || targetPrefab == null) return;
 
-            _currentTarget.Setup(isHold, beatDuration, defaultHoldRequiredSeconds, isHold ? "GIỮ CHUỘT" : "CLICK CHUỘT",
-                (hit) => { _waitHit = hit; _waitResolved = true; });
+            _currentTarget = Instantiate(targetPrefab, spawnArea);
+
+            // Random vị trí trong spawnArea (UI RectTransform)
+            var rect = spawnArea.rect;
+            float x = Random.Range(rect.xMin, rect.xMax);
+            float y = Random.Range(rect.yMin, rect.yMax);
+            _currentTarget.GetComponent<RectTransform>().anchoredPosition = new Vector2(x, y);
+
+            _waitResolved = false;
+            _waitHit = false;
+
+            _currentTarget.Setup(
+                isHold,
+                beatDuration,
+                defaultHoldRequiredSeconds,
+                isHold ? "GIỮ CHUỘT" : "CLICK CHUỘT",
+                (hit) => { _waitHit = hit; _waitResolved = true; }
+            );
         }
+
 
         private IEnumerator WaitPlayerInputRoutine(bool isHoldStep)
         {
             while (!_waitResolved) yield return null;
 
-            // NEW: play sfx ngay lúc chốt hit/miss
+            // play sfx ngay lúc chốt hit/miss
             if (AudioManager.HasInstance)
             {
                 if (_waitHit) AudioManager.Instance.PlaySEClip(hitSfx, hitSfxVolume);
@@ -261,9 +234,131 @@ namespace IronIvy.Gameplay.Rhythm
         private void KillTarget() { if (_currentTarget) Destroy(_currentTarget.gameObject); }
         private float BeatDuration() => 60f / Mathf.Max(1f, bpm);
 
+        // Giống AnimalRhythm: có nút "StopGame" để ép kết thúc ngay lập tức,
+        // tránh kẹt coroutine khi PauseWorld (timeScale = 0) hoặc khi cần thoát minigame gấp.
+        public void StopGame()
+        {
+            if (!IsRunning) return;
+            if (_isStopping) return;
+
+            _isStopping = true;
+            IsRunning = false;
+
+            KillTarget();
+
+            if (_sequenceCoroutine != null)
+            {
+                StopCoroutine(_sequenceCoroutine);
+                _sequenceCoroutine = null;
+            }
+
+            // --- BỔ SUNG: Dừng nhạc minigame ---
+            if (AudioManager.HasInstance)
+                AudioManager.Instance.FadeOutBGM();
+            // Khôi phục camera/HUD giống Animal
+            if (CameraManager.HasInstance)
+                CameraManager.Instance.RestoreMinigameCamera();
+
+            if (ListenManager.HasInstance)
+                ListenManager.Instance.RaiseRhythmHUDHide();
+
+            // Tính kết quả + bắn result + cleanup
+            FinishSequence();
+        }
+
+        private void FinishSequence()
+        {
+            // FinishSequence có thể được gọi từ coroutine bình thường hoặc từ StopGame().
+            IsRunning = false;
+            _sequenceCoroutine = null;
+
+            // Nếu không đi qua StopGame(), vẫn cần khôi phục camera/HUD tại đây.
+            if (!_isStopping)
+            {
+                // --- BỔ SUNG: Dừng nhạc minigame ---
+                if (AudioManager.HasInstance)
+                    AudioManager.Instance.FadeOutBGM();
+                if (CameraManager.HasInstance)
+                    CameraManager.Instance.RestoreMinigameCamera();
+                if (AudioManager.HasInstance)
+                {
+                    AudioManager.Instance.PopBGM();
+                }
+                if (ListenManager.HasInstance)
+                    ListenManager.Instance.RaiseRhythmHUDHide();
+            }
+
+            float totalNotes = _seqTotalHits + _seqTotalMisses;
+            float finalTrust = (totalNotes > 0) ? (float)_seqTotalHits / totalNotes : 0f;
+
+            if (ListenManager.HasInstance)
+            {
+                ListenManager.Instance.RaiseRhythmPlantResult(new ListenManager.RhythmPlantResultPayload(
+                    new Dictionary<FoodItem, int>(_totalRewards), _seqTotalHits, _seqTotalMisses, finalTrust));
+            }
+
+            if (InventoryManager.HasInstance)
+            {
+                foreach (var kv in _totalRewards) InventoryManager.Instance.AddFood(kv.Key, kv.Value);
+            }
+
+            StartCoroutine(CleanupPlotsRoutine());
+        }
+
+        // --- HÀM TÍNH TOÁN AN TOÀN
+
+        private int CalculateTotalBeatsForTimeline(PlantDefinition plant)
+        {
+            if (plant == null || plant.stages == null)
+                return 1;
+
+            int total = 0;
+
+            foreach (var st in plant.stages)
+            {
+                if (st?.patterns == null) continue;
+
+                foreach (var pat in st.patterns)
+                {
+                    if (pat == null) continue;
+                    total += pat.GetTotalBeats(); // hàm này đã có sẵn trong codebase của em
+                }
+            }
+
+            return Mathf.Max(1, total);
+        }
+
+        private int CalculateTotalBeatsScorable(PlantDefinition plant)
+        {
+            if (plant == null || plant.stages == null)
+                return 1;
+
+            int total = 0;
+
+            foreach (var st in plant.stages)
+            {
+                if (st?.patterns == null) continue;
+
+                foreach (var pat in st.patterns)
+                {
+                    if (pat?.sequence == null) continue;
+
+                    foreach (var step in pat.sequence)
+                    {
+                        if (step.type == RhythmPattern.StepType.Rest) continue;
+                        total += Mathf.Max(1, step.beats);
+                    }
+                }
+            }
+
+            return Mathf.Max(1, total);
+        }
+
+
+
         private IEnumerator CleanupPlotsRoutine()
         {
-            yield return new WaitForSeconds(0.25f);
+            yield return new WaitForSecondsRealtime(0.25f);
             if (_seqPlots != null)
                 foreach (var p in _seqPlots)
                 {

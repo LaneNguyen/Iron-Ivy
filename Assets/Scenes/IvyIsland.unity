@@ -28443,6 +28443,7 @@ GameObject:
   - component: {fileID: 1218075730}
   - component: {fileID: 1218075729}
   - component: {fileID: 1218075732}
+  - component: {fileID: 1218075733}
   m_Layer: 5
   m_Name: ArchivePanel
   m_TagString: Untagged
@@ -28562,6 +28563,18 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!225 &1218075733
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1218075727}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 0
+  m_IgnoreParentGroups: 0
 --- !u!1 &1218275916
 GameObject:
   m_ObjectHideFlags: 0
@@ -40671,6 +40684,7 @@ MonoBehaviour:
     plantRewardPanel: {fileID: 1884528628}
     animalRewardPanel: {fileID: 879635564}
   mainGameUIPanel: {fileID: 1242797073}
+  archivePanel: {fileID: 1218075729}
 --- !u!1 &1697515287
 GameObject:
   m_ObjectHideFlags: 0
@@ -49532,7 +49546,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
+    rgba: 16777215
   m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -58234,14 +58248,14 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 1ff5f45e2a21193488edfe7529b74216, type: 2}
   spawnArea: {fileID: 1523857185}
   targetPrefab: {fileID: 1498861386948161440, guid: 011907322a6fae44c8bdd097d3f2a3bd, type: 3}
-  disappearVfxPrefab: {fileID: 100018, guid: a40b64bf23366dc42a892af2c6ff6140, type: 3}
-  hitSfx: {fileID: 8300000, guid: 89d6176ef86364148ac4529ad8bcb494, type: 3}
-  missSfx: {fileID: 8300000, guid: 809268e06b72f094186afdb7cd36d2ef, type: 3}
-  hitSfxVolume: 1
-  missSfxVolume: 1
   bpm: 15
   delayBetweenPlots: 2
   defaultHoldRequiredSeconds: 0.7
+  hitSfx: {fileID: 8300000, guid: 89d6176ef86364148ac4529ad8bcb494, type: 3}
+  hitSfxVolume: 1
+  missSfx: {fileID: 8300000, guid: 809268e06b72f094186afdb7cd36d2ef, type: 3}
+  missSfxVolume: 1
+  disappearVfxPrefab: {fileID: 100018, guid: a40b64bf23366dc42a892af2c6ff6140, type: 3}
 --- !u!114 &8785595535983932980
 MonoBehaviour:
   m_ObjectHideFlags: 0

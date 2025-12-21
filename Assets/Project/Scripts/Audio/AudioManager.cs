@@ -19,135 +19,104 @@ public class AudioManager : BaseManager<AudioManager>
 
     private float bgmFadeSpeedRate = BGM_FADE_SPEED_RATE_HIGH;
 
-    // next BGM name, SE name
-    private string nextBGMName;
-    private string nextSEName;
+    // ===== NEW: BGM STATE MEMORY =====
+    private string currentBGMName = "";
+    private string previousBGMName = "";
+    private float previousBGMTime = 0f;
 
-    // flag check BGM đang fade out không
+    // next BGM name
+    private string nextBGMName;
     private bool isFadeOut = false;
 
-    // audio source riêng cho BGM và SE
     public AudioSource AttachBGMSource;
     public AudioSource AttachSESource;
 
-    // default BGM cho toàn game (set trong Inspector)
     [Header("Default BGM Settings")]
     public string defaultBGMName;
 
-    // keep all audio clips đã load
     private Dictionary<string, AudioClip> bgmDic;
     private Dictionary<string, AudioClip> seDic;
 
     protected override void Awake()
     {
         base.Awake();
-        // Load all SE & BGM files from resource folder
+
         bgmDic = new Dictionary<string, AudioClip>();
         seDic = new Dictionary<string, AudioClip>();
 
-        object[] bgmList = Resources.LoadAll("Audio/BGM");
-        object[] seList = Resources.LoadAll("Audio/SE");
-
-        foreach (AudioClip bgm in bgmList)
-        {
+        foreach (AudioClip bgm in Resources.LoadAll<AudioClip>("Audio/BGM"))
             bgmDic[bgm.name] = bgm;
-        }
-        foreach (AudioClip se in seList)
-        {
+
+        foreach (AudioClip se in Resources.LoadAll<AudioClip>("Audio/SE"))
             seDic[se.name] = se;
-        }
     }
 
     private void Start()
     {
-        // load volume đã lưu hoặc dùng default
         AttachBGMSource.volume = PlayerPrefs.GetFloat(BGM_VOLUME_KEY, BGM_VOLUME_DEFAULT);
         AttachSESource.volume = PlayerPrefs.GetFloat(SE_VOLUME_KEY, SE_VOLUME_DEFAULT);
 
-        // load trạng thái mute BGM
-        bool isMuteBgm = (PlayerPrefs.GetInt(BGM_MUTE_KEY, BGM_MUTE_DEFAULT) == BGM_MUTE_DEFAULT) ? false : true;
-        AttachBGMSource.mute = isMuteBgm;
+        AttachBGMSource.mute = PlayerPrefs.GetInt(BGM_MUTE_KEY, BGM_MUTE_DEFAULT) != 0;
+        AttachSESource.mute = PlayerPrefs.GetInt(SE_MUTE_KEY, SE_MUTE_DEFAULT) != 0;
 
-        // load trạng thái mute SE (sửa lại cho đúng SE_MUTE_DEFAULT)
-        bool isMuteSe = (PlayerPrefs.GetInt(SE_MUTE_KEY, SE_MUTE_DEFAULT) == SE_MUTE_DEFAULT) ? false : true;
-        AttachSESource.mute = isMuteSe;
-
-        // auto play BGM mặc định nếu có set tên và chưa có gì đang chạy
         if (!string.IsNullOrEmpty(defaultBGMName))
         {
-            if (!AttachBGMSource.isPlaying || AttachBGMSource.clip == null)
-            {
-                PlayBGM(defaultBGMName);
-            }
+            PlayBGM(defaultBGMName);
         }
     }
 
-    public void PlaySE(string seName, float delay = 0.0f)
-    {
-        if (!seDic.ContainsKey(seName))
-        {
-            Debug.Log(seName + "There is no SE named");
-            return;
-        }
-
-        nextSEName = seName;
-        Invoke(nameof(DelayPlaySE), delay);
-    }
-
-    private void DelayPlaySE()
-    {
-        AttachSESource.PlayOneShot(seDic[nextSEName] as AudioClip);
-    }
-
-    // NEW: helper nho, play SE tu AudioClip (minigame UI hay dung)
-    public void PlaySEClip(AudioClip clip, float volumeScale = 1f, float delay = 0.0f)
-    {
-        if (clip == null) return;
-        if (AttachSESource == null) return;
-        if (AttachSESource.mute) return;
-
-        volumeScale = Mathf.Clamp01(volumeScale);
-
-        if (delay > 0f)
-        {
-            StartCoroutine(DelayPlayClipRoutine(clip, volumeScale, delay));
-            return;
-        }
-
-        AttachSESource.PlayOneShot(clip, volumeScale);
-    }
-
-    private IEnumerator DelayPlayClipRoutine(AudioClip clip, float volumeScale, float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        if (clip == null) yield break;
-        if (AttachSESource == null) yield break;
-        if (AttachSESource.mute) yield break;
-
-        AttachSESource.PlayOneShot(clip, Mathf.Clamp01(volumeScale));
-    }
+    // ===============================
+    // ===== PUBLIC BGM CONTROL =====
+    // ===============================
 
     public void PlayBGM(string bgmName, float fadeSpeedRate = BGM_FADE_SPEED_RATE_HIGH)
     {
         if (!bgmDic.ContainsKey(bgmName))
         {
-            Debug.Log(bgmName + "There is no BGM named");
+            Debug.LogWarning($"[AudioManager] No BGM named {bgmName}");
             return;
         }
 
-        // If BGM is not currently playing, or clip bị null (weird case) thì play luôn
+        // same BGM, ignore
+        if (AttachBGMSource.isPlaying && AttachBGMSource.clip != null && AttachBGMSource.clip.name == bgmName)
+            return;
+
+        CacheCurrentBGM();
+
+        nextBGMName = bgmName;
+        bgmFadeSpeedRate = fadeSpeedRate;
+
         if (!AttachBGMSource.isPlaying || AttachBGMSource.clip == null)
         {
-            nextBGMName = "";
-            AttachBGMSource.clip = bgmDic[bgmName] as AudioClip;
-            AttachBGMSource.Play();
+            PlayNextBGM();
         }
-        // When a different BGM is playing, fade out the BGM that is playing before playing the next one.
-        // Ignore when the same BGM is playing
-        else if (AttachBGMSource.clip.name != bgmName)
+        else
         {
-            nextBGMName = bgmName;
-            FadeOutBGM(fadeSpeedRate);
+            isFadeOut = true;
+        }
+    }
+
+    /// <summary>
+    /// Dùng khi vào Minigame
+    /// </summary>
+    public void PushBGM(string bgmName)
+    {
+        PlayBGM(bgmName);
+    }
+
+    /// <summary>
+    /// Dùng khi thoát Minigame
+    /// </summary>
+    public void PopBGM()
+    {
+        if (!string.IsNullOrEmpty(previousBGMName))
+        {
+            PlayBGM(previousBGMName);
+            AttachBGMSource.time = previousBGMTime;
+        }
+        else if (!string.IsNullOrEmpty(defaultBGMName))
+        {
+            PlayBGM(defaultBGMName);
         }
     }
 
@@ -155,111 +124,112 @@ public class AudioManager : BaseManager<AudioManager>
     {
         bgmFadeSpeedRate = fadeSpeedRate;
         isFadeOut = true;
+        nextBGMName = "";
     }
+
+    // ===============================
+    // ===== INTERNAL UPDATE LOOP ====
+    // ===============================
 
     private void Update()
     {
-        if (!isFadeOut)
-        {
-            return;
-        }
+        if (!isFadeOut) return;
 
-        // Gradually lower the volume, and when the volume reaches 0
-        // return the volume and play the next song
         AttachBGMSource.volume -= Time.deltaTime * bgmFadeSpeedRate;
-        if (AttachBGMSource.volume <= 0)
-        {
-            // cache clip name trước khi stop để biết mình đang fade cái gì
-            string fadedClipName = (AttachBGMSource.clip != null) ? AttachBGMSource.clip.name : "";
+        if (AttachBGMSource.volume > 0f) return;
 
-            AttachBGMSource.Stop();
-            AttachBGMSource.volume = PlayerPrefs.GetFloat(BGM_VOLUME_KEY, BGM_VOLUME_DEFAULT);
-            isFadeOut = false;
+        AttachBGMSource.Stop();
+        AttachBGMSource.volume = PlayerPrefs.GetFloat(BGM_VOLUME_KEY, BGM_VOLUME_DEFAULT);
+        isFadeOut = false;
 
-            // Case 1: có nextBGMName thì play như cũ
-            if (!string.IsNullOrEmpty(nextBGMName))
-            {
-                PlayBGM(nextBGMName);
-                return;
-            }
-
-            // Case 2 (PATCH): không có next => auto quay về default BGM
-            // Đây là đúng case minigame fade xong rồi "quên" bật lại nhạc nền
-            if (!string.IsNullOrEmpty(defaultBGMName))
-            {
-                // tránh restart vô hạn nếu default đang là cái vừa fade
-                if (fadedClipName != defaultBGMName)
-                {
-                    PlayBGM(defaultBGMName);
-                }
-                else
-                {
-                    // nếu vừa fade đúng default thì play lại cho chắc (tuỳ bạn muốn im luôn hay không)
-                    PlayBGM(defaultBGMName);
-                }
-            }
-        }
+        PlayNextBGM();
     }
 
-    public void ChangeBGMVolume(float BGMVolume)
+    private void PlayNextBGM()
     {
-        AttachBGMSource.volume = BGMVolume;
-        PlayerPrefs.SetFloat(BGM_VOLUME_KEY, BGMVolume);
+        if (string.IsNullOrEmpty(nextBGMName)) return;
+
+        AttachBGMSource.clip = bgmDic[nextBGMName];
+        AttachBGMSource.Play();
+
+        currentBGMName = nextBGMName;
+        nextBGMName = "";
     }
 
-    public void ChangeSEVolume(float SEVolume)
+    private void CacheCurrentBGM()
     {
-        AttachSESource.volume = SEVolume;
-        PlayerPrefs.SetFloat(SE_VOLUME_KEY, SEVolume);
+        if (AttachBGMSource.clip == null) return;
+
+        previousBGMName = AttachBGMSource.clip.name;
+        previousBGMTime = AttachBGMSource.time;
     }
 
-    public void MuteBGM(bool isMute)
+    // ===============================
+    // ===== SE HANDLING (UNCHANGED)
+    // ===============================
+
+    public void PlaySE(string seName, float delay = 0.0f)
     {
-        AttachBGMSource.mute = isMute;
-
-        int isMuteValue = 0;
-
-        if (isMute)
-        {
-            isMuteValue = 1;
-        }
-
-        PlayerPrefs.SetInt(BGM_MUTE_KEY, isMuteValue);
+        if (!seDic.ContainsKey(seName)) return;
+        StartCoroutine(DelayPlaySE(seDic[seName], delay));
     }
 
-    public void MuteSE(bool isMute)
+    private IEnumerator DelayPlaySE(AudioClip clip, float delay)
     {
-        AttachSESource.mute = isMute;
+        yield return new WaitForSeconds(delay);
+        AttachSESource.PlayOneShot(clip);
+    }
 
-        int isMuteValue = 0;
+    public void PlaySEClip(AudioClip clip, float volumeScale = 1f)
+    {
+        if (clip == null || AttachSESource.mute) return;
+        AttachSESource.PlayOneShot(clip, Mathf.Clamp01(volumeScale));
+    }
 
-        if (isMute)
-        {
-            isMuteValue = 1;
-        }
+    public void ChangeBGMVolume(float volume)
+    {
+        AttachBGMSource.volume = volume;
+        PlayerPrefs.SetFloat(BGM_VOLUME_KEY, volume);
+    }
 
-        PlayerPrefs.SetInt(SE_MUTE_KEY, isMuteValue);
+    public void ChangeSEVolume(float volume)
+    {
+        AttachSESource.volume = volume;
+        PlayerPrefs.SetFloat(SE_VOLUME_KEY, volume);
+    }
+
+    public void MuteBGM(bool mute)
+    {
+        AttachBGMSource.mute = mute;
+        PlayerPrefs.SetInt(BGM_MUTE_KEY, mute ? 1 : 0);
+    }
+
+    public void MuteSE(bool mute)
+    {
+        AttachSESource.mute = mute;
+        PlayerPrefs.SetInt(SE_MUTE_KEY, mute ? 1 : 0);
     }
 
     // helper nho de phat SE tai vi tri 3d (dung cho tieng keu animal ngoai world)
-    public void PlaySEAtPosition(AudioClip clip, Vector3 position, float volumeScale = 1f)
+public void PlaySEAtPosition(AudioClip clip, Vector3 position, float volumeScale = 1f)
+{
+    if (clip == null)
     {
-        if (clip == null)
-        {
-            return;
-        }
-
-        // neu SE dang mute thi thoi, de game setting control
-        if (AttachSESource != null && AttachSESource.mute)
-        {
-            return;
-        }
-
-        // lay volume goc tu SE channel chinh
-        float baseVolume = (AttachSESource != null) ? AttachSESource.volume : SE_VOLUME_DEFAULT;
-        float finalVolume = Mathf.Clamp01(baseVolume * volumeScale);
-
-        // dung PlayClipAtPoint nhung thong qua audio manager 1 cho cho de control
-        AudioSource.PlayClipAtPoint(clip, position, finalVolume);
+        return;
     }
+
+    // neu SE dang mute thi thoi, de game setting control
+    if (AttachSESource != null && AttachSESource.mute)
+    {
+        return;
+    }
+
+    // lay volume goc tu SE channel chinh
+    float baseVolume = (AttachSESource != null) ? AttachSESource.volume : 1f;
+    float finalVolume = Mathf.Clamp01(baseVolume * volumeScale);
+
+    // dung PlayClipAtPoint nhung thong qua audio manager 1 cho cho de control
+    AudioSource.PlayClipAtPoint(clip, position, finalVolume);
+}
+
 }

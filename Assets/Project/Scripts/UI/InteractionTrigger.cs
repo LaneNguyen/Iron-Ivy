@@ -1,7 +1,7 @@
+using IronIvy.Core;
+using IronIvy.Gameplay.Animals;
 using UnityEngine;
 using UnityEngine.Events;
-using IronIvy.Gameplay.Animals;
-using IronIvy.Core;
 
 namespace IronIvy.Gameplay.Interaction
 {
@@ -294,6 +294,18 @@ namespace IronIvy.Gameplay.Interaction
 
             if (debugLog)
                 Debug.Log($"[InteractionTrigger] RecheckOverlap -> {stillInside}");
+        }
+
+
+        public void OpenArchivePanel()
+        {
+            if (!UIManager.HasInstance)
+            {
+                CancelStickyInteraction();
+                return;
+            }
+
+            UIManager.Instance.OpenArchiveUI();
         }
 
         // Backward compat

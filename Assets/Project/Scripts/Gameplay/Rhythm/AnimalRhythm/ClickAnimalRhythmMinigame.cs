@@ -151,7 +151,9 @@ namespace IronIvy.Gameplay.Rhythm
             if (AudioManager.HasInstance)
             {
                 if (animalDef != null && animalDef.minigameMusicLoop != null)
-                    AudioManager.Instance.PlayBGM(animalDef.minigameMusicLoop.name);
+                    //AudioManager.Instance.PlayBGM(animalDef.minigameMusicLoop.name);
+                    //logic lưu nhạc
+                     AudioManager.Instance.PushBGM(animalDef.minigameMusicLoop.name);
                 else if (!string.IsNullOrEmpty(bgmKey))
                     AudioManager.Instance.PlayBGM(bgmKey);
             }
@@ -180,6 +182,11 @@ namespace IronIvy.Gameplay.Rhythm
 
             if (CameraManager.HasInstance)
                 CameraManager.Instance.RestoreMinigameCamera();
+
+            if (AudioManager.HasInstance)
+            {
+                AudioManager.Instance.PopBGM();
+            }
 
             if (ListenManager.HasInstance)
                 ListenManager.Instance.RaiseRhythmHUDHide();

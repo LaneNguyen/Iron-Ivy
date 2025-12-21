@@ -27,7 +27,8 @@ namespace IronIvy.Gameplay.World
 
             // 1) VFX
             if (healEffect != null) healEffect.Play();
-            yield return new WaitForSeconds(animDuration);
+            yield return new WaitForSecondsRealtime(animDuration);
+
 
             // 2) Backend
             if (EnergyManager.HasInstance) EnergyManager.Instance.RestoreFullEnergy();
