@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: plant_Cauliflower
   m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Data.PlantDefinition
   id: cauliflowerplant
-  displayName: Cauliflower
+  displayName: "S\xFAp l\u01A1 tr\u1EAFng"
   stages:
   - stageName: Seed
     prefab: {fileID: 3177982295653799335, guid: d8449dba764bea44ab90269de06a50d0, type: 3}

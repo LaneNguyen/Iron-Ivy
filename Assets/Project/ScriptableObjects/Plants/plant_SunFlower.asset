@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: plant_SunFlower
   m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Data.PlantDefinition
   id: sunflowerplant
-  displayName: Sunflower
+  displayName: "Hoa H\u01B0\u1EDBng D\u01B0\u01A1ng"
   stages:
   - stageName: Seed
     prefab: {fileID: 7894121702400547446, guid: 0078b9131652b014992393af8523ccbc, type: 3}
