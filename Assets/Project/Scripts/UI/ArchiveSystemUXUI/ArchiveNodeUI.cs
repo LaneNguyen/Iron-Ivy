@@ -1,13 +1,17 @@
+using IronIvy.Core;
+using IronIvy.Data;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
-using IronIvy.Data;
-using IronIvy.Core;
 
 namespace IronIvy.UI
 {
     public class ArchiveNodeUI : MonoBehaviour
     {
+        [Header("Node Data (Manual Placement)")]
+        [Tooltip("Lane tự kéo ArchiveNodeDefinition vào đây cho từng node trên cây.")]
+        public ArchiveNodeDefinition definition;
+
         [Header("UI Components")]
         public Button btnSelect;
         public Image iconImage;
@@ -15,8 +19,8 @@ namespace IronIvy.UI
         public GameObject lockOverlay;
 
         [Header("Optional Texts (auto hide when unlocked)")]
-        public TextMeshProUGUI dataCostText;
-        public TextMeshProUGUI currentDataText;
+        public TextMeshProUGUI dataCostText;     // hiển thị required %
+        public TextMeshProUGUI currentDataText;  // hiển thị current %
 
         [Header("Parent Gating Visual")]
         [Range(0.1f, 1f)] public float blockedAlpha = 0.5f;
@@ -31,9 +35,49 @@ namespace IronIvy.UI
         private ArchivePanel _parentPanel;
         private CanvasGroup _cg;
 
+        // Panel sẽ dùng property này thay vì truy cập field tên "definition" (tránh nhầm).
+        public ArchiveNodeDefinition Data => _data != null ? _data : definition;
+
+
+        private void Awake()
+        {
+
+            if (_parentPanel == null)
+                _parentPanel = GetComponentInParent<ArchivePanel>(true);
+
+            if (_data == null && definition != null)
+                _data = definition;
+
+            if (btnSelect != null)
+            {
+                btnSelect.onClick.RemoveAllListeners();
+                btnSelect.onClick.AddListener(OnNodeClicked);
+            }
+
+            if (_cg == null) _cg = GetComponent<CanvasGroup>();
+            if (_cg == null) _cg = gameObject.AddComponent<CanvasGroup>();
+
+            // optional: refresh visual luôn (nếu manager sẵn)
+            if (ArchiveManager.HasInstance)
+                RefreshVisual();
+        }
+
+        private void OnEnable()
+        {
+            if (ArchiveManager.HasInstance)
+                ArchiveManager.Instance.OnNodeUnlocked += HandleNodeUnlocked;
+        }
+        private void OnDisable()
+        {
+            if (ArchiveManager.HasInstance)
+                ArchiveManager.Instance.OnNodeUnlocked -= HandleNodeUnlocked;
+        }
+
+
         public void Setup(ArchiveNodeDefinition data, ArchivePanel parent)
         {
-            _data = data;
+            // Ưu tiên data truyền vào; nếu null thì dùng definition set trong Inspector.
+            _data = data != null ? data : definition;
             _parentPanel = parent;
 
             if (_cg == null) _cg = GetComponent<CanvasGroup>();
@@ -45,22 +89,37 @@ namespace IronIvy.UI
                 iconImage.enabled = (iconImage.sprite != null);
             }
 
-            btnSelect.onClick.RemoveAllListeners();
-            btnSelect.onClick.AddListener(OnNodeClicked);
+            if (btnSelect != null)
+            {
+                btnSelect.onClick.RemoveAllListeners();
+                btnSelect.onClick.AddListener(OnNodeClicked);
+            }
 
             RefreshVisual();
         }
 
         public void RefreshVisual()
         {
-            if (_data == null || !ArchiveManager.HasInstance) return;
+            if (Data == null || !ArchiveManager.HasInstance) return;
 
-            bool isUnlocked = ArchiveManager.Instance.IsNodeUnlocked(_data.id);
-            bool canAfford = ArchiveManager.Instance.currentPoints >= _data.costToUnlock;
+            bool isUnlocked = ArchiveManager.Instance.IsNodeUnlocked(Data.id);
+
+            // ✅ NEW RULE: costToUnlock là Required Progress Percent (%)
+            float requiredPercent = Mathf.Clamp(Data.costToUnlock, 0f, 100f);
+            float currentPercent = ArchiveManager.Instance.CurrentPercent100;
+
+            bool canUnlockByProgress = currentPercent + 0.0001f >= requiredPercent;
             bool parentUnlocked = IsParentUnlocked();
 
             // node đã mở -> hide 2 text refs
             SetCostTextsVisible(!isUnlocked);
+
+            // update optional texts
+            if (!isUnlocked)
+            {
+                if (dataCostText != null) dataCostText.text = $"{requiredPercent:0.#}%";
+                if (currentDataText != null) currentDataText.text = $"{currentPercent:0.#}%";
+            }
 
             // reset alpha default
             SetWholeNodeAlpha(1f);
@@ -71,7 +130,7 @@ namespace IronIvy.UI
                 if (iconImage && iconImage.enabled) iconImage.color = Color.white;
                 if (lockOverlay) lockOverlay.SetActive(false);
 
-                btnSelect.interactable = true;
+                if (btnSelect != null) btnSelect.interactable = true;
                 return;
             }
 
@@ -86,18 +145,18 @@ namespace IronIvy.UI
                 if (lockOverlay) lockOverlay.SetActive(true);
 
                 // vẫn cho click để xem mô tả (unlock bị chặn ở panel + manager)
-                btnSelect.interactable = true;
+                if (btnSelect != null) btnSelect.interactable = true;
                 return;
             }
 
             // unlockable bình thường
-            if (canAfford)
+            if (canUnlockByProgress)
             {
                 if (borderImage) borderImage.color = affordableColor;
                 if (iconImage && iconImage.enabled) iconImage.color = new Color(1f, 1f, 1f, 0.8f);
                 if (lockOverlay) lockOverlay.SetActive(true);
 
-                btnSelect.interactable = true;
+                if (btnSelect != null) btnSelect.interactable = true;
                 return;
             }
 
@@ -105,13 +164,13 @@ namespace IronIvy.UI
             if (iconImage && iconImage.enabled) iconImage.color = new Color(0.3f, 0.3f, 0.3f, 1f);
             if (lockOverlay) lockOverlay.SetActive(true);
 
-            btnSelect.interactable = true;
+            if (btnSelect != null) btnSelect.interactable = true;
         }
 
         private bool IsParentUnlocked()
         {
-            if (_data.requiredParent == null) return true;
-            return ArchiveManager.Instance.IsNodeUnlocked(_data.requiredParent.id);
+            if (Data.requiredParent == null) return true;
+            return ArchiveManager.Instance.IsNodeUnlocked(Data.requiredParent.id);
         }
 
         private void SetCostTextsVisible(bool visible)
@@ -128,8 +187,16 @@ namespace IronIvy.UI
 
         private void OnNodeClicked()
         {
-            if (_parentPanel != null)
-                _parentPanel.SelectNode(_data);
+            if (_parentPanel != null && Data != null)
+                _parentPanel.SelectNode(Data);
+        }
+
+        private void HandleNodeUnlocked(string id)
+        {
+            if (Data == null) return;
+            if (Data.id != id) return;
+
+            RefreshVisual();
         }
     }
 }

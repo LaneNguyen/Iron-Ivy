@@ -274,6 +274,7 @@ Shader "SyntyStudios/VegitationShader"
 			#endif
 
 			#define ASE_NEEDS_VERT_POSITION
+			
 			#define ASE_NEEDS_FRAG_COLOR
 			#define ASE_NEEDS_FRAG_WORLD_POSITION
 			#define ASE_NEEDS_FRAG_WORLD_NORMAL
@@ -1008,6 +1009,7 @@ clip(Alpha - AlphaClipThreshold);
 			#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Color.hlsl"
 
 			#define ASE_NEEDS_VERT_POSITION
+			#define ASE_NEEDS_FRAG_WORLD_POSITION
 			#pragma shader_feature_local LOD_FADE_CROSSFADE
 
 
@@ -1500,6 +1502,7 @@ clip(Alpha - AlphaClipThreshold);
 			#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Color.hlsl"
 
 			#define ASE_NEEDS_VERT_POSITION
+			#define ASE_NEEDS_FRAG_WORLD_POSITION
 			#pragma shader_feature_local LOD_FADE_CROSSFADE
 
 
@@ -3002,6 +3005,7 @@ clip(Alpha - AlphaClipThreshold);
 			#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Color.hlsl"
 
 			#define ASE_NEEDS_VERT_POSITION
+			#define ASE_NEEDS_FRAG_WORLD_POSITION
 			#pragma shader_feature_local LOD_FADE_CROSSFADE
 
 

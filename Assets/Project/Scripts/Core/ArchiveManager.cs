@@ -1,7 +1,7 @@
-using UnityEngine;
 using System;
 using System.Collections.Generic;
 using IronIvy.Data;
+using UnityEngine;
 
 namespace IronIvy.Core
 {
@@ -20,9 +20,15 @@ namespace IronIvy.Core
         public float currentPoints = 0f;
         public List<string> unlockedNodeIDs = new List<string>();
 
+        // Current progress (0..1). 1.0 means đạt 100% archive progress.
         public float CurrentPercent => Mathf.Clamp01(maxArchivePoints > 0f ? currentPoints / maxArchivePoints : 0f);
 
+        // Helper: progress in percent (0..100)
+        public float CurrentPercent100 => CurrentPercent * 100f;
+
         public event Action<float> OnPointsChanged;
+        public event Action<string> OnNodeUnlocked;
+
 
         // cache để check trùng id
         private Dictionary<string, int> _idCount = new Dictionary<string, int>();
@@ -64,7 +70,7 @@ namespace IronIvy.Core
             currentPoints += amount;
             currentPoints = Mathf.Clamp(currentPoints, 0f, maxArchivePoints);
 
-            Debug.Log($"[Archive] +{amount} pts, total = {currentPoints}/{maxArchivePoints}");
+            Debug.Log($"[Archive] +{amount} pts, total = {currentPoints}/{maxArchivePoints} ({CurrentPercent100:0.#}%)");
             NotifyArchiveChanged();
         }
 
@@ -94,7 +100,7 @@ namespace IronIvy.Core
                 return false;
             }
 
-            // chặn cứng nếu id bị trùng (đúng bug Lane mô tả)
+            // chặn cứng nếu id bị trùng
             if (HasDuplicateId(node.id))
             {
                 reason = $"Duplicate id '{node.id}' (fix ids in ArchiveNodeDefinition assets)";
@@ -131,9 +137,13 @@ namespace IronIvy.Core
                 }
             }
 
-            if (currentPoints < node.costToUnlock)
+            //   NEW RULE:
+            // costToUnlock được hiểu là "Required Progress Percent (%)" để unlock node.
+            // Ví dụ node.costToUnlock = 5 nghĩa là cần đạt 5% progress (CurrentPercent100 >= 5).
+            float requiredPercent = Mathf.Clamp(node.costToUnlock, 0f, 100f);
+            if (CurrentPercent100 + 0.0001f < requiredPercent)
             {
-                reason = "Not enough points";
+                reason = "Not enough progress";
                 return false;
             }
 
@@ -148,12 +158,14 @@ namespace IronIvy.Core
                 return false;
             }
 
-            currentPoints -= node.costToUnlock;
+            //  NEW RULE:
+            // Unlock không còn tiêu thụ (trừ) progress/points nữa.
             unlockedNodeIDs.Add(node.id);
+            OnNodeUnlocked?.Invoke(node.id);
 
             ApplyReward(node);
 
-            Debug.Log($"[Archive] Unlocked Node: {node.title}");
+            Debug.Log($"[Archive] Unlocked Node: {node.title} (Progress stays at {CurrentPercent100:0.#}%)");
             NotifyArchiveChanged();
 
             if (SaveLoadManager.HasInstance)

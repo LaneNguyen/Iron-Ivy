@@ -11,9 +11,9 @@ namespace IronIvy.UI
 {
     public class ArchivePanel : MonoBehaviour, IPointerClickHandler
     {
-        [Header("Container")]
-        public Transform nodeContainer;
-        public ArchiveNodeUI nodePrefab;
+        [Header("Container (Manual Placement)")]
+        public RectTransform nodesContainer; // chứa các ArchiveNodeUI mà Lane tự đặt tay
+        public RectTransform zoomContent;    // Content để zoom/pan (background + nodes). Nếu null sẽ dùng nodesContainer
 
         [Header("Detail Section")]
         public GameObject detailPanel;
@@ -38,10 +38,12 @@ namespace IronIvy.UI
         public float nodeStartScale = 0.9f;
 
         [Header("Optional Labels (auto hide when unlocked)")]
-        public GameObject costLabelObject;   // chữ ghi chú cho cost
-        public GameObject totalLabelObject;  // chữ ghi chú cho total
+        public GameObject costLabelObject;
+        public GameObject totalLabelObject;
 
-        private List<ArchiveNodeUI> _spawnedNodes = new List<ArchiveNodeUI>();
+        // Danh sách này giờ được node tự register vào, KHÔNG scan toàn bộ.
+        private readonly List<ArchiveNodeUI> _spawnedNodes = new List<ArchiveNodeUI>();
+
         private ArchiveNodeDefinition _currentSelection;
 
         private Coroutine _descTypeRoutine;
@@ -55,6 +57,30 @@ namespace IronIvy.UI
 
             if (descText != null)
                 descText.maxVisibleCharacters = int.MaxValue;
+
+            if (zoomContent == null && nodesContainer != null)
+                zoomContent = nodesContainer;
+        }
+
+        // ===== Public API cho node tự đăng ký =====
+        public void RegisterNode(ArchiveNodeUI node)
+        {
+            if (node == null) return;
+            if (_spawnedNodes.Contains(node)) return;
+
+            _spawnedNodes.Add(node);
+
+            // Node sẽ tự có definition sẵn, nhưng panel cần gắn lại ref & callback
+            if (node.Data != null)
+    node.Setup(node.Data, this);
+
+            PrepareNodeHidden(node);
+        }
+
+        public void UnregisterNode(ArchiveNodeUI node)
+        {
+            if (node == null) return;
+            _spawnedNodes.Remove(node);
         }
 
         public void Show()
@@ -64,10 +90,10 @@ namespace IronIvy.UI
             StopNodeReveal();
             StopDescTyping(resetVisible: true);
 
-            RebuildTree();
             UpdateTotalPoints();
-
             if (detailPanel) detailPanel.SetActive(false);
+
+            RefreshAllNodes();
 
             _revealRoutine = StartCoroutine(RevealNodesSequence());
         }
@@ -81,32 +107,21 @@ namespace IronIvy.UI
 
         private void OnCloseClicked()
         {
-            // đóng đúng flow (để UIManager bật lại main panel)
             if (UIManager.HasInstance)
             {
                 UIManager.Instance.CloseArchiveUI();
                 return;
             }
 
-            // fallback nếu thiếu UIManager
             Hide();
         }
 
-        private void RebuildTree()
+        private void RefreshAllNodes()
         {
-            foreach (Transform child in nodeContainer) Destroy(child.gameObject);
-            _spawnedNodes.Clear();
-
-            if (!ArchiveManager.HasInstance || ArchiveManager.Instance.allNodes == null)
-                return;
-
-            foreach (var nodeData in ArchiveManager.Instance.allNodes)
+            for (int i = 0; i < _spawnedNodes.Count; i++)
             {
-                ArchiveNodeUI newNode = Instantiate(nodePrefab, nodeContainer);
-                newNode.Setup(nodeData, this);
-                _spawnedNodes.Add(newNode);
-
-                PrepareNodeHidden(newNode);
+                if (_spawnedNodes[i] != null)
+                    _spawnedNodes[i].RefreshVisual();
             }
         }
 
@@ -116,9 +131,7 @@ namespace IronIvy.UI
             if (detailPanel) detailPanel.SetActive(true);
 
             if (titleText) titleText.text = node.title;
-
-            if (descText)
-                PlayDescTypewriter(node.description);
+            if (descText) PlayDescTypewriter(node.description);
 
             UpdateUnlockButtonState();
         }
@@ -131,16 +144,14 @@ namespace IronIvy.UI
             bool isUnlocked = ArchiveManager.Instance.IsNodeUnlocked(_currentSelection.id);
             SetCostTotalVisible(!isUnlocked);
 
-            if (costText != null) costText.gameObject.SetActive(!isUnlocked);
-            if (totalPointsText != null) totalPointsText.gameObject.SetActive(!isUnlocked);
-
             if (costText)
             {
                 if (isUnlocked) costText.gameObject.SetActive(false);
                 else
                 {
+                    float requiredPercent = Mathf.Clamp(_currentSelection.costToUnlock, 0f, 100f);
                     costText.gameObject.SetActive(true);
-                    costText.text = $"{_currentSelection.costToUnlock}%";
+                    costText.text = $"{requiredPercent:0.#}%";
                 }
             }
 
@@ -155,7 +166,6 @@ namespace IronIvy.UI
                 return;
             }
 
-
             bool canUnlock = ArchiveManager.Instance.CanUnlockNode(_currentSelection, out string reason);
             unlockButton.interactable = canUnlock;
 
@@ -164,10 +174,9 @@ namespace IronIvy.UI
                 if (canUnlock) unlockButtonLabel.text = "MỞ KHÓA";
                 else
                 {
-                    // map reason -> text dễ hiểu
                     if (reason.StartsWith("Need parent")) unlockButtonLabel.text = "CẦN MỞ NODE TRƯỚC";
                     else if (reason.Contains("Duplicate id")) unlockButtonLabel.text = "LỖI ID (TRÙNG)";
-                    else if (reason == "Not enough points") unlockButtonLabel.text = "THIẾU DATA";
+                    else if (reason == "Not enough progress") unlockButtonLabel.text = "CHƯA ĐẠT MỨC DATA";
                     else unlockButtonLabel.text = "KHÔNG THỂ MỞ";
                 }
             }
@@ -179,33 +188,32 @@ namespace IronIvy.UI
         private void OnUnlockClicked()
         {
             if (_currentSelection == null) return;
+            if (nodesContainer != null)
+{
+    // chỉ refresh các node UI đang active trong tree (nhẹ hơn refresh toàn scene)
+    var nodes = nodesContainer.GetComponentsInChildren<ArchiveNodeUI>(true);
+    for (int i = 0; i < nodes.Length; i++)
+        nodes[i].RefreshVisual();
+}
             if (!ArchiveManager.HasInstance) return;
 
-            bool ok = ArchiveManager.Instance.UnlockNode(_currentSelection);
+            ArchiveManager.Instance.UnlockNode(_currentSelection);
 
             UpdateTotalPoints();
             UpdateUnlockButtonState();
-
-            for (int i = 0; i < _spawnedNodes.Count; i++)
-            {
-                if (_spawnedNodes[i] != null)
-                    _spawnedNodes[i].RefreshVisual();
-            }
-
-            if (!ok)
-                Debug.Log("[ArchivePanel] Unlock failed (parent/points/duplicate id).");
+            RefreshAllNodes();
         }
 
         private void UpdateTotalPoints()
         {
             if (ArchiveManager.HasInstance && totalPointsText)
             {
-                totalPointsText.text = $"{ArchiveManager.Instance.currentPoints}%";
+                float p = ArchiveManager.Instance.CurrentPercent100;
+                totalPointsText.text = $"{p:0.#}%";
             }
         }
 
-        // ===== typewriter (giữ nguyên) =====
-
+        // ===== typewriter giữ nguyên =====
         private void PlayDescTypewriter(string content)
         {
             StopDescTyping(resetVisible: true);
@@ -286,8 +294,7 @@ namespace IronIvy.UI
             if (inside) SkipDescTyping();
         }
 
-        // ===== node reveal (giữ nguyên) =====
-
+        // ===== reveal giữ nguyên (nhưng chạy trên list đã register) =====
         private void PrepareNodeHidden(ArchiveNodeUI node)
         {
             if (node == null) return;
@@ -375,6 +382,5 @@ namespace IronIvy.UI
             if (costLabelObject != null) costLabelObject.SetActive(visible);
             if (totalLabelObject != null) totalLabelObject.SetActive(visible);
         }
-
     }
 }
