@@ -1,6 +1,6 @@
-﻿using UnityEngine;
+﻿using IronIvy.Systems.Camera;
 using Unity.Cinemachine;
-using IronIvy.Systems.Camera;
+using UnityEngine;
 
 namespace IronIvy.Gameplay
 {
@@ -19,10 +19,10 @@ namespace IronIvy.Gameplay
 
         [Header("Physics Settings (Restored)")]
         [Tooltip("Thời gian để đạt tốc độ tối đa (Càng nhỏ càng nhanh)")]
-        public float acceleration = 0.1f; 
+        public float acceleration = 0.1f;
 
         [Tooltip("Thời gian để dừng lại hẳn (Càng nhỏ dừng càng nhanh)")]
-        public float deceleration = 0.15f; 
+        public float deceleration = 0.15f;
 
         [Tooltip("Trọng lực")]
         public float gravity = 15.0f;
@@ -48,9 +48,9 @@ namespace IronIvy.Gameplay
         private Animator _anim;
 
         // Physics State
-        private float _verticalVelocity;       // Y velocity
-        private Vector3 _currentVelocity;      // XZ velocity
-        private Vector3 _smoothDampVelocity;   // helper cho SmoothDamp
+        private float _verticalVelocity;
+        private Vector3 _currentVelocity;
+        private Vector3 _smoothDampVelocity;
 
         [SerializeField, Tooltip("Debug: Check xem controller có đang active không")]
         private bool isTPSActive = true;
@@ -62,7 +62,7 @@ namespace IronIvy.Gameplay
         {
             _cc = GetComponent<CharacterController>();
             _anim = GetComponent<Animator>();
-            _isoController = GetComponent<IsoPlayerController>(); // có thì lấy, không có thì thôi
+            _isoController = GetComponent<IsoPlayerController>();
         }
 
         private void Start()
@@ -79,10 +79,8 @@ namespace IronIvy.Gameplay
                 CameraManager.Instance.OnCameraChanged += OnCameraChanged;
             }
 
-            // sync trạng thái Iso theo TPS ban đầu
             if (_isoController != null)
             {
-                // nếu TPS đang active => tắt iso, ngược lại bật iso
                 _isoController.enabled = !isTPSActive;
             }
         }
@@ -100,12 +98,10 @@ namespace IronIvy.Gameplay
             if (isTPSActive)
             {
                 HandleCameraInput();
-                HandleMovement();      // TPS tự move
+                HandleMovement();
             }
             else
             {
-                // nếu TPS tắt mà Iso cũng tắt (trường hợp đặc biệt) thì vẫn phải có gravity
-                // còn nếu Iso đang bật thì để Iso lo SimpleMove + gravity luôn, mình không đụng
                 if (_isoController == null || !_isoController.enabled)
                 {
                     ApplyGravityOnly();
@@ -131,34 +127,30 @@ namespace IronIvy.Gameplay
             cameraPivot.position = transform.position + Vector3.up * 1.5f;
         }
 
-        // Movement dùng SmoothDamp, giữ nguyên như bạn đang xài
         private void HandleMovement()
         {
             float h = Input.GetAxis("Horizontal");
             float v = Input.GetAxis("Vertical");
             bool isRun = Input.GetKey(KeyCode.LeftShift);
 
-            // 1. Hướng move theo camera
             Vector3 targetDir = Vector3.zero;
             if (Camera.main != null)
             {
                 Vector3 camForward = Camera.main.transform.forward;
                 Vector3 camRight = Camera.main.transform.right;
-                camForward.y = 0; 
+                camForward.y = 0;
                 camRight.y = 0;
-                camForward.Normalize(); 
+                camForward.Normalize();
                 camRight.Normalize();
                 targetDir = (camForward * v + camRight * h).normalized;
             }
 
-            // 2. Tốc độ mong muốn
             float targetSpeed = 0f;
             if (targetDir.magnitude > 0.1f)
             {
                 targetSpeed = isRun ? runSpeed : walkSpeed;
             }
 
-            // 3. Quán tính accel/decel
             float smoothTime = (targetSpeed > 0.1f) ? acceleration : deceleration;
             Vector3 targetVelocity = targetDir * targetSpeed;
 
@@ -169,7 +161,6 @@ namespace IronIvy.Gameplay
                 smoothTime
             );
 
-            // 4. Xoay theo hướng đang di chuyển
             if (_currentVelocity.magnitude > 0.1f)
             {
                 Quaternion targetRot = Quaternion.LookRotation(_currentVelocity.normalized);
@@ -180,7 +171,6 @@ namespace IronIvy.Gameplay
                 );
             }
 
-            // 5. Gravity
             if (_cc.isGrounded)
             {
                 if (_verticalVelocity < 0.0f)
@@ -196,18 +186,38 @@ namespace IronIvy.Gameplay
                 _verticalVelocity -= gravity * Time.deltaTime;
             }
 
-            // 6. Move final
             Vector3 finalMove = _currentVelocity;
             finalMove.y = _verticalVelocity;
-
             _cc.Move(finalMove * Time.deltaTime);
 
-            // 7. Animation
             if (_anim)
             {
-                float speedPercent = new Vector3(_cc.velocity.x, 0, _cc.velocity.z).magnitude;
-                _anim.SetFloat("Speed", speedPercent);
+                Vector3 flatVel = new Vector3(_cc.velocity.x, 0f, _cc.velocity.z);
+                float speed = flatVel.magnitude;
+
+                // Speed
+                _anim.SetFloat("Speed", speed);
+
+                // Side: chỉ update khi thật sự đang move, còn đứng yên thì khóa về 0 để không jitter
+                float sideRaw = Input.GetAxis("Horizontal");
+
+                // ngưỡng đứng yên (tùy game, 0.03 - 0.08 thường ổn)
+                const float idleSpeedThreshold = 0.05f;
+
+                if (speed < idleSpeedThreshold)
+                {
+                    _anim.SetFloat("Side", 0f);
+                }
+                else
+                {
+                    // optional: bỏ rung nhỏ của axis khi đang move
+                    const float sideDeadZone = 0.02f;
+                    if (Mathf.Abs(sideRaw) < sideDeadZone) sideRaw = 0f;
+
+                    _anim.SetFloat("Side", sideRaw);
+                }
             }
+
         }
 
         private void ApplyGravityOnly()
@@ -219,10 +229,6 @@ namespace IronIvy.Gameplay
 
             _cc.Move(new Vector3(0, _verticalVelocity, 0) * Time.deltaTime);
         }
-
-        // =========================================================
-        // CAMERA EVENT LISTENER
-        // =========================================================
 
         private void OnCameraChanged(CinemachineCamera oldCam, CinemachineCamera newCam)
         {
@@ -237,7 +243,6 @@ namespace IronIvy.Gameplay
         {
             isTPSActive = active;
 
-            // bật TPS => tắt Iso; tắt TPS => bật Iso
             if (_isoController != null)
             {
                 _isoController.enabled = !active;
@@ -245,10 +250,8 @@ namespace IronIvy.Gameplay
 
             if (active)
             {
-                // reset quán tính một chút cho đỡ bị "kéo" từ iso
                 _currentVelocity = Vector3.zero;
                 _smoothDampVelocity = Vector3.zero;
-
                 ResyncCameraAnglesFromPivot();
             }
         }

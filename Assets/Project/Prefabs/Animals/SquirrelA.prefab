@@ -154,6 +154,7 @@ SkinnedMeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 6dd829427f72aa84b9e63e6a15f42f70, type: 2}
+  - {fileID: 2100000, guid: 568c79335874fbe4ba36f74becb0039d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -699,6 +700,8 @@ MonoBehaviour:
   disableTriggerColliderWhileInteracting: 1
   interactionTriggerCollider: {fileID: 0}
   interactCooldown: 0.25
+  autoResetSeconds: 3
+  reEnableDelaySeconds: 0.25
   debugLog: 0
 --- !u!65 &6377033508812778218
 BoxCollider:

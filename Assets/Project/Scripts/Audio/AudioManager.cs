@@ -211,25 +211,34 @@ public class AudioManager : BaseManager<AudioManager>
     }
 
     // helper nho de phat SE tai vi tri 3d (dung cho tieng keu animal ngoai world)
-public void PlaySEAtPosition(AudioClip clip, Vector3 position, float volumeScale = 1f)
-{
-    if (clip == null)
+    public void PlaySEAtPosition(AudioClip clip, Vector3 position, float volumeScale = 1f)
     {
-        return;
+        if (clip == null)
+        {
+            return;
+        }
+
+        // neu SE dang mute thi thoi, de game setting control
+        if (AttachSESource != null && AttachSESource.mute)
+        {
+            return;
+        }
+
+        // lay volume goc tu SE channel chinh
+        float baseVolume = (AttachSESource != null) ? AttachSESource.volume : 1f;
+        float finalVolume = Mathf.Clamp01(baseVolume * volumeScale);
+
+        // dung PlayClipAtPoint nhung thong qua audio manager 1 cho cho de control
+        AudioSource.PlayClipAtPoint(clip, position, finalVolume);
     }
 
-    // neu SE dang mute thi thoi, de game setting control
-    if (AttachSESource != null && AttachSESource.mute)
+    public void ApplyPrefsNow()
     {
-        return;
+        AttachBGMSource.volume = PlayerPrefs.GetFloat(BGM_VOLUME_KEY, BGM_VOLUME_DEFAULT);
+        AttachSESource.volume = PlayerPrefs.GetFloat(SE_VOLUME_KEY, SE_VOLUME_DEFAULT);
+
+        AttachBGMSource.mute = PlayerPrefs.GetInt(BGM_MUTE_KEY, BGM_MUTE_DEFAULT) != 0;
+        AttachSESource.mute = PlayerPrefs.GetInt(SE_MUTE_KEY, SE_MUTE_DEFAULT) != 0;
     }
-
-    // lay volume goc tu SE channel chinh
-    float baseVolume = (AttachSESource != null) ? AttachSESource.volume : 1f;
-    float finalVolume = Mathf.Clamp01(baseVolume * volumeScale);
-
-    // dung PlayClipAtPoint nhung thong qua audio manager 1 cho cho de control
-    AudioSource.PlayClipAtPoint(clip, position, finalVolume);
-}
 
 }

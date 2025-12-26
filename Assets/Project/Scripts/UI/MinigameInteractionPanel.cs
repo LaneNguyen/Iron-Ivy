@@ -37,6 +37,19 @@ namespace IronIvy.UI
         [Header("Config")]
         [SerializeField] private int animalEnergyCost = 1;
 
+                [Header("Feedback (Favorite Food)")]
+        [TextArea] public string correctFeedbackText = "Trúng gu trúng gu! (Buff Active)";
+        [TextArea] public string wrongFeedbackText = "Không phải món khoái khẩu, nhưng vẫn chơi được nè.";
+
+        public Color correctFeedbackColor = new Color(0.2f, 0.85f, 0.35f, 1f);
+        public Color wrongFeedbackColor = new Color(1f, 0.45f, 0.2f, 1f);
+
+        [Header("Food Slot Color (Optional)")]
+        public bool useFavoriteColorOnSelectedSlot = true;
+        public Color correctSelectedColor = new Color(0.2f, 0.9f, 0.35f, 1f);
+        public Color wrongSelectedColor = new Color(1f, 0.55f, 0.2f, 1f);
+
+
         [Header("Debug")]
         public bool debugLog = true;
 
@@ -217,38 +230,67 @@ namespace IronIvy.UI
             }
         }
 
-        private void OnFoodSelected(FoodItem food)
+               private void OnFoodSelected(FoodItem food)
         {
             if (_selectedFood == food)
             {
                 _selectedFood = null;
                 UpdateSlotHighlights();
-                if (buffInfoText) buffInfoText.text = "";
+
+                if (buffInfoText)
+                {
+                    buffInfoText.text = "";
+                    buffInfoText.color = Color.white;
+                }
                 return;
             }
 
             _selectedFood = food;
             UpdateSlotHighlights();
 
-            if (_currentAnimal != null && _currentAnimal.Definition != null)
+            if (buffInfoText)
             {
-                if (_currentAnimal.Definition.favoriteFood == food)
+                // default
+                buffInfoText.text = "";
+                buffInfoText.color = Color.white;
+
+                if (_currentAnimal != null && _currentAnimal.Definition != null)
                 {
-                    if (buffInfoText) buffInfoText.text = "<color=green>Trúng gu trúng gu! (Buff Active)</color>";
-                }
-                else
-                {
-                    if (buffInfoText) buffInfoText.text = "Chọn món này.";
+                    bool isCorrect = (_currentAnimal.Definition.favoriteFood == food);
+
+                    buffInfoText.text = isCorrect ? correctFeedbackText : wrongFeedbackText;
+                    buffInfoText.color = isCorrect ? correctFeedbackColor : wrongFeedbackColor;
                 }
             }
         }
 
-        private void UpdateSlotHighlights()
+
+                private void UpdateSlotHighlights()
         {
+            bool hasAnimalDef = (_currentAnimal != null && _currentAnimal.Definition != null);
+
             foreach (var kvp in _slotBackgrounds)
             {
                 if (kvp.Value == null) continue;
-                kvp.Value.color = (kvp.Key == _selectedFood) ? selectedColor : normalColor;
+
+                bool isSelected = (kvp.Key == _selectedFood);
+
+                if (!isSelected)
+                {
+                    kvp.Value.color = normalColor;
+                    continue;
+                }
+
+                // Selected slot
+                if (useFavoriteColorOnSelectedSlot && hasAnimalDef && _selectedFood != null)
+                {
+                    bool isCorrect = (_currentAnimal.Definition.favoriteFood == _selectedFood);
+                    kvp.Value.color = isCorrect ? correctSelectedColor : wrongSelectedColor;
+                }
+                else
+                {
+                    kvp.Value.color = selectedColor;
+                }
             }
         }
 

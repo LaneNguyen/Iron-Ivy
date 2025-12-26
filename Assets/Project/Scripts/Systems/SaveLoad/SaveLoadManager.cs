@@ -1,15 +1,34 @@
 using UnityEngine;
 using System.Collections.Generic;
-using System.Linq; // Cần cái này để xử lý chuỗi
+using System.Linq;
 
 namespace IronIvy.Core
 {
     public class SaveLoadManager : BaseManager<SaveLoadManager>
     {
         const string KEY_ARCHIVE_POINTS = "ironivy.archive.points";
-        const string KEY_ARCHIVE_NODES = "ironivy.archive.nodes"; // Key lưu danh sách node
-        const string KEY_ENERGY_CUR = "ironivy.energy.cur";
-        const string KEY_ENERGY_MAX = "ironivy.energy.max";
+        const string KEY_ARCHIVE_NODES  = "ironivy.archive.nodes";
+        const string KEY_ENERGY_CUR     = "ironivy.energy.cur";
+        const string KEY_ENERGY_MAX     = "ironivy.energy.max";
+
+        public bool HasSaveData()
+        {
+            return PlayerPrefs.HasKey(KEY_ARCHIVE_POINTS)
+                || PlayerPrefs.HasKey(KEY_ARCHIVE_NODES)
+                || PlayerPrefs.HasKey(KEY_ENERGY_MAX)
+                || PlayerPrefs.HasKey(KEY_ENERGY_CUR);
+        }
+
+        public void DeleteSaveData()
+        {
+            PlayerPrefs.DeleteKey(KEY_ARCHIVE_POINTS);
+            PlayerPrefs.DeleteKey(KEY_ARCHIVE_NODES);
+            PlayerPrefs.DeleteKey(KEY_ENERGY_CUR);
+            PlayerPrefs.DeleteKey(KEY_ENERGY_MAX);
+            PlayerPrefs.Save();
+
+            Debug.Log("[SaveLoad] Deleted save data (Archive/Energy).");
+        }
 
         public void SaveGame()
         {
@@ -19,17 +38,13 @@ namespace IronIvy.Core
 
         public void SaveAll()
         {
-            // 1. Save Archive
             if (ArchiveManager.HasInstance)
             {
                 PlayerPrefs.SetFloat(KEY_ARCHIVE_POINTS, ArchiveManager.Instance.currentPoints);
-                
-                // [FIX] Convert List<string> thành 1 chuỗi để lưu (VD: "node1,node2,node3")
                 string nodesString = string.Join(",", ArchiveManager.Instance.unlockedNodeIDs);
                 PlayerPrefs.SetString(KEY_ARCHIVE_NODES, nodesString);
             }
 
-            // 2. Save Energy
             if (EnergyManager.HasInstance)
             {
                 PlayerPrefs.SetInt(KEY_ENERGY_CUR, EnergyManager.Instance.Current);
@@ -39,35 +54,49 @@ namespace IronIvy.Core
             PlayerPrefs.Save();
         }
 
-        public void LoadAll()
+        // treatMissingAsNewGame: nếu chưa có save -> energy full, archive empty
+        public void LoadAll(bool treatMissingAsNewGame = true)
         {
-            // 1. Load Energy
-            if (EnergyManager.HasInstance)
-            {
-                int defaultMax = 6; 
-                int savedMax = PlayerPrefs.GetInt(KEY_ENERGY_MAX, defaultMax);
-                int savedCur = PlayerPrefs.GetInt(KEY_ENERGY_CUR, savedMax);
+            bool hasSave = HasSaveData();
 
-                // Gọi hàm set data mới trong EnergyManager
-                EnergyManager.Instance.SetLoadedData(savedCur, savedMax);
-            }
-
-            // 2. Load Archive
+            // 1) Load Archive trước
             if (ArchiveManager.HasInstance)
             {
-                float points = PlayerPrefs.GetFloat(KEY_ARCHIVE_POINTS, 0);
-                
-                // [FIX] Load chuỗi node và tách ra thành List
+                float points = (hasSave)
+                    ? PlayerPrefs.GetFloat(KEY_ARCHIVE_POINTS, 0f)
+                    : 0f;
+
                 List<string> loadedNodes = new List<string>();
-                string nodesString = PlayerPrefs.GetString(KEY_ARCHIVE_NODES, "");
-                
+                string nodesString = (hasSave) ? PlayerPrefs.GetString(KEY_ARCHIVE_NODES, "") : "";
                 if (!string.IsNullOrEmpty(nodesString))
+                    loadedNodes = nodesString.Split(',').Where(s => !string.IsNullOrEmpty(s)).ToList();
+
+                ArchiveManager.Instance.LoadState(points, loadedNodes);
+            }
+
+            // 2) Load Energy
+            if (EnergyManager.HasInstance)
+            {
+                int defaultMax = 6;
+                int savedMax = PlayerPrefs.GetInt(KEY_ENERGY_MAX, defaultMax);
+
+                int savedCur;
+                if (!hasSave && treatMissingAsNewGame)
                 {
-                    loadedNodes = nodesString.Split(',').ToList();
+                    // New profile / no save: full energy
+                    savedCur = savedMax;
+                }
+                else
+                {
+                    // Có save: lấy đúng value (kể cả 0 nếu người chơi thật sự hết energy)
+                    // Nếu key cur không tồn tại thì default = max
+                    if (PlayerPrefs.HasKey(KEY_ENERGY_CUR))
+                        savedCur = PlayerPrefs.GetInt(KEY_ENERGY_CUR, savedMax);
+                    else
+                        savedCur = savedMax;
                 }
 
-                // Đẩy data vào ArchiveManager để nó tự Rebuild
-                ArchiveManager.Instance.LoadState(points, loadedNodes);
+                EnergyManager.Instance.SetLoadedData(savedCur, savedMax);
             }
         }
     }

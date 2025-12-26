@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using UnityEngine;
-using IronIvy.UI;
 using IronIvy.Gameplay.Interaction;
 using IronIvy.Gameplay.Rhythm;
+using IronIvy.UI;
+using UnityEngine;
 
 namespace IronIvy.Gameplay
 {
@@ -16,6 +16,9 @@ namespace IronIvy.Gameplay
         public PlantRhythmStartPanel startPanel;
         public ClickPlantRhythmMinigame minigameSystem;
         public InteractionTrigger interactionTrigger;
+
+        private PlantPlot _currentHighlighted;
+
 
         private void Start()
         {
@@ -37,5 +40,28 @@ namespace IronIvy.Gameplay
             if (minigameSystem != null && minigameSystem.IsRunning) return;
             if (startPanel) startPanel.ShowForArea(this);
         }
+
+        public void HighlightPlot(PlantPlot plot)
+        {
+            if (_currentHighlighted == plot) return;
+
+            // tắt cái cũ
+            if (_currentHighlighted != null)
+                _currentHighlighted.SetHighlighted(false);
+
+            _currentHighlighted = plot;
+
+            if (_currentHighlighted != null)
+                _currentHighlighted.SetHighlighted(true);
+        }
+        public void ClearHighlight()
+        {
+            if (_currentHighlighted != null)
+            {
+                _currentHighlighted.SetHighlighted(false);
+                _currentHighlighted = null;
+            }
+        }
+
     }
 }

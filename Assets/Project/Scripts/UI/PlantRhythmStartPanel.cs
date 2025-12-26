@@ -35,6 +35,11 @@ namespace IronIvy.UI
 
         public int baseEnergyCost => energyPerPlant;
 
+        [Header("Visual - Slot Colors")]
+        public Color slotNormalColor = Color.white;
+        public Color slotSelectedColor = new Color(1f, 0.92f, 0.2f, 1f); // vàng mềm
+        public Color slotFilledColor = new Color(0.75f, 1f, 0.75f, 1f);  // xanh nhẹ (ô đã chọn cây) - optional
+
         private PlantArea _currentArea;
         private List<PlantDefinition> _selectedPlants = new List<PlantDefinition>();
         private int _currentSelectedSlotIndex = -1;
@@ -69,16 +74,22 @@ namespace IronIvy.UI
 
             _currentSelectedSlotIndex = (_selectedPlants.Count > 0) ? 0 : -1;
             RefreshUI();
+            HighlightCurrentPlot();
         }
 
         public void Hide()
         {
+            ClearPlotHighlight();
+            ClearAllPreviews();
             if (root) root.SetActive(false);
             _currentArea = null;
         }
 
         private void OnCancelClicked()
         {
+            ClearPlotHighlight();
+            ClearAllPreviews();
+
             // đóng popup, trả UI về main
             if (UIManager.HasInstance)
                 UIManager.Instance.CloseAllPopups();
@@ -105,6 +116,11 @@ namespace IronIvy.UI
                 int index = i;
                 Button btn = Instantiate(plotSlotPrefab, plotSlotContainer);
 
+                // Vì UI đang rebuild liên tục (Destroy/Instantiate),
+                // ta set màu trực tiếp và tắt Transition để Unity không override.
+                btn.transition = Selectable.Transition.None;
+
+                // Text
                 var txt = btn.GetComponentInChildren<TextMeshProUGUI>();
                 if (txt)
                 {
@@ -114,16 +130,35 @@ namespace IronIvy.UI
                     txt.text = $"Ô đất {index + 1}\n<size=80%>{plantName}</size>";
                 }
 
-                var img = btn.GetComponent<Image>();
-                if (img)
-                    img.color = (index == _currentSelectedSlotIndex) ? Color.yellow : Color.white;
+                // Color
+                ApplySlotVisual(btn, index);
 
+                // Click
                 btn.onClick.AddListener(() =>
                 {
                     _currentSelectedSlotIndex = index;
                     RefreshUI();
+                    HighlightCurrentPlot();
                 });
             }
+        }
+
+        private void ApplySlotVisual(Button btn, int index)
+        {
+            if (btn == null) return;
+
+            var g = btn.targetGraphic;
+            if (g == null) return;
+
+            bool isSelected = (index == _currentSelectedSlotIndex);
+            bool isFilled = (_selectedPlants != null && index >= 0 && index < _selectedPlants.Count && _selectedPlants[index] != null);
+
+            if (isSelected)
+                g.color = slotSelectedColor;
+            else if (isFilled)
+                g.color = slotFilledColor;
+            else
+                g.color = slotNormalColor;
         }
 
         private void RenderSeedList()
@@ -163,15 +198,25 @@ namespace IronIvy.UI
 
         private void SelectPlantForCurrentSlot(PlantDefinition plant)
         {
-            if (_currentSelectedSlotIndex >= 0 && _currentSelectedSlotIndex < _selectedPlants.Count)
+            if (_currentSelectedSlotIndex < 0 || _currentSelectedSlotIndex >= _selectedPlants.Count) return;
+
+            // gắn plant vào slot hiện tại
+            _selectedPlants[_currentSelectedSlotIndex] = plant;
+
+            // preview "cây mờ" tại plot tương ứng
+            if (_currentArea != null && _currentArea.plots != null
+                && _currentSelectedSlotIndex >= 0 && _currentSelectedSlotIndex < _currentArea.plots.Count)
             {
-                _selectedPlants[_currentSelectedSlotIndex] = plant;
-
-                if (_currentSelectedSlotIndex < _selectedPlants.Count - 1)
-                    _currentSelectedSlotIndex++;
-
-                RefreshUI();
+                var plot = _currentArea.plots[_currentSelectedSlotIndex];
+                if (plot != null) plot.SetPreviewPlant(plant);
             }
+
+            // auto advance slot (giữ behavior cũ)
+            if (_currentSelectedSlotIndex < _selectedPlants.Count - 1)
+                _currentSelectedSlotIndex++;
+
+            RefreshUI();
+            HighlightCurrentPlot();
         }
 
         private void UpdateStatus()
@@ -205,7 +250,41 @@ namespace IronIvy.UI
                 return;
             }
 
+            // trước khi start, clear highlight + preview để tránh kẹt hình
+            ClearPlotHighlight();
+            ClearAllPreviews();
+
             UIManager.Instance.RequestStartPlantRhythm(_currentArea, _selectedPlants, cost);
+        }
+
+        // =========================
+        // World Highlight Hooks
+        // =========================
+        private void HighlightCurrentPlot()
+        {
+            if (_currentArea == null) return;
+            if (_currentSelectedSlotIndex < 0) return;
+            if (_currentArea.plots == null) return;
+            if (_currentSelectedSlotIndex >= _currentArea.plots.Count) return;
+
+            _currentArea.HighlightPlot(_currentArea.plots[_currentSelectedSlotIndex]);
+        }
+
+        private void ClearPlotHighlight()
+        {
+            if (_currentArea != null)
+                _currentArea.ClearHighlight();
+        }
+
+        private void ClearAllPreviews()
+        {
+            if (_currentArea == null || _currentArea.plots == null) return;
+
+            for (int i = 0; i < _currentArea.plots.Count; i++)
+            {
+                if (_currentArea.plots[i] != null)
+                    _currentArea.plots[i].ClearPreview();
+            }
         }
     }
 }

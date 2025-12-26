@@ -28,6 +28,10 @@ namespace IronIvy.Core
             public RhythmHUD rhythmHUD;
             public PlantRhythmRewardPanel plantRewardPanel;
             public AnimalRhythmRewardPanel animalRewardPanel;
+
+            // NEW: Minimap nằm trong Notify group
+            // Gợi ý: drag "MinimapRoot" (GameObject) vào đây trong Inspector
+            public GameObject minimapRoot;
         }
 
         [Header("Refs")]
@@ -52,13 +56,16 @@ namespace IronIvy.Core
         private void Start()
         {
             EnsureMinigameRefs();
-            
+
             // Khởi tạo trạng thái overlay ban đầu
             if (fadeOverlay != null)
             {
                 fadeOverlay.alpha = 0f;
                 fadeOverlay.gameObject.SetActive(false);
             }
+
+            // Minimap: default là hiện (nếu có assign)
+            SetMinimapVisible(true);
         }
 
         private void OnEnable()
@@ -119,6 +126,18 @@ namespace IronIvy.Core
         }
 
         // =========================
+        // MINIMAP VISIBILITY (Notify Group)
+        // =========================
+        public void ShowMinimap() => SetMinimapVisible(true);
+        public void HideMinimap() => SetMinimapVisible(false);
+
+        private void SetMinimapVisible(bool visible)
+        {
+            if (notify != null && notify.minimapRoot != null)
+                notify.minimapRoot.SetActive(visible);
+        }
+
+        // =========================
         // START MINIGAME REQUESTS
         // =========================
         public bool RequestStartPlantRhythm(PlantArea area, List<PlantDefinition> selectedPlants, int energyCost)
@@ -130,6 +149,10 @@ namespace IronIvy.Core
 
             _plantRhythmMinigame.StartSequence(area.plots, selectedPlants, area);
             CloseAllPopups();
+
+            // Minigame start: hide minimap
+            HideMinimap();
+
             if (ListenManager.HasInstance) ListenManager.Instance.RaiseMinigameStarted();
             return true;
         }
@@ -156,6 +179,10 @@ namespace IronIvy.Core
 
             _animalRhythmMinigame.RequestPlay(animal, isFavorite);
             CloseAllPopups();
+
+            // Minigame start: hide minimap
+            HideMinimap();
+
             if (ListenManager.HasInstance) ListenManager.Instance.RaiseMinigameStarted();
             return true;
         }
@@ -163,11 +190,11 @@ namespace IronIvy.Core
         // =========================
         // UI CONTROL & FADE LOGIC
         // =========================
-        
+
         public void OpenArchiveUI()
         {
             if (archivePanel == null) return;
-            
+            HideMinimap();
             if (_fadeRoutine != null) StopCoroutine(_fadeRoutine);
             _fadeRoutine = StartCoroutine(OpenArchiveWithFade());
         }
@@ -185,7 +212,7 @@ namespace IronIvy.Core
 
             // 3) Fade back
             yield return FadeOverlay(0f, fadeInTime, blockRaycasts: false);
-            
+
             _fadeRoutine = null;
         }
 
@@ -220,6 +247,7 @@ namespace IronIvy.Core
         {
             // Hiện tại đóng Archive quay về Main HUD
             CloseAllPopups();
+            ShowMinimap();
         }
 
         public void CloseAllPopups()
@@ -228,7 +256,7 @@ namespace IronIvy.Core
             if (popup.animalInteractionPanel != null) popup.animalInteractionPanel.Hide();
             if (notify.plantRewardPanel != null) notify.plantRewardPanel.Hide();
             if (notify.animalRewardPanel != null) notify.animalRewardPanel.gameObject.SetActive(false);
-            
+
             // Nếu có ArchivePanel đang mở thì ẩn luôn (tùy thuộc vào cấu trúc ArchivePanel.Show/Hide của bạn)
             if (archivePanel != null) archivePanel.gameObject.SetActive(false);
 

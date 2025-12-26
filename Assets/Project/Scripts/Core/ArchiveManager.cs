@@ -40,6 +40,12 @@ namespace IronIvy.Core
             RebuildUnlockedPlants();
         }
 
+        public void InitCore()
+        {
+            // đảm bảo UI sync khi vào gameplay
+            NotifyArchiveChanged();
+        }
+
         private void RebuildIdCountCache()
         {
             _idCount.Clear();

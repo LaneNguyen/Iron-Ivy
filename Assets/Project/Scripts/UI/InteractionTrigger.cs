@@ -17,35 +17,37 @@ namespace IronIvy.Gameplay.Interaction
         public UnityEvent<bool> onToggleHighlight;
 
         [Header("Logic")]
-        [Tooltip("Hook OpenAnimalInteractionPanelSticky() vào đây")]
         public UnityEvent onInteract;
 
         [Header("Sticky Interaction")]
         public AnimalController animalToLock;
 
-        [Tooltip("Ignore trigger exit trong lúc interacting")]
         public bool ignoreExitWhileInteracting = true;
-
-        [Tooltip("Disable trigger collider trong lúc interacting")]
         public bool disableTriggerColliderWhileInteracting = true;
 
-        [Header("Collider Binding (IMPORTANT)")]
-        [Tooltip("Kéo đúng collider trigger dùng cho interaction vào đây. Nếu bỏ trống, script sẽ tự tìm collider isTrigger=true.")]
+        [Header("Collider Binding")]
         public Collider interactionTriggerCollider;
 
         [Header("Anti spam")]
         public float interactCooldown = 0.25f;
 
+        [Header("Auto Reset")]
+        public float autoResetSeconds = 3f;
+        public float reEnableDelaySeconds = 0.25f;
+
         [Header("Debug")]
         public bool debugLog = false;
 
-        // ===== Runtime state =====
+        // ===== Runtime =====
         private bool _isPlayerInZone;
         private bool _isInteracting;
         private float _nextAllowedTime;
 
         private Collider _triggerCol;
         private Collider _playerCol;
+
+        private Coroutine _autoResetRoutine;
+        private Coroutine _reEnableRoutine;
 
         private void Awake()
         {
@@ -60,12 +62,13 @@ namespace IronIvy.Gameplay.Interaction
 
         private void OnEnable()
         {
-            // pooled spawn: đảm bảo collider trigger không bị "kẹt disabled" từ vòng trước
             BindTriggerCollider();
 
             _isInteracting = false;
             _isPlayerInZone = false;
             _playerCol = null;
+
+            StopAllCoroutines();
 
             if (_triggerCol != null)
                 _triggerCol.enabled = true;
@@ -76,69 +79,45 @@ namespace IronIvy.Gameplay.Interaction
             onToggleHighlight?.Invoke(false);
         }
 
+        private void OnDisable()
+        {
+            StopAllCoroutines();
+
+            if (ListenManager.HasInstance)
+                ListenManager.Instance.OnRhythmResultClosed -= OnRewardPanelClosed;
+        }
+
         private void BindTriggerCollider()
         {
-            // 1) ưu tiên collider Lane kéo tay
             if (interactionTriggerCollider != null)
             {
                 _triggerCol = interactionTriggerCollider;
-                if (debugLog && !_triggerCol.isTrigger)
-                    Debug.LogWarning($"[InteractionTrigger] {name} interactionTriggerCollider is NOT trigger. Please set isTrigger=true on that collider.");
                 return;
             }
 
-            // 2) auto-pick: ưu tiên collider trigger ngay trên object này
-            var colsHere = GetComponents<Collider>();
-            for (int i = 0; i < colsHere.Length; i++)
+            var cols = GetComponentsInChildren<Collider>(true);
+            foreach (var c in cols)
             {
-                if (colsHere[i] != null && colsHere[i].isTrigger)
+                if (c.isTrigger)
                 {
-                    _triggerCol = colsHere[i];
+                    _triggerCol = c;
                     return;
                 }
             }
 
-            // 3) auto-pick: tìm trong children (include inactive)
-            var colsChild = GetComponentsInChildren<Collider>(true);
-            for (int i = 0; i < colsChild.Length; i++)
-            {
-                if (colsChild[i] != null && colsChild[i].isTrigger)
-                {
-                    _triggerCol = colsChild[i];
-                    return;
-                }
-            }
-
-            // 4) fallback cuối: lấy đại collider trên object (nhưng không chỉnh isTrigger nữa)
             _triggerCol = GetComponent<Collider>();
-
-            if (debugLog)
-                Debug.LogWarning($"[InteractionTrigger] {name} cannot find any trigger collider. Please assign 'interactionTriggerCollider' manually.");
         }
 
         private void Update()
         {
-            bool keyDown = Input.GetKeyDown(interactKey);
-
-            if (debugLog)
-            {
-                Debug.Log(
-                    $"[InteractionTrigger][Update] {name} " +
-                    $"inZone={_isPlayerInZone} interacting={_isInteracting} keyDown={keyDown}"
-                );
-            }
-
             if (!_isPlayerInZone) return;
             if (_isInteracting) return;
             if (Time.time < _nextAllowedTime) return;
 
-            if (keyDown)
+            if (Input.GetKeyDown(interactKey))
             {
                 _nextAllowedTime = Time.time + interactCooldown;
                 _isInteracting = true;
-
-                if (debugLog)
-                    Debug.Log($"[InteractionTrigger] Interact START ({name})");
 
                 if (interactPrompt)
                     interactPrompt.SetActive(false);
@@ -148,20 +127,32 @@ namespace IronIvy.Gameplay.Interaction
                 if (animalToLock != null)
                     animalToLock.SetInteractionLocked(true);
 
-                // chỉ disable đúng trigger collider, không bao giờ đụng collider physical
                 if (disableTriggerColliderWhileInteracting && _triggerCol != null)
                     _triggerCol.enabled = false;
 
-                try
+                if (_autoResetRoutine != null)
+                    StopCoroutine(_autoResetRoutine);
+
+                if (autoResetSeconds > 0f)
+                    _autoResetRoutine = StartCoroutine(AutoResetAfterSeconds(autoResetSeconds));
+
+                // ===== LISTEN reward panel close =====
+                if (ListenManager.HasInstance)
                 {
-                    onInteract?.Invoke();
+                    ListenManager.Instance.OnRhythmResultClosed -= OnRewardPanelClosed;
+                    ListenManager.Instance.OnRhythmResultClosed += OnRewardPanelClosed;
                 }
-                catch (System.Exception ex)
-                {
-                    Debug.LogError($"[InteractionTrigger] onInteract error: {ex}");
-                    CancelStickyInteraction();
-                }
+
+                onInteract?.Invoke();
             }
+        }
+
+        private System.Collections.IEnumerator AutoResetAfterSeconds(float seconds)
+        {
+            yield return new WaitForSeconds(seconds);
+
+            if (_isInteracting)
+                CancelStickyInteraction();
         }
 
         private void OnTriggerEnter(Collider other)
@@ -171,16 +162,10 @@ namespace IronIvy.Gameplay.Interaction
             _playerCol = other;
             _isPlayerInZone = true;
 
-            if (!_isInteracting)
-            {
-                if (interactPrompt)
-                    interactPrompt.SetActive(true);
+            if (!_isInteracting && interactPrompt)
+                interactPrompt.SetActive(true);
 
-                onToggleHighlight?.Invoke(true);
-            }
-
-            if (debugLog)
-                Debug.Log($"[InteractionTrigger][Enter] {name} player entered");
+            onToggleHighlight?.Invoke(true);
         }
 
         private void OnTriggerExit(Collider other)
@@ -188,11 +173,7 @@ namespace IronIvy.Gameplay.Interaction
             if (!other.CompareTag(playerTag)) return;
 
             if (_isInteracting && ignoreExitWhileInteracting)
-            {
-                if (debugLog)
-                    Debug.Log($"[InteractionTrigger][Exit] ignored (sticky)");
                 return;
-            }
 
             _isPlayerInZone = false;
             _playerCol = null;
@@ -201,51 +182,44 @@ namespace IronIvy.Gameplay.Interaction
                 interactPrompt.SetActive(false);
 
             onToggleHighlight?.Invoke(false);
-
-            if (debugLog)
-                Debug.Log($"[InteractionTrigger][Exit] {name} player exited");
         }
 
-        // ===== Entry point để UI gọi =====
-        public void OpenAnimalInteractionPanelSticky()
+        // ===== CALLED BY LISTEN MANAGER =====
+        private void OnRewardPanelClosed()
         {
-            if (!UIManager.HasInstance || animalToLock == null)
-            {
-                CancelStickyInteraction();
-                return;
-            }
+            if (debugLog)
+                Debug.Log($"[InteractionTrigger] Reward panel closed -> CompleteSticky ({name})");
 
-            UIManager.Instance.ShowAnimalInteraction(animalToLock, this);
+            if (ListenManager.HasInstance)
+                ListenManager.Instance.OnRhythmResultClosed -= OnRewardPanelClosed;
+
+            CompleteStickyInteraction();
         }
 
-        // ===== Khi panel đóng / cancel =====
         public void CompleteStickyInteraction()
         {
             if (!_isInteracting) return;
 
-            if (debugLog)
-                Debug.Log($"[InteractionTrigger] CompleteSticky ({name})");
-
             _isInteracting = false;
 
-            if (_triggerCol != null)
-                _triggerCol.enabled = true;
+            if (_autoResetRoutine != null)
+                StopCoroutine(_autoResetRoutine);
 
-            if (animalToLock != null)
-            {
-                animalToLock.SetInteractionLocked(false);
-                animalToLock.CancelLookAtPlayerNow();
-            }
+            if (_reEnableRoutine != null)
+                StopCoroutine(_reEnableRoutine);
 
-            RecheckPlayerOverlap();
+            _reEnableRoutine = StartCoroutine(ReEnableAfterDelay(reEnableDelaySeconds));
         }
 
         private void CancelStickyInteraction()
         {
-            if (debugLog)
-                Debug.Log($"[InteractionTrigger] CancelSticky ({name})");
+            CompleteStickyInteraction();
+        }
 
-            _isInteracting = false;
+        private System.Collections.IEnumerator ReEnableAfterDelay(float delay)
+        {
+            if (delay > 0f)
+                yield return new WaitForSeconds(delay);
 
             if (_triggerCol != null)
                 _triggerCol.enabled = true;
@@ -259,56 +233,35 @@ namespace IronIvy.Gameplay.Interaction
             RecheckPlayerOverlap();
         }
 
-        // ===== Gia cố quan trọng =====
-        // Khi collider bị disable, Unity không gửi Exit.
-        // Hàm này check lại overlap để tránh kẹt prompt/highlight.
         private void RecheckPlayerOverlap()
         {
-            if (_triggerCol == null)
-                return;
-
-            bool stillInside = false;
-
-            if (_playerCol != null)
+            if (_triggerCol == null || _playerCol == null)
             {
-                // bounds intersects ok cho case cơ bản
-                stillInside = _triggerCol.bounds.Intersects(_playerCol.bounds);
-            }
-
-            _isPlayerInZone = stillInside;
-
-            if (!stillInside)
-            {
-                if (interactPrompt)
-                    interactPrompt.SetActive(false);
-
+                _isPlayerInZone = false;
+                if (interactPrompt) interactPrompt.SetActive(false);
                 onToggleHighlight?.Invoke(false);
+                return;
             }
-            else
+
+            bool inside = _triggerCol.bounds.Intersects(_playerCol.bounds);
+            _isPlayerInZone = inside;
+
+            if (inside)
             {
                 if (!_isInteracting && interactPrompt)
                     interactPrompt.SetActive(true);
 
                 onToggleHighlight?.Invoke(true);
             }
-
-            if (debugLog)
-                Debug.Log($"[InteractionTrigger] RecheckOverlap -> {stillInside}");
-        }
-
-
-        public void OpenArchivePanel()
-        {
-            if (!UIManager.HasInstance)
+            else
             {
-                CancelStickyInteraction();
-                return;
-            }
+                if (interactPrompt)
+                    interactPrompt.SetActive(false);
 
-            UIManager.Instance.OpenArchiveUI();
+                onToggleHighlight?.Invoke(false);
+            }
         }
 
-        // Backward compat
         public void ForceHidePrompt()
         {
             if (interactPrompt)

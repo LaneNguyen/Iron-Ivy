@@ -3,119 +3,111 @@ using UnityEngine.InputSystem;
 
 namespace IronIvy.Gameplay
 {
-    // controller isometric cho player
-    // - có thể dùng New Input System hoặc legacy axis
-    // - chỉ lo move + interact đơn giản
     [RequireComponent(typeof(CharacterController))]
     public class IsoPlayerController : MonoBehaviour
     {
-        [Header("Input System mới")]
-        [Tooltip("Action Move (Vector2). Kéo PlayerControls (Player/Move) vào đây")]
+        [Header("Input System (optional)")]
         public InputActionReference moveAction;
+        public InputActionReference runAction;
 
-        [Tooltip("Action Interact (Button). Kéo PlayerControls (Player/Interact) vào đây (optional)")]
-        public InputActionReference interactAction;
-
-        [Header("Legacy Input Manager")]
-        [Tooltip("Axis Horizontal (legacy input)")]
+        [Header("Legacy Input (optional)")]
         public string legacyHorizontal = "Horizontal";
-
-        [Tooltip("Axis Vertical (legacy input)")]
         public string legacyVertical = "Vertical";
-
-        [Tooltip("Phím tương tác (legacy input)")]
-        public KeyCode legacyInteractKey = KeyCode.E;
+        public KeyCode legacyRunKey = KeyCode.LeftShift;
 
         [Header("Movement")]
-        [Tooltip("Tốc độ di chuyển chính (m/s)")]
         public float moveSpeed = 5f;
+        public float runMultiplier = 1.5f;
+        public float accelerationTime = 0.06f;
+        public float decelerationTime = 0.08f;
+        public float rotationMaxDegree = 900f;
+        public float inputDeadZone = 0.06f;
 
-        [Tooltip("Thời gian vọt lên tốc độ mục tiêu (giây). Nhỏ = bốc hơn")]
-        public float accelerationTime = 0.08f;
-
-        [Tooltip("Thời gian hãm về 0 (giây). Lớn hơn để dừng mượt")]
-        public float decelerationTime = 0.12f;
-
-        [Tooltip("Tốc độ quay tối đa (độ/giây)")]
-        public float rotationMaxDegree = 360f;
-
-        [Tooltip("Bỏ rung input nhỏ (0-0.2). 0.1 là khá ổn cho keyboard hoặc stick")]
-        public float inputDeadZone = 0.08f;
-
-        [Header("Tham chiếu")]
-        [Tooltip("Camera dùng để định hướng move. Để trống sẽ lấy Camera.main")]
+        [Header("References")]
         public Camera mainCamera;
-
-        [Tooltip("Animator cần tham số Speed (float). Nếu để trống sẽ tự tìm quanh player")]
         public Animator animator;
 
+        [Header("Animator Params (BlendTree: X=Side, Y=Speed)")]
+        public string paramSide = "Side";                 // float
+        public string paramSpeed = "Speed";               // float
+        public string paramRun = "run";                   // bool OR float/int (tùy controller)
+        public string paramSpeedMultiplier = "speedMultiplier"; // float (optional)
+
+        [Header("Animator Feel")]
+        [Tooltip("0 = phản hồi ngay. 0.03-0.08 = mượt nhẹ.")]
+        public float animatorDamp = 0.05f;
+
+        [Tooltip("Ngưỡng input nhỏ coi như đứng yên.")]
+        public float movingThreshold = 0.05f;
+
         private CharacterController _cc;
+        private bool _useNewInput;
 
         private Vector2 _moveInput;
-        private Vector3 _smoothedVelocity = Vector3.zero;
-        private Vector3 _velRef = Vector3.zero;
+        private Vector3 _smoothedVelocity;
+        private Vector3 _velRef;
 
-        private bool _useNewInput;
+        private int hSide;
+        private int hSpeed;
+        private int hRun;
+        private int hSpeedMul;
 
         private void Awake()
         {
             _cc = GetComponent<CharacterController>();
-
             if (!mainCamera) mainCamera = Camera.main;
 
-            // cố gắng auto tìm animator
+            // Quan trọng: ưu tiên Animator cùng GameObject (để khỏi trỏ nhầm)
             if (!animator)
             {
                 animator = GetComponent<Animator>();
-                if (!animator) animator = GetComponentInChildren<Animator>();
+                if (!animator) animator = GetComponentInChildren<Animator>(true);
             }
 
 #if ENABLE_INPUT_SYSTEM
-            // chỉ cần có moveAction là bật new input
             _useNewInput = (moveAction != null);
-            if (!_useNewInput)
-                Debug.LogWarning("IsoPlayerController no MoveAction, fallback legacy or no move");
 #else
             _useNewInput = false;
 #endif
+
+            hSide = Animator.StringToHash(paramSide);
+            hSpeed = Animator.StringToHash(paramSpeed);
+            hRun = Animator.StringToHash(paramRun);
+            hSpeedMul = Animator.StringToHash(paramSpeedMultiplier);
         }
 
         private void OnEnable()
         {
 #if ENABLE_INPUT_SYSTEM
-            if (_useNewInput && moveAction != null)
-                moveAction.action.Enable();
-            if (_useNewInput && interactAction != null)
-                interactAction.action.Enable();
+            if (_useNewInput && moveAction != null) moveAction.action.Enable();
+            if (_useNewInput && runAction != null) runAction.action.Enable();
 #endif
         }
 
         private void OnDisable()
         {
 #if ENABLE_INPUT_SYSTEM
-            if (_useNewInput && moveAction != null)
-                moveAction.action.Disable();
-            if (_useNewInput && interactAction != null)
-                interactAction.action.Disable();
+            if (_useNewInput && moveAction != null) moveAction.action.Disable();
+            if (_useNewInput && runAction != null) runAction.action.Disable();
 #endif
         }
 
         private void Update()
         {
-            // 1. đọc input (new input hoặc legacy)
-            Vector2 rawMove = ReadMove();
-            if (rawMove.sqrMagnitude < inputDeadZone * inputDeadZone)
-                rawMove = Vector2.zero;
+            // 1) Read input
+            Vector2 raw = ReadMove();
+            if (raw.sqrMagnitude < inputDeadZone * inputDeadZone) raw = Vector2.zero;
+            _moveInput = Vector2.ClampMagnitude(raw, 1f);
 
-            _moveInput = rawMove;
+            bool isRunHeld = ReadRunHeld();
 
-            // 2. convert sang world dir theo camera
-            Vector3 moveDir = Vector3.zero;
+            // 2) World direction by camera
+            Vector3 moveDirWorld = Vector3.zero;
             if (_moveInput.sqrMagnitude > 0.0001f)
             {
                 if (!mainCamera)
                 {
-                    moveDir = new Vector3(_moveInput.x, 0f, _moveInput.y);
+                    moveDirWorld = new Vector3(_moveInput.x, 0f, _moveInput.y);
                 }
                 else
                 {
@@ -127,32 +119,31 @@ namespace IronIvy.Gameplay
                     camR.y = 0f;
                     camR.Normalize();
 
-                    moveDir = camR * _moveInput.x + camF * _moveInput.y;
-                    if (moveDir.sqrMagnitude > 1f) moveDir.Normalize();
+                    moveDirWorld = camR * _moveInput.x + camF * _moveInput.y;
+                    if (moveDirWorld.sqrMagnitude > 1f) moveDirWorld.Normalize();
                 }
             }
 
-            // 3. smooth tốc độ
-            Vector3 targetVelocity = moveDir * moveSpeed;
-            float smoothTime = (targetVelocity.sqrMagnitude > 0.0001f) ? accelerationTime : decelerationTime;
+            // 3) Smooth velocity
+            float finalSpeed = moveSpeed * (isRunHeld ? runMultiplier : 1f);
+            Vector3 targetVel = moveDirWorld * finalSpeed;
+
+            float smoothTime = (targetVel.sqrMagnitude > 0.0001f) ? accelerationTime : decelerationTime;
 
             _smoothedVelocity = Vector3.SmoothDamp(
                 _smoothedVelocity,
-                targetVelocity,
+                targetVel,
                 ref _velRef,
                 Mathf.Max(0.0001f, smoothTime)
             );
 
-            // 4. di chuyển bằng SimpleMove (có gravity sẵn)
+            // 4) Move
             _cc.SimpleMove(_smoothedVelocity);
 
-            // 5. xoay theo hướng move
-            Vector3 facing = _smoothedVelocity;
-            facing.y = 0f;
-
-            if (facing.sqrMagnitude > 0.0001f && rotationMaxDegree > 0f)
+            // 5) Rotate snappy (theo hướng input/camera)
+            if (moveDirWorld.sqrMagnitude > 0.0001f && rotationMaxDegree > 0f)
             {
-                Quaternion toRot = Quaternion.LookRotation(facing, Vector3.up);
+                Quaternion toRot = Quaternion.LookRotation(moveDirWorld, Vector3.up);
                 transform.rotation = Quaternion.RotateTowards(
                     transform.rotation,
                     toRot,
@@ -160,13 +151,66 @@ namespace IronIvy.Gameplay
                 );
             }
 
-            // 6. cập nhật animator
-            if (animator)
-            {
-                float targetSpeed = _smoothedVelocity.magnitude;
-                animator.SetFloat("Speed", targetSpeed, 0.1f, Time.deltaTime);
-            }
+            // 6) Animator (no animator.speed hack)
+            UpdateAnimator(isRunHeld);
+        }
 
+        private void UpdateAnimator(bool isRunHeld)
+        {
+            if (!animator) return;
+
+            float inputMag01 = Mathf.Clamp01(_moveInput.magnitude);
+            bool isMoving = inputMag01 > movingThreshold;
+
+            // Side: trái/phải theo input X (đúng isometric)
+            float side = isMoving ? _moveInput.x : 0f;
+
+            // Speed: world speed (m/s) để match BlendTree nếu nó đặt Pos theo giá trị lớn (2..5..6)
+            float speed = _smoothedVelocity.magnitude;
+
+            SetFloatSafe(hSide, side, animatorDamp);
+            SetFloatSafe(hSpeed, speed, animatorDamp);
+
+            // run + speedMultiplier (optional)
+            SetRunSafe(isRunHeld);
+            SetFloatSafe(hSpeedMul, isRunHeld ? runMultiplier : 1f, animatorDamp);
+        }
+
+        private void SetFloatSafe(int hash, float value, float damp)
+        {
+            if (!animator) return;
+
+            for (int i = 0; i < animator.parameterCount; i++)
+            {
+                var p = animator.parameters[i];
+                if (p.nameHash != hash) continue;
+                if (p.type != AnimatorControllerParameterType.Float) return;
+
+                if (damp <= 0f) animator.SetFloat(hash, value);
+                else animator.SetFloat(hash, value, damp, Time.deltaTime);
+                return;
+            }
+        }
+
+        private void SetRunSafe(bool isRunHeld)
+        {
+            if (!animator) return;
+
+            for (int i = 0; i < animator.parameterCount; i++)
+            {
+                var p = animator.parameters[i];
+                if (p.nameHash != hRun) continue;
+
+                if (p.type == AnimatorControllerParameterType.Bool) animator.SetBool(hRun, isRunHeld);
+                else if (p.type == AnimatorControllerParameterType.Float)
+                {
+                    if (animatorDamp <= 0f) animator.SetFloat(hRun, isRunHeld ? 1f : 0f);
+                    else animator.SetFloat(hRun, isRunHeld ? 1f : 0f, animatorDamp, Time.deltaTime);
+                }
+                else if (p.type == AnimatorControllerParameterType.Int) animator.SetInteger(hRun, isRunHeld ? 1 : 0);
+
+                return;
+            }
         }
 
         private Vector2 ReadMove()
@@ -176,37 +220,26 @@ namespace IronIvy.Gameplay
                 return moveAction.action.ReadValue<Vector2>();
 #endif
 #if ENABLE_LEGACY_INPUT_MANAGER
-            return new Vector2(
-                Input.GetAxisRaw(legacyHorizontal),
-                Input.GetAxisRaw(legacyVertical)
-            );
+            return new Vector2(Input.GetAxisRaw(legacyHorizontal), Input.GetAxisRaw(legacyVertical));
 #else
             return Vector2.zero;
 #endif
         }
 
-        private bool ReadInteractPressed()
+        private bool ReadRunHeld()
         {
 #if ENABLE_INPUT_SYSTEM
-            if (_useNewInput && interactAction != null)
-                return interactAction.action.WasPerformedThisFrame();
+            if (_useNewInput && runAction != null)
+            {
+                float v = runAction.action.ReadValue<float>();
+                return v > 0.5f;
+            }
 #endif
 #if ENABLE_LEGACY_INPUT_MANAGER
-            return Input.GetKeyDown(legacyInteractKey);
+            return Input.GetKey(legacyRunKey);
 #else
             return false;
 #endif
         }
-
-#if UNITY_EDITOR
-        private void OnValidate()
-        {
-            if (!mainCamera) mainCamera = Camera.main;
-            accelerationTime = Mathf.Max(0.0f, accelerationTime);
-            decelerationTime = Mathf.Max(0.0f, decelerationTime);
-            moveSpeed = Mathf.Max(0.0f, moveSpeed);
-            rotationMaxDegree = Mathf.Max(0.0f, rotationMaxDegree);
-        }
-#endif
     }
 }

@@ -14,15 +14,19 @@ namespace IronIvy.Core
         protected override void Awake()
         {
             base.Awake();
-            Current = maxEnergy;
+            //Current = maxEnergy;
         }
 
-        private void Start()
+        // gọi khi bắt đầu gameplay core
+
+        public void InitCore()
         {
+            if (Current <= 0)
+                Current = maxEnergy;
+
             UpdateUI();
         }
 
-        // reset theo ngày
         public void ResetDaily()
         {
             Current = maxEnergy;
@@ -64,9 +68,7 @@ namespace IronIvy.Core
         {
             maxEnergy = Mathf.Max(1, max);
             Current = Mathf.Clamp(current, 0, maxEnergy);
-            UpdateUI();
         }
-
         // helper để bắn event cho UI
         private void UpdateUI()
         {

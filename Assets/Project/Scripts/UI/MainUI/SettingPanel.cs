@@ -136,22 +136,24 @@ public class SettingPanel : MonoBehaviour
 
     // giữ lại cho UI cũ nếu panel của bạn vẫn có nút "Apply"
     // nhưng thực tế đã apply realtime rồi
-    public void OnSubmitButtonClick()
+   public void OnSubmitButtonClick()
+{
+    if (AudioManager.HasInstance)
     {
-        if (AudioManager.HasInstance)
-        {
-            AudioManager.Instance.ChangeBGMVolume(bgmValue);
-            AudioManager.Instance.ChangeSEVolume(seValue);
-            AudioManager.Instance.MuteBGM(isBGMMute);
-            AudioManager.Instance.MuteSE(isSEMute);
-        }
-
-        UIManager.Instance?.CloseSettings();
+        AudioManager.Instance.ChangeBGMVolume(bgmValue);
+        AudioManager.Instance.ChangeSEVolume(seValue);
+        AudioManager.Instance.MuteBGM(isBGMMute);
+        AudioManager.Instance.MuteSE(isSEMute);
     }
 
-    public void OnCloseButtonClick()
-    {
-        // đóng panel thôi, audio đã apply rồi
-        UIManager.Instance?.CloseSettings();
-    }
+    if (UIManager.HasInstance) UIManager.Instance.CloseSettings();
+    else gameObject.SetActive(false);
+}
+
+public void OnCloseButtonClick()
+{
+    if (UIManager.HasInstance) UIManager.Instance.CloseSettings();
+    else gameObject.SetActive(false);
+}
+
 }
