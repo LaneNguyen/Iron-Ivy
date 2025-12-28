@@ -35,6 +35,25 @@ namespace IronIvy.Gameplay.Rhythm
         [Range(0f, 1f)] public float hitSfxVolume = 1f;
         [Range(0f, 1f)] public float missSfxVolume = 1f;
 
+
+        [Header("Animal Material After Minigame")]
+        public Material successMaterial;
+        public Material failMaterial;
+        [Range(0f, 1f)] public float successThreshold = 0.5f;
+
+        [Header("Finish FX Material Fade")]
+        public Material finishFxMaterial;
+        public float finishFadeDuration = 0.8f;
+
+        // URP Lit thường dùng _BaseColor, shader cũ hay dùng _Color
+        public string fadeColorProperty = "_BaseColor";
+
+        // Nếu muốn sau khi fade xong trả về material cũ (hiếm khi cần, vì animal sẽ despawn)
+        public bool restoreOriginalAfterFade = false;
+
+        private Coroutine _finishFadeRoutine;
+
+
         [Header("Debug")]
         public bool logFlow = false;
 
@@ -49,7 +68,8 @@ namespace IronIvy.Gameplay.Rhythm
         private readonly List<RhythmPattern> _playlist = new List<RhythmPattern>();
         private int _playlistIndex;
         private RhythmPattern _currentPattern;
-        
+
+
 
         private int _currentStepIndex;
         private int _beatsLeftInStep;
@@ -169,9 +189,9 @@ namespace IronIvy.Gameplay.Rhythm
                 AudioManager.Instance.PopBGM(); // Khôi phục PopBGM
             }
 
-// reaction HUD clear (light hook)
-if (UIManager.HasInstance && UIManager.Instance != null && UIManager.Instance.notify.rhythmHUD != null)
-    UIManager.Instance.notify.rhythmHUD.ClearReactionPresenterAnimal();
+            // reaction HUD clear (light hook)
+            if (UIManager.HasInstance && UIManager.Instance != null && UIManager.Instance.notify.rhythmHUD != null)
+                UIManager.Instance.notify.rhythmHUD.ClearReactionPresenterAnimal();
 
 
             if (CameraManager.HasInstance)
@@ -190,7 +210,8 @@ if (UIManager.HasInstance && UIManager.Instance != null && UIManager.Instance.no
                     new ListenManager.RhythmAnimalResultPayload(_currentAnimal, successRatio, archiveGained, lootItem, lootCount, _totalHit, _totalMiss)
                 );
             }
-
+        
+ApplyFinishMaterialThenFadeOut(finishFadeDuration);
             if (_currentAnimal != null)
             {
                 _currentAnimal.MarkMinigamePlayed();
@@ -390,99 +411,218 @@ if (UIManager.HasInstance && UIManager.Instance != null && UIManager.Instance.no
             InventoryManager.Instance.AddFood(item, count); // Khôi phục AddFood
         }
 
-      private bool BuildRandomPlaylistForAnimal(AnimalDefinition def, List<RhythmPattern> outList)
-{
-    if (def == null) return false;
-
-    var pool = def.randomFragments;
-    if (pool == null || pool.Length == 0) return false;
-
-    List<RhythmPattern> fragmentPool = new List<RhythmPattern>();
-    for (int i = 0; i < pool.Length; i++)
-    {
-        var pat = pool[i];
-        if (pat == null) continue;
-        if (pat.sequence == null || pat.sequence.Length == 0) continue;
-
-        if (CountScorableBeatsInPattern(pat) <= 0) continue;
-
-        fragmentPool.Add(pat);
-    }
-
-    if (fragmentPool.Count == 0) return false;
-
-    int minBeats = Mathf.Max(1, def.minRandomBeats);
-    int maxBeats = Mathf.Max(minBeats, def.maxRandomBeats);
-    int minFragments = Mathf.Max(1, def.minRandomFragments);
-    int maxFragments = Mathf.Max(minFragments, def.maxRandomFragments);
-
-    int totalBeats = 0;
-    int fragmentsUsed = 0;
-    int safety = 128;
-
-    List<RhythmPattern> working = new List<RhythmPattern>(fragmentPool);
-    ShuffleList(working);
-
-    int idx = 0;
-    bool isFirst = true;
-    int restBeatsBetween = 1;
-
-    while (safety-- > 0 && fragmentsUsed < maxFragments && totalBeats < maxBeats)
-    {
-        if (idx >= working.Count)
+        private bool BuildRandomPlaylistForAnimal(AnimalDefinition def, List<RhythmPattern> outList)
         {
+            if (def == null) return false;
+
+            var pool = def.randomFragments;
+            if (pool == null || pool.Length == 0) return false;
+
+            List<RhythmPattern> fragmentPool = new List<RhythmPattern>();
+            for (int i = 0; i < pool.Length; i++)
+            {
+                var pat = pool[i];
+                if (pat == null) continue;
+                if (pat.sequence == null || pat.sequence.Length == 0) continue;
+
+                if (CountScorableBeatsInPattern(pat) <= 0) continue;
+
+                fragmentPool.Add(pat);
+            }
+
+            if (fragmentPool.Count == 0) return false;
+
+            int minBeats = Mathf.Max(1, def.minRandomBeats);
+            int maxBeats = Mathf.Max(minBeats, def.maxRandomBeats);
+            int minFragments = Mathf.Max(1, def.minRandomFragments);
+            int maxFragments = Mathf.Max(minFragments, def.maxRandomFragments);
+
+            int totalBeats = 0;
+            int fragmentsUsed = 0;
+            int safety = 128;
+
+            List<RhythmPattern> working = new List<RhythmPattern>(fragmentPool);
             ShuffleList(working);
-            idx = 0;
+
+            int idx = 0;
+            bool isFirst = true;
+            int restBeatsBetween = 1;
+
+            while (safety-- > 0 && fragmentsUsed < maxFragments && totalBeats < maxBeats)
+            {
+                if (idx >= working.Count)
+                {
+                    ShuffleList(working);
+                    idx = 0;
+                }
+
+                var pick = working[idx++];
+                int beats = CountScorableBeatsInPattern(pick);
+                if (beats <= 0) continue;
+
+                if (!isFirst && restBeatsBetween > 0)
+                    outList.Add(GetOrCreateRestPattern(restBeatsBetween));
+
+                outList.Add(pick);
+                totalBeats += beats;
+                fragmentsUsed++;
+                isFirst = false;
+
+                if (fragmentsUsed >= minFragments && totalBeats >= minBeats && totalBeats <= maxBeats)
+                    break;
+            }
+
+            return outList.Count > 0;
         }
 
-        var pick = working[idx++];
-        int beats = CountScorableBeatsInPattern(pick);
-        if (beats <= 0) continue;
+        private void ShuffleList<T>(List<T> list)
+        {
+            for (int i = 0; i < list.Count; i++)
+            {
+                int j = Random.Range(i, list.Count);
+                T tmp = list[i];
+                list[i] = list[j];
+                list[j] = tmp;
+            }
+        }
 
-        if (!isFirst && restBeatsBetween > 0)
-            outList.Add(GetOrCreateRestPattern(restBeatsBetween));
+        private RhythmPattern GetOrCreateRestPattern(int beats = 1)
+        {
+            if (_runtimeRestPattern == null)
+            {
+                _runtimeRestPattern = ScriptableObject.CreateInstance<RhythmPattern>();
+                _runtimeRestPattern.patternId = "runtime_rest";
+                _runtimeRestPattern.displayName = "Runtime Rest";
+                _runtimeRestPattern.bpm = Mathf.RoundToInt(bpm);
+                _runtimeRestPattern.hitWindowSeconds = 0.2f;
+            }
 
-        outList.Add(pick);
-        totalBeats += beats;
-        fragmentsUsed++;
-        isFirst = false;
-
-        if (fragmentsUsed >= minFragments && totalBeats >= minBeats && totalBeats <= maxBeats)
-            break;
-    }
-
-    return outList.Count > 0;
-}
-
-private void ShuffleList<T>(List<T> list)
-{
-    for (int i = 0; i < list.Count; i++)
-    {
-        int j = Random.Range(i, list.Count);
-        T tmp = list[i];
-        list[i] = list[j];
-        list[j] = tmp;
-    }
-}
-
-private RhythmPattern GetOrCreateRestPattern(int beats = 1)
-{
-    if (_runtimeRestPattern == null)
-    {
-        _runtimeRestPattern = ScriptableObject.CreateInstance<RhythmPattern>();
-        _runtimeRestPattern.patternId = "runtime_rest";
-        _runtimeRestPattern.displayName = "Runtime Rest";
-        _runtimeRestPattern.bpm = Mathf.RoundToInt(bpm);
-        _runtimeRestPattern.hitWindowSeconds = 0.2f;
-    }
-
-    _runtimeRestPattern.sequence = new RhythmPattern.Step[]
-    {
+            _runtimeRestPattern.sequence = new RhythmPattern.Step[]
+            {
         new RhythmPattern.Step { type = RhythmPattern.StepType.Rest, beats = Mathf.Max(1, beats) }
-    };
+            };
 
-    return _runtimeRestPattern;
-}
+            return _runtimeRestPattern;
+        }
+
+        private void ApplyResultMaterialToCurrentAnimal(float successRatio)
+        {
+            if (_currentAnimal == null) return;
+
+            var r = _currentAnimal.GetComponentInChildren<Renderer>(true);
+            if (r == null) return;
+
+            var mat = (successRatio >= successThreshold) ? successMaterial : failMaterial;
+            if (mat == null) return;
+
+            // đổi riêng con này, không ảnh hưởng toàn map
+            r.material = mat;
+        }
+
+        private void ApplyFinishMaterialThenFadeOut(float duration)
+        {
+            if (_currentAnimal == null) return;
+            if (finishFxMaterial == null) return;
+
+            var r = _currentAnimal.GetComponentInChildren<Renderer>(true);
+            if (r == null) return;
+
+            // Stop routine cũ nếu đang chạy
+            if (_finishFadeRoutine != null)
+            {
+                StopCoroutine(_finishFadeRoutine);
+                _finishFadeRoutine = null;
+            }
+
+            _finishFadeRoutine = StartCoroutine(FinishMaterialFadeRoutine(r, duration));
+        }
+
+        private IEnumerator FinishMaterialFadeRoutine(Renderer r, float duration)
+        {
+            if (r == null) yield break;
+
+            // Lưu material gốc (để optional restore)
+            var originalShared = r.sharedMaterials;
+
+            // Tạo instance materials riêng cho con này (tránh đổi cả map)
+            var mats = r.materials;
+
+            // Replace tất cả slot bằng finishFxMaterial (nếu chỉ muốn slot 0 thì sửa vòng lặp i=0)
+            for (int i = 0; i < mats.Length; i++)
+                mats[i] = new Material(finishFxMaterial);
+
+            r.materials = mats;
+
+            // Fade alpha của finish mats về 0
+            float t = 0f;
+            duration = Mathf.Max(0.01f, duration);
+
+            // Determine property fallback
+            string prop = fadeColorProperty;
+            bool hasProp = mats.Length > 0 && mats[0] != null && mats[0].HasProperty(prop);
+            if (!hasProp)
+            {
+                // fallback phổ biến
+                if (mats.Length > 0 && mats[0] != null && mats[0].HasProperty("_Color"))
+                    prop = "_Color";
+                else
+                    prop = ""; // không có property màu để fade
+            }
+
+            // Cache start colors
+            Color[] startColors = new Color[mats.Length];
+            for (int i = 0; i < mats.Length; i++)
+            {
+                if (mats[i] == null) continue;
+                startColors[i] = (!string.IsNullOrEmpty(prop) && mats[i].HasProperty(prop))
+                    ? mats[i].GetColor(prop)
+                    : Color.white;
+            }
+
+            while (t < duration)
+            {
+                t += Time.unscaledDeltaTime;
+                float p = Mathf.Clamp01(t / duration);
+                float a = Mathf.Lerp(1f, 0f, p);
+
+                for (int i = 0; i < mats.Length; i++)
+                {
+                    var m = mats[i];
+                    if (m == null) continue;
+
+                    if (!string.IsNullOrEmpty(prop) && m.HasProperty(prop))
+                    {
+                        var c = startColors[i];
+                        c.a = a;
+                        m.SetColor(prop, c);
+                    }
+                }
+
+                yield return null;
+            }
+
+            // đảm bảo alpha = 0
+            for (int i = 0; i < mats.Length; i++)
+            {
+                var m = mats[i];
+                if (m == null) continue;
+
+                if (!string.IsNullOrEmpty(prop) && m.HasProperty(prop))
+                {
+                    var c = startColors[i];
+                    c.a = 0f;
+                    m.SetColor(prop, c);
+                }
+            }
+
+            // Optional restore
+            if (restoreOriginalAfterFade)
+            {
+                r.sharedMaterials = originalShared;
+            }
+
+            _finishFadeRoutine = null;
+        }
 
     }
 }
