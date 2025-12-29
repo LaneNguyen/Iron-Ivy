@@ -386,7 +386,7 @@ MonoBehaviour:
   - 0
   m_Max: -1.32
   m_Min: -10
-  m_Compensation: 0
+  m_Compensation: 1.87
   m_Renderers:
   - {fileID: 6199491144496425757}
 --- !u!1 &820331994994272637

@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -13,60 +12,30 @@ namespace IronIvy.Core
         [SerializeField] private string gameplaySceneName = "GameplayScene";
 
         [Header("Overlay (Active/Disable)")]
-        [SerializeField] private GameObject loadingOverlay; // Panel gốc (lý tưởng nhất là nằm dưới BootstrapperRoot - DontDestroy)
-        [SerializeField] private Image fadeImage;           // Ảnh toàn màn hình (con của overlay)
-
-        [Header("Loading UI (Optional)")]
-        [Tooltip("Tùy chọn: Slider hiển thị tiến độ load (0..1).")]
-        [SerializeField] private Slider loadingProgressBar;
-
-        [Tooltip("Tùy chọn: Text hiển thị % load. (TMP_Text)")]
-        [SerializeField] private TMP_Text loadingPercentText;
+        [SerializeField] private GameObject loadingOverlay; // Panel root (must be under BootstrapperRoot - DontDestroy)
+        [SerializeField] private Image fadeImage;           // Fullscreen Image (child of overlay)
 
         [Header("Timing (Realtime)")]
         [Tooltip("Loading panel phải xuất hiện tối thiểu bấy nhiêu giây trước khi bắt đầu FADE IN.")]
         [SerializeField] private float minShowBeforeFadeInSeconds = 2.5f;
 
-        [Tooltip("Fade IN (sáng lên/đen đặc) để che màn hình trước khi kích hoạt scene.")]
+        [Tooltip("Fade IN (sáng lên) để che màn hình trước khi activate scene.")]
         [SerializeField] private float fadeInSeconds = 0.35f;
 
         [Tooltip("Fade OUT (mờ dần) để lộ gameplay.")]
         [SerializeField] private float fadeOutSeconds = 0.65f;
-
-        [Header("Progress UX (Realtime)")]
-        [Tooltip("Độ mượt khi thanh tiến trình chạy (giây). Tăng lên = chạy chậm/mượt hơn.")]
-        [SerializeField] private float progressSmoothTime = 0.20f;
-
-        [Tooltip("Khi scene đã load xong (op.progress>=0.9), thời gian để chạy nốt từ 90% -> 100%.")]
-        [SerializeField] private float fillToHundredSeconds = 0.75f;
-
-        [Tooltip("Giới hạn mục tiêu tối đa trước khi 'Sẵn sàng' (để tránh nhảy lên 100% quá sớm).")]
-        [Range(0.90f, 0.999f)]
-        [SerializeField] private float preReadyCap = 0.99f;
 
         [Header("Warmup")]
         [SerializeField] private bool warmupAllShaders = true;
         [SerializeField] private int extraSettleFrames = 2;
 
         [Header("Audio")]
-        [SerializeField] private bool pauseAudioDuringLoad = true;
+        [SerializeField] private bool pauseAudioDuringLoad = false;
 
-        // NEW: Nếu em xoá AudioManager khỏi các scene, bootstrapper sẽ đảm bảo có AudioManager sống.
-        [Tooltip("Optional: Prefab AudioManager (có sẵn AttachBGMSource/AttachSESource). Nếu bỏ trống, sẽ auto-create runtime.")]
-        [SerializeField] private AudioManager audioManagerPrefab;
-
-        [Tooltip("BGM mặc định khi vào GameplayScene (tên clip trong Resources/Audio/BGM).")]
-        [SerializeField] private string gameplayDefaultBGMName = "";
-
-        [Header("Camera Safety")]
-        [SerializeField] private bool ensureTempCameraDuringLoad = true;
-        [SerializeField] private bool forceAllCamerasToDisplay1 = true;
+        [Header("Lifecycle")]
+[SerializeField] private bool destroyBootstrapperAfterEnterGameplay = false;
 
         private Camera _loadingCam;
-
-        // Trạng thái làm mượt tiến trình
-        private float _displayedProgress01;
-        private float _progressVelocity;
 
         protected override void Awake()
         {
@@ -75,24 +44,10 @@ namespace IronIvy.Core
 
             DontDestroyOnLoad(gameObject);
 
-            if (!fadeImage && loadingOverlay)
-                fadeImage = loadingOverlay.GetComponentInChildren<Image>(true);
-
-            if (!loadingProgressBar && loadingOverlay)
-                loadingProgressBar = loadingOverlay.GetComponentInChildren<Slider>(true);
-
-            if (!loadingPercentText && loadingOverlay)
-                loadingPercentText = loadingOverlay.GetComponentInChildren<TMP_Text>(true);
-
             if (loadingOverlay) loadingOverlay.SetActive(false);
+
+            // Start with no fade overlay visible
             SetFadeAlpha(0f);
-
-            _displayedProgress01 = 0f;
-            _progressVelocity = 0f;
-            ApplyProgressUI(0f);
-
-            // NEW: đảm bảo AudioManager tồn tại ngay từ đầu (nếu scene menu đã xoá / sau này unload menu)
-            EnsureAudioManagerExists();
         }
 
         public void StartNewGame()
@@ -107,79 +62,47 @@ namespace IronIvy.Core
 
         private IEnumerator CoStartGameAdditive(bool isNewGame)
         {
+
+            
+            EnsureLoadingCamera();
+
             Time.timeScale = 1f;
 
-            // Ensure audio trước khi làm gì khác (đặc biệt trước khi unload menu)
-            EnsureAudioManagerExists();
-
+            // Cache current menu scene handle BEFORE anything changes
             Scene menuScene = SceneManager.GetActiveScene();
 
             if (pauseAudioDuringLoad)
                 AudioListener.pause = true;
 
-            if (ensureTempCameraDuringLoad)
-                EnsureLoadingCamera();
-
-            if (forceAllCamerasToDisplay1)
-                ForceAllCamerasToDisplay1();
-
+            // 1) Show loading panel immediately (but do NOT fade-in yet)
             if (loadingOverlay) loadingOverlay.SetActive(true);
+
+            // Ensure fade image starts fully transparent so player can see loading panel
             SetFadeAlpha(0f);
 
-            _displayedProgress01 = 0f;
-            _progressVelocity = 0f;
-            ApplyProgressUI(0f);
-
+            // Let UI render at least one frame
             yield return null;
 
             float showStart = Time.realtimeSinceStartup;
 
+            // 2) Begin loading Gameplay ADDITIVE, but hold activation
             AsyncOperation op = SceneManager.LoadSceneAsync(gameplaySceneName, LoadSceneMode.Additive);
             op.allowSceneActivation = false;
 
-            bool sceneReady = false;
-
-            while (!sceneReady)
+            // 3) Wait until Unity finishes loading (progress reaches 0.9)
+            // (0.9 means "ready to activate", waiting for allowSceneActivation = true)
+            while (op.progress < 0.9f)
             {
-                float raw01 = Mathf.Clamp01(op.progress / 0.9f);
-
-                if (op.progress >= 0.9f)
-                    sceneReady = true;
-
-                float target01 = Mathf.Min(raw01, preReadyCap);
-
-                _displayedProgress01 = Mathf.SmoothDamp(
-                    _displayedProgress01,
-                    target01,
-                    ref _progressVelocity,
-                    Mathf.Max(0.0001f, progressSmoothTime),
-                    Mathf.Infinity,
-                    Time.unscaledDeltaTime
-                );
-
-                ApplyProgressUI(_displayedProgress01);
                 yield return null;
             }
 
-            float fillStart = Time.realtimeSinceStartup;
-            float fillEnd = fillStart + Mathf.Max(0.01f, fillToHundredSeconds);
-            float startFillFrom = Mathf.Max(_displayedProgress01, 0.90f);
-
-            while (Time.realtimeSinceStartup < fillEnd)
-            {
-                float t = Mathf.InverseLerp(fillStart, fillEnd, Time.realtimeSinceStartup);
-                _displayedProgress01 = Mathf.Lerp(startFillFrom, 1f, t);
-                ApplyProgressUI(_displayedProgress01);
-                yield return null;
-            }
-
-            _displayedProgress01 = 1f;
-            ApplyProgressUI(1f);
-
+            // 4) Enforce minimum time showing the loading panel BEFORE starting fade-in
             float minEnd = showStart + Mathf.Max(0f, minShowBeforeFadeInSeconds);
             while (Time.realtimeSinceStartup < minEnd)
                 yield return null;
 
+            // 5) NOW start Fade IN to cover the screen
+            // During fade-in, allow scene activation ONCE
             bool activated = false;
             yield return FadeTo(1f, fadeInSeconds, onDuringFade: () =>
             {
@@ -190,68 +113,27 @@ namespace IronIvy.Core
                 }
             });
 
+            // 6) Wait until activation completes
             while (!op.isDone)
                 yield return null;
 
+            // 7) Set active scene to gameplay
             Scene gameplayScene = SceneManager.GetSceneByName(gameplaySceneName);
             if (gameplayScene.IsValid())
                 SceneManager.SetActiveScene(gameplayScene);
 
-            if (forceAllCamerasToDisplay1)
-                ForceAllCamerasToDisplay1();
-
+            // Helps URP/ambient sometimes after additive activation
             DynamicGI.UpdateEnvironment();
 
+            // Settle frames for Awake/Start/layout/cameras
             for (int i = 0; i < Mathf.Max(0, extraSettleFrames); i++)
                 yield return null;
 
-            if (ensureTempCameraDuringLoad)
-            {
-                yield return WaitForGameplayCameraReady(gameplaySceneName, 5f);
-
-                // Sau khi gameplay camera đã xuất hiện, chỉ giữ đúng 1 listener trên camera gameplay đang enable
-                var cams = GameObject.FindObjectsOfType<Camera>(true);
-                Camera chosen = null;
-                for (int i = 0; i < cams.Length; i++)
-                {
-                    if (!cams[i]) continue;
-                    if (!cams[i].enabled) continue;
-                    if (!cams[i].gameObject.activeInHierarchy) continue;
-
-                    // Ưu tiên camera thuộc gameplay scene
-                    if (cams[i].gameObject.scene.name == gameplaySceneName)
-                    {
-                        chosen = cams[i];
-                        break;
-                    }
-                }
-
-                // Sau khi gameplay camera đã xuất hiện: tắt hết listener trước, rồi bật đúng 1 cái trên chosen
-                DisableAllAudioListeners();
-
-                if (chosen != null)
-                {
-                    var gameplayListener = EnsureListenerOnCamera(chosen);
-                    DisableAllAudioListenersExcept(gameplayListener);
-                }
-                else
-                {
-                    Debug.LogWarning("[Bootstrapper] Không tìm thấy camera gameplay để gắn AudioListener.");
-                }
-
-
-                DisableLoadingCamera();
-            }
-
+            yield return WaitForGameplayCameraReady(gameplaySceneName, 5f);
+            DisableLoadingCamera();
             Time.timeScale = 1f;
 
-            // NEW: Set BGM của gameplay ngay sau khi scene mới đã active
-            EnsureAudioManagerExists();
-            if (!string.IsNullOrEmpty(gameplayDefaultBGMName) && AudioManager.Instance != null)
-            {
-                AudioManager.Instance.RequestSceneDefaultBGM(gameplayDefaultBGMName);
-            }
-
+            // 8) Load data + init while screen is still covered
             if (isNewGame && SaveLoadManager.HasInstance)
                 SaveLoadManager.Instance.DeleteSaveData();
 
@@ -261,12 +143,11 @@ namespace IronIvy.Core
             if (GameManager.HasInstance)
                 GameManager.Instance.InitGameplayCore(isNewGame);
 
+            // 9) Warmup shaders (avoid in Editor to reduce hitch while testing)
             if (warmupAllShaders && !Application.isEditor)
                 Shader.WarmupAllShaders();
 
-            // Ensure audio trước khi unload menu để tránh trường hợp AudioManager còn nằm trong menuScene
-            EnsureAudioManagerExists();
-
+            // 10) Unload menu scene (overlay stays because it's under DontDestroy bootstrapper)
             if (menuScene.IsValid())
             {
                 AsyncOperation unload = SceneManager.UnloadSceneAsync(menuScene);
@@ -274,73 +155,27 @@ namespace IronIvy.Core
                     while (!unload.isDone) yield return null;
             }
 
+            // Ensure one frame with gameplay ready but still covered
             yield return null;
 
+            // 11) Fade OUT smoothly to reveal gameplay
             yield return FadeTo(0f, fadeOutSeconds);
 
-            if (loadingOverlay) loadingOverlay.SetActive(false);
+         // 12) Hide loading panel after fade out finishes
+if (loadingOverlay) loadingOverlay.SetActive(false);
+
+if (pauseAudioDuringLoad)
+    AudioListener.pause = false;
+
+// OPTIONAL: destroy bootstrapper object if you want it gone after entering gameplay
+if (destroyBootstrapperAfterEnterGameplay)
+{
+    Destroy(gameObject);
+}
+
 
             if (pauseAudioDuringLoad)
                 AudioListener.pause = false;
-        }
-
-        // =========================
-        // NEW: Audio safety for additive flow
-        // =========================
-        private void EnsureAudioManagerExists()
-        {
-            if (AudioManager.Instance != null)
-            {
-                // Nếu có rồi thì đảm bảo nó không bị mất AudioSource reference
-                if (AudioManager.Instance.AttachBGMSource == null)
-                    AudioManager.Instance.AttachBGMSource = AudioManager.Instance.GetComponentInChildren<AudioSource>(true);
-
-                if (AudioManager.Instance.AttachSESource == null)
-                {
-                    // nếu chỉ có 1 AudioSource, tạo thêm 1 cái cho SE
-                    var sources = AudioManager.Instance.GetComponentsInChildren<AudioSource>(true);
-                    if (sources != null && sources.Length >= 2)
-                        AudioManager.Instance.AttachSESource = sources[1];
-                }
-
-                return;
-            }
-
-            // Không có AudioManager -> spawn mới (prefab nếu có, không thì auto-create)
-            AudioManager mgr = null;
-
-            if (audioManagerPrefab != null)
-            {
-                mgr = Instantiate(audioManagerPrefab);
-            }
-            else
-            {
-                GameObject go = new GameObject("AudioManager(Runtime)");
-                mgr = go.AddComponent<AudioManager>();
-
-                // Tạo 2 AudioSource tối thiểu để AudioManager chạy được
-                var bgm = go.AddComponent<AudioSource>();
-                bgm.loop = true;
-                bgm.playOnAwake = false;
-
-                var se = go.AddComponent<AudioSource>();
-                se.loop = false;
-                se.playOnAwake = false;
-
-                mgr.AttachBGMSource = bgm;
-                mgr.AttachSESource = se;
-            }
-        }
-
-        private void ApplyProgressUI(float normalized01)
-        {
-            normalized01 = Mathf.Clamp01(normalized01);
-
-            if (loadingProgressBar)
-                loadingProgressBar.value = normalized01;
-
-            if (loadingPercentText)
-                loadingPercentText.text = $"{Mathf.RoundToInt(normalized01 * 100f)}%";
         }
 
         private void SetFadeAlpha(float a)
@@ -351,6 +186,10 @@ namespace IronIvy.Core
             fadeImage.color = c;
         }
 
+        /// <summary>
+        /// Fade fadeImage alpha to targetAlpha in realtime (unscaled).
+        /// Optional onDuringFade executes every frame during the fade (useful for allowSceneActivation).
+        /// </summary>
         private IEnumerator FadeTo(float targetAlpha, float seconds, Action onDuringFade = null)
         {
             if (!fadeImage) yield break;
@@ -363,15 +202,13 @@ namespace IronIvy.Core
                 yield break;
             }
 
-            float startTime = Time.realtimeSinceStartup;
-            float endTime = startTime + seconds;
-
-            while (Time.realtimeSinceStartup < endTime)
+            float t = 0f;
+            while (t < seconds)
             {
+                t += Time.unscaledDeltaTime;
                 onDuringFade?.Invoke();
 
-                float t = Mathf.InverseLerp(startTime, endTime, Time.realtimeSinceStartup);
-                float a = Mathf.Lerp(startAlpha, targetAlpha, t);
+                float a = Mathf.Lerp(startAlpha, targetAlpha, t / seconds);
                 SetFadeAlpha(a);
 
                 yield return null;
@@ -380,12 +217,9 @@ namespace IronIvy.Core
             SetFadeAlpha(targetAlpha);
         }
 
-       private void EnsureLoadingCamera()
+        private void EnsureLoadingCamera()
         {
             if (_loadingCam != null) return;
-
-            // Tắt tai nghe ở scene cũ trước
-            DisableAllAudioListeners();
 
             GameObject go = new GameObject("Bootstrapper_LoadingCamera");
             DontDestroyOnLoad(go);
@@ -393,15 +227,9 @@ namespace IronIvy.Core
             _loadingCam = go.AddComponent<Camera>();
             _loadingCam.clearFlags = CameraClearFlags.SolidColor;
             _loadingCam.backgroundColor = Color.black;
-            _loadingCam.cullingMask = 0;
+            _loadingCam.cullingMask = 0;   // không render world, chỉ cần tồn tại để tránh warning
             _loadingCam.depth = 999;
             _loadingCam.enabled = true;
-            _loadingCam.targetDisplay = 0;
-
-            // --- FIX: THÊM DÒNG NÀY ---
-            // Gắn tạm tai nghe vào camera loading để nhạc vẫn nghe được lúc chuyển cảnh
-            go.AddComponent<AudioListener>(); 
-            // --------------------------
         }
 
         private void DisableLoadingCamera()
@@ -418,7 +246,7 @@ namespace IronIvy.Core
 
             while (Time.realtimeSinceStartup - start < timeoutSeconds)
             {
-                Camera[] cams = GameObject.FindObjectsOfType<Camera>(true);
+                var cams = GameObject.FindObjectsOfType<Camera>(true);
                 for (int i = 0; i < cams.Length; i++)
                 {
                     Camera cam = cams[i];
@@ -426,59 +254,36 @@ namespace IronIvy.Core
                     if (!cam.enabled) continue;
                     if (!cam.gameObject.activeInHierarchy) continue;
 
+                    // Chỉ cần có 1 camera thuộc gameplay scene là coi như OK
                     if (cam.gameObject.scene.name == sceneName)
                         yield break;
                 }
-
                 yield return null;
             }
 
-            Debug.LogWarning("[Bootstrapper] Timeout chờ camera gameplay. Hãy đảm bảo GameplayScene có một Camera đang bật.");
+            Debug.LogWarning("[Bootstrapper] Timeout waiting for gameplay camera. Check GameplayScene camera setup.");
         }
 
         private void ForceAllCamerasToDisplay1()
-        {
-            var cams = GameObject.FindObjectsOfType<Camera>(true);
-            foreach (var cam in cams)
-            {
-                if (!cam) continue;
-                cam.targetDisplay = 0;
-            }
-        }
+{
+    var cams = GameObject.FindObjectsOfType<Camera>(true);
+    foreach (var cam in cams)
+    {
+        if (!cam) continue;
+        cam.targetDisplay = 0; // Display 1
+    }
+}
 
-        private void DisableAllAudioListenersExcept(AudioListener keep)
-        {
-            var listeners = GameObject.FindObjectsOfType<AudioListener>(true);
-            for (int i = 0; i < listeners.Length; i++)
-            {
-                var l = listeners[i];
-                if (!l) continue;
-                l.enabled = (l == keep);
-            }
-        }
-
-        private AudioListener EnsureListenerOnCamera(Camera cam)
-        {
-            if (!cam) return null;
-
-            // Nếu cam có sẵn listener thì dùng luôn
-            var l = cam.GetComponent<AudioListener>();
-            if (!l) l = cam.gameObject.AddComponent<AudioListener>();
-            l.enabled = true;
-            return l;
-        }
-
-        private void DisableAllAudioListeners()
-        {
-            var listeners = GameObject.FindObjectsOfType<AudioListener>(true);
-            for (int i = 0; i < listeners.Length; i++)
-            {
-                var l = listeners[i];
-                if (!l) continue;
-                l.enabled = false;
-            }
-        }
-
+private void LogCameras(string tag)
+{
+    var cams = GameObject.FindObjectsOfType<Camera>(true);
+    Debug.Log($"[{tag}] Cameras count = {cams.Length}");
+    foreach (var cam in cams)
+    {
+        if (!cam) continue;
+        Debug.Log($"[{tag}] {cam.name} enabled={cam.enabled} active={cam.gameObject.activeInHierarchy} scene={cam.gameObject.scene.name} targetDisplay={cam.targetDisplay} depth={cam.depth}");
+    }
+}
 
     }
 }

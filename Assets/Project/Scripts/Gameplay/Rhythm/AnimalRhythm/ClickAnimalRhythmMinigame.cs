@@ -35,8 +35,11 @@ namespace IronIvy.Gameplay.Rhythm
         [Range(0f, 1f)] public float hitSfxVolume = 1f;
         [Range(0f, 1f)] public float missSfxVolume = 1f;
 
-        [Header("Debug")]
-        public bool logFlow = false;
+
+        [Header("Animal Material After Minigame")]
+        public Material successMaterial;
+        public Material failMaterial;
+        [Range(0f, 1f)] public float successThreshold = 0.5f;
 
         [Header("Finish FX Material Fade")]
         public Material finishFxMaterial;
@@ -50,6 +53,10 @@ namespace IronIvy.Gameplay.Rhythm
 
         private Coroutine _finishFadeRoutine;
 
+
+        [Header("Debug")]
+        public bool logFlow = false;
+
         public bool IsRunning { get; private set; }
 
         private AnimalController _currentAnimal;
@@ -61,6 +68,7 @@ namespace IronIvy.Gameplay.Rhythm
         private readonly List<RhythmPattern> _playlist = new List<RhythmPattern>();
         private int _playlistIndex;
         private RhythmPattern _currentPattern;
+
 
 
         private int _currentStepIndex;
@@ -202,9 +210,8 @@ namespace IronIvy.Gameplay.Rhythm
                     new ListenManager.RhythmAnimalResultPayload(_currentAnimal, successRatio, archiveGained, lootItem, lootCount, _totalHit, _totalMiss)
                 );
             }
-
-            ApplyFinishMaterialThenFadeOut(finishFadeDuration);
-
+        
+ApplyFinishMaterialThenFadeOut(finishFadeDuration);
             if (_currentAnimal != null)
             {
                 _currentAnimal.MarkMinigamePlayed();
@@ -388,19 +395,8 @@ namespace IronIvy.Gameplay.Rhythm
         {
             if (_currentAnimal == null || !ArchiveManager.HasInstance) return 0f;
             var def = _currentAnimal.Definition;
-
-            // Logic cũ: Tính điểm gốc dựa trên phong độ (thắng tuyệt đối hay thắng thường)
             float finalReward = (successRatio >= 0.99f) ? def.archiveReward : (successRatio >= 0.5f ? def.archiveReward * 0.5f : 0f);
-
-            // --- THÊM ĐOẠN NÀY ---
-            // Nếu có Buff thức ăn -> Nhân đôi điểm Archive nhận được
-            if (_hasFavoriteBuff)
-            {
-                finalReward *= 2f;
-            }
-            // ---------------------
-
-            if (finalReward > 0f) ArchiveManager.Instance.AddProgress(finalReward);
+            if (finalReward > 0f) ArchiveManager.Instance.AddProgress(finalReward); // Khôi phục AddProgress
             return finalReward;
         }
 
@@ -408,28 +404,11 @@ namespace IronIvy.Gameplay.Rhythm
         {
             item = null; count = 0;
             if (_currentAnimal == null || !InventoryManager.HasInstance || successRatio < 0.5f) return;
-
             var def = _currentAnimal.Definition;
-
-            // --- SỬA TỪ ĐÂY ---
-            // Đổi sang dùng biến MỚI: rewardItem
-            if (def.rewardItem == null) return;
-
-            item = def.rewardItem;
-
-            // Logic tính số lượng (random trong khoảng min-max)
-            int baseCount = Random.Range(def.rewardMinCount, def.rewardMaxCount + 1);
-
-            // Logic Buff x2 (giữ nguyên logic muốn)
-            if (_hasFavoriteBuff && def.doubleLootOnBuff)
-            {
-                baseCount *= 2;
-            }
-
-            count = baseCount;
-            // --- KẾT THÚC SỬA ---
-
-            InventoryManager.Instance.AddFood(item, count);
+            if (def.dropItem == null) return; // Khôi phục dropItem
+            item = def.dropItem;
+            count = (_hasFavoriteBuff && def.doubleLootOnBuff) ? def.dropCount * 2 : def.dropCount;
+            InventoryManager.Instance.AddFood(item, count); // Khôi phục AddFood
         }
 
         private bool BuildRandomPlaylistForAnimal(AnimalDefinition def, List<RhythmPattern> outList)
@@ -524,6 +503,20 @@ namespace IronIvy.Gameplay.Rhythm
             };
 
             return _runtimeRestPattern;
+        }
+
+        private void ApplyResultMaterialToCurrentAnimal(float successRatio)
+        {
+            if (_currentAnimal == null) return;
+
+            var r = _currentAnimal.GetComponentInChildren<Renderer>(true);
+            if (r == null) return;
+
+            var mat = (successRatio >= successThreshold) ? successMaterial : failMaterial;
+            if (mat == null) return;
+
+            // đổi riêng con này, không ảnh hưởng toàn map
+            r.material = mat;
         }
 
         private void ApplyFinishMaterialThenFadeOut(float duration)
@@ -630,7 +623,6 @@ namespace IronIvy.Gameplay.Rhythm
 
             _finishFadeRoutine = null;
         }
-
 
     }
 }
