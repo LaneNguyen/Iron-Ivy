@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[DefaultExecutionOrder(-1000)]
 public class AudioManager : BaseManager<AudioManager>
 {
     private const float BGM_FADE_SPEED_RATE_HIGH = 0.9f;
@@ -19,12 +20,10 @@ public class AudioManager : BaseManager<AudioManager>
 
     private float bgmFadeSpeedRate = BGM_FADE_SPEED_RATE_HIGH;
 
-    // ===== NEW: BGM STATE MEMORY =====
     private string currentBGMName = "";
     private string previousBGMName = "";
     private float previousBGMTime = 0f;
 
-    // next BGM name
     private string nextBGMName;
     private bool isFadeOut = false;
 
@@ -37,8 +36,29 @@ public class AudioManager : BaseManager<AudioManager>
     private Dictionary<string, AudioClip> bgmDic;
     private Dictionary<string, AudioClip> seDic;
 
+    // ===== HARD GUARD: only one AudioManager may live =====
+    private static AudioManager _persistent;
+
     protected override void Awake()
     {
+        // Duplicate guard FIRST, before BaseManager touches Instance.
+        if (_persistent != null && _persistent != this)
+        {
+            if (!string.IsNullOrEmpty(defaultBGMName))
+            {
+                _persistent.RequestSceneDefaultBGM(defaultBGMName);
+            }
+
+            Destroy(gameObject);
+            return;
+        }
+
+        _persistent = this;
+
+        // Make sure it survives scene unload no matter what
+        DontDestroyOnLoad(gameObject);
+
+        // Now let BaseManager do its internal wiring (safe because duplicates are already blocked)
         base.Awake();
 
         bgmDic = new Dictionary<string, AudioClip>();
@@ -53,6 +73,13 @@ public class AudioManager : BaseManager<AudioManager>
 
     private void Start()
     {
+        // Only persistent instance reaches here (duplicates destroyed in Awake)
+        if (AttachBGMSource == null || AttachSESource == null)
+        {
+            Debug.LogWarning("[AudioManager] Missing AttachBGMSource / AttachSESource on the persistent instance.");
+            return;
+        }
+
         AttachBGMSource.volume = PlayerPrefs.GetFloat(BGM_VOLUME_KEY, BGM_VOLUME_DEFAULT);
         AttachSESource.volume = PlayerPrefs.GetFloat(SE_VOLUME_KEY, SE_VOLUME_DEFAULT);
 
@@ -65,19 +92,43 @@ public class AudioManager : BaseManager<AudioManager>
         }
     }
 
+    private void OnDestroy()
+    {
+        // Nếu persistent bị destroy, log rõ để debug production
+        if (_persistent == this)
+        {
+            _persistent = null;
+            Debug.LogWarning("[AudioManager] Persistent instance was destroyed. Check scene unload / singleton duplicate logic.");
+        }
+    }
+
+    // Scene mới yêu cầu đổi nhạc nền theo scene
+    public void RequestSceneDefaultBGM(string bgmName)
+    {
+        if (string.IsNullOrEmpty(bgmName)) return;
+
+        defaultBGMName = bgmName;
+        PlayBGM(bgmName);
+    }
+
     // ===============================
     // ===== PUBLIC BGM CONTROL =====
     // ===============================
 
     public void PlayBGM(string bgmName, float fadeSpeedRate = BGM_FADE_SPEED_RATE_HIGH)
     {
+        if (AttachBGMSource == null)
+        {
+            Debug.LogWarning("[AudioManager] AttachBGMSource is null.");
+            return;
+        }
+
         if (!bgmDic.ContainsKey(bgmName))
         {
             Debug.LogWarning($"[AudioManager] No BGM named {bgmName}");
             return;
         }
 
-        // same BGM, ignore
         if (AttachBGMSource.isPlaying && AttachBGMSource.clip != null && AttachBGMSource.clip.name == bgmName)
             return;
 
@@ -96,23 +147,18 @@ public class AudioManager : BaseManager<AudioManager>
         }
     }
 
-    /// <summary>
-    /// Dùng khi vào Minigame
-    /// </summary>
     public void PushBGM(string bgmName)
     {
         PlayBGM(bgmName);
     }
 
-    /// <summary>
-    /// Dùng khi thoát Minigame
-    /// </summary>
     public void PopBGM()
     {
         if (!string.IsNullOrEmpty(previousBGMName))
         {
             PlayBGM(previousBGMName);
-            AttachBGMSource.time = previousBGMTime;
+            if (AttachBGMSource != null)
+                AttachBGMSource.time = previousBGMTime;
         }
         else if (!string.IsNullOrEmpty(defaultBGMName))
         {
@@ -127,13 +173,10 @@ public class AudioManager : BaseManager<AudioManager>
         nextBGMName = "";
     }
 
-    // ===============================
-    // ===== INTERNAL UPDATE LOOP ====
-    // ===============================
-
     private void Update()
     {
         if (!isFadeOut) return;
+        if (AttachBGMSource == null) return;
 
         AttachBGMSource.volume -= Time.deltaTime * bgmFadeSpeedRate;
         if (AttachBGMSource.volume > 0f) return;
@@ -147,6 +190,7 @@ public class AudioManager : BaseManager<AudioManager>
 
     private void PlayNextBGM()
     {
+        if (AttachBGMSource == null) return;
         if (string.IsNullOrEmpty(nextBGMName)) return;
 
         AttachBGMSource.clip = bgmDic[nextBGMName];
@@ -158,6 +202,7 @@ public class AudioManager : BaseManager<AudioManager>
 
     private void CacheCurrentBGM()
     {
+        if (AttachBGMSource == null) return;
         if (AttachBGMSource.clip == null) return;
 
         previousBGMName = AttachBGMSource.clip.name;
@@ -165,7 +210,7 @@ public class AudioManager : BaseManager<AudioManager>
     }
 
     // ===============================
-    // ===== SE HANDLING (UNCHANGED)
+    // ===== SE HANDLING (KEEP OLD)
     // ===============================
 
     public void PlaySE(string seName, float delay = 0.0f)
@@ -177,68 +222,65 @@ public class AudioManager : BaseManager<AudioManager>
     private IEnumerator DelayPlaySE(AudioClip clip, float delay)
     {
         yield return new WaitForSeconds(delay);
-        AttachSESource.PlayOneShot(clip);
+        if (AttachSESource != null)
+            AttachSESource.PlayOneShot(clip);
     }
 
     public void PlaySEClip(AudioClip clip, float volumeScale = 1f)
     {
-        if (clip == null || AttachSESource.mute) return;
+        if (clip == null) return;
+        if (AttachSESource == null) return;
+        if (AttachSESource.mute) return;
+
         AttachSESource.PlayOneShot(clip, Mathf.Clamp01(volumeScale));
+    }
+
+    public void PlaySEAtPosition(AudioClip clip, Vector3 position, float volumeScale = 1f)
+    {
+        if (clip == null) return;
+        if (AttachSESource != null && AttachSESource.mute) return;
+
+        float baseVolume = (AttachSESource != null) ? AttachSESource.volume : 1f;
+        float finalVolume = Mathf.Clamp01(baseVolume * volumeScale);
+        AudioSource.PlayClipAtPoint(clip, position, finalVolume);
     }
 
     public void ChangeBGMVolume(float volume)
     {
+        if (AttachBGMSource == null) return;
         AttachBGMSource.volume = volume;
         PlayerPrefs.SetFloat(BGM_VOLUME_KEY, volume);
     }
 
     public void ChangeSEVolume(float volume)
     {
+        if (AttachSESource == null) return;
         AttachSESource.volume = volume;
         PlayerPrefs.SetFloat(SE_VOLUME_KEY, volume);
     }
 
     public void MuteBGM(bool mute)
     {
+        if (AttachBGMSource == null) return;
         AttachBGMSource.mute = mute;
         PlayerPrefs.SetInt(BGM_MUTE_KEY, mute ? 1 : 0);
     }
 
     public void MuteSE(bool mute)
     {
+        if (AttachSESource == null) return;
         AttachSESource.mute = mute;
         PlayerPrefs.SetInt(SE_MUTE_KEY, mute ? 1 : 0);
     }
 
-    // helper nho de phat SE tai vi tri 3d (dung cho tieng keu animal ngoai world)
-    public void PlaySEAtPosition(AudioClip clip, Vector3 position, float volumeScale = 1f)
-    {
-        if (clip == null)
-        {
-            return;
-        }
-
-        // neu SE dang mute thi thoi, de game setting control
-        if (AttachSESource != null && AttachSESource.mute)
-        {
-            return;
-        }
-
-        // lay volume goc tu SE channel chinh
-        float baseVolume = (AttachSESource != null) ? AttachSESource.volume : 1f;
-        float finalVolume = Mathf.Clamp01(baseVolume * volumeScale);
-
-        // dung PlayClipAtPoint nhung thong qua audio manager 1 cho cho de control
-        AudioSource.PlayClipAtPoint(clip, position, finalVolume);
-    }
-
     public void ApplyPrefsNow()
     {
+        if (AttachBGMSource == null || AttachSESource == null) return;
+
         AttachBGMSource.volume = PlayerPrefs.GetFloat(BGM_VOLUME_KEY, BGM_VOLUME_DEFAULT);
         AttachSESource.volume = PlayerPrefs.GetFloat(SE_VOLUME_KEY, SE_VOLUME_DEFAULT);
 
         AttachBGMSource.mute = PlayerPrefs.GetInt(BGM_MUTE_KEY, BGM_MUTE_DEFAULT) != 0;
         AttachSESource.mute = PlayerPrefs.GetInt(SE_MUTE_KEY, SE_MUTE_DEFAULT) != 0;
     }
-
 }

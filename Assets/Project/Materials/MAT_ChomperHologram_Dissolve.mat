@@ -32,7 +32,6 @@ Material:
   - _RECEIVE_SHADOWS_ON
   - _REFLECTIONS_CLASSIC
   - _RIMLIGHTINGSTAGE_BEFORELIGHTING
-  - _RIM_LIGHTING_ON
   - _SHADINGMODEL_PBR
   - _SPECULARMODEL_CLASSIC
   - _TEXTUREBLENDINGMODE_RGB
@@ -47,7 +46,7 @@ Material:
   m_CustomRenderQueue: 3000
   stringTagMap: {}
   disabledShaderPasses: []
-  m_LockedProperties: 
+  m_LockedProperties: _ToonCutoff
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -56,27 +55,27 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BlendingNormalMapB:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 6246e3fe4a63c1f4f9acec9623576fc7, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BlendingNormalMapG:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 8175cba73bf87af41aeba7bbd2f3c4cd, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BlendingNormalMapWhite:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 8175cba73bf87af41aeba7bbd2f3c4cd, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BlendingTextureB:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: f39690d17007ab242928cd91e5a530a6, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BlendingTextureG:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 2af6ba1567607124eb61349fa044375b, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BlendingTextureWhite:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 2af6ba1567607124eb61349fa044375b, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BumpMap:
@@ -100,7 +99,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DistortTex:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: fcb69fdadf254834880fe3c443965278, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _EmissionMap:
@@ -152,7 +151,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _TexBlendingMask:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 5a775794f8704ba4385b9c92cf9f1224, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _ToonRamp:
@@ -160,15 +159,15 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _TriplanarTopNormalMap:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 8175cba73bf87af41aeba7bbd2f3c4cd, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _TriplanarTopTex:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 2af6ba1567607124eb61349fa044375b, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _VertexDistortionNoiseTex:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: fcb69fdadf254834880fe3c443965278, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
@@ -257,7 +256,7 @@ Material:
     - _HeightGradientOn: 0
     - _HeightGradientPositionSpace: 0
     - _HighlightCutoff: 0.807
-    - _HighlightSmoothness: 0.5
+    - _HighlightSmoothness: 1
     - _Highlights: 1
     - _HighlightsStrength: 1
     - _Hit: 0
@@ -271,9 +270,9 @@ Material:
     - _HologramBaseAlpha: 0.25
     - _HologramFrequency: 20
     - _HologramLineCenter: 0.5
-    - _HologramLineSmoothness: 2
+    - _HologramLineSmoothness: 2.99
     - _HologramLineSpacing: 2
-    - _HologramScrollSpeed: 2
+    - _HologramScrollSpeed: 1
     - _HueBrightness: 0.97
     - _HueBrightnessLM: 1
     - _HueSaturation: 1.14
@@ -307,7 +306,7 @@ Material:
     - _NearFade: 0
     - _NormalInfluence: 1.15
     - _NormalMapEnabled: 1
-    - _NormalStrength: 2
+    - _NormalStrength: 0
     - _OcclusionStrength: 1
     - _OutlineMode: 8
     - _OutlineThickness: 1
@@ -326,7 +325,7 @@ Material:
     - _ReflectionsAtten: 0.4
     - _RenderPreset: 2
     - _RimAttenuation: 1
-    - _RimLighting: 1
+    - _RimLighting: 0
     - _RimLightingStage: 0
     - _SSSAtten: 0.3
     - _SSSFrontAtten: 0.2
@@ -407,7 +406,7 @@ Material:
     - _HitColor: {r: 1, g: 1, b: 1, a: 1}
     - _HologramColor: {r: 1.25, g: 2.8, b: 6.8, a: 1}
     - _HologramLineDirection: {r: 0, g: 1, b: 0, a: 0}
-    - _OutlineColor: {r: 0, g: 0, b: 0, a: 1}
+    - _OutlineColor: {r: 1, g: 0.91886795, b: 0.91886795, a: 0.06666667}
     - _RimColor: {r: 0, g: 1.639211, b: 44.727043, a: 1}
     - _RimOffset: {r: 0, g: 0.1, b: 0, a: 0}
     - _SSSColor: {r: 2, g: 1.4901961, b: 1.9607843, a: 1}

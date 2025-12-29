@@ -8,10 +8,6 @@ using IronIvy.Core;
 
 namespace IronIvy.UI
 {
-    // panel chuẩn bị trước khi chơi plant rhythm
-    // - chọn plot
-    // - chọn seed cho từng plot
-    // - bắn request qua UIManager để start minigame
     public class PlantRhythmStartPanel : MonoBehaviour
     {
         [Header("Root")]
@@ -33,20 +29,47 @@ namespace IronIvy.UI
         [Header("Config")]
         public int energyPerPlant = 1;
 
+        // GIỮ NGUYÊN để MainGameUIPanel compile
         public int baseEnergyCost => energyPerPlant;
 
         [Header("Visual - Slot Colors")]
         public Color slotNormalColor = Color.white;
-        public Color slotSelectedColor = new Color(1f, 0.92f, 0.2f, 1f); // vàng mềm
-        public Color slotFilledColor = new Color(0.75f, 1f, 0.75f, 1f);  // xanh nhẹ (ô đã chọn cây) - optional
+        public Color slotSelectedColor = new Color(1f, 0.92f, 0.2f, 1f);
+        public Color slotFilledColor = new Color(0.75f, 1f, 0.75f, 1f);
+
+        // =========================
+        // Guide: show when panel opens first time
+        // =========================
+        [Header("Guide - Show when panel opens first time")]
+        [SerializeField] private GameObject guidePanelOnFirstOpen;
+
+        [SerializeField] private string guideStepId_FirstOpen = "guide.plant.startpanel.open";
+
+        [SerializeField] private bool pauseGameWhenGuideShown = false;
+        [SerializeField] private bool forceGuideOnTop = true;
+        [SerializeField] private int guideSortingOrderOverride = 5000;
+
+        [Header("Guide - Testing in Unity")]
+        [Tooltip("Trong Unity Editor: nếu true thì bỏ qua PlayerPrefs (guide luôn hiện để test).")]
+        [SerializeField] private bool ignorePrefsInEditor = true;
+
+        [Tooltip("Trong Unity Editor: nếu true thì CompleteAndClose sẽ KHÔNG ghi nhận MarkShown.")]
+        [SerializeField] private bool disableMarkInEditor = true;
+
+        private GuidePanelView _activeGuideView;
 
         private PlantArea _currentArea;
         private List<PlantDefinition> _selectedPlants = new List<PlantDefinition>();
         private int _currentSelectedSlotIndex = -1;
 
+        // GIỮ NGUYÊN để code cũ không gãy (MainGameUIPanel đang gọi)
         public void Show()
         {
             if (root) root.SetActive(true);
+
+            // Nếu ai đó vẫn gọi Show() cũ thì mình cũng cố show guide (an toàn)
+            TryShowGuide_OnFirstOpen();
+
             Debug.LogWarning("Old Show() called. Please update caller to use ShowForArea(PlantArea).");
         }
 
@@ -63,6 +86,7 @@ namespace IronIvy.UI
         {
             _currentArea = area;
             _selectedPlants.Clear();
+            _activeGuideView = null;
 
             if (area != null && area.plots != null)
             {
@@ -71,6 +95,9 @@ namespace IronIvy.UI
             }
 
             if (root) root.SetActive(true);
+
+            // ✅ ĐÚNG Ý MỚI: guide hiện ngay khi panel mở (lần đầu)
+            TryShowGuide_OnFirstOpen();
 
             _currentSelectedSlotIndex = (_selectedPlants.Count > 0) ? 0 : -1;
             RefreshUI();
@@ -81,6 +108,14 @@ namespace IronIvy.UI
         {
             ClearPlotHighlight();
             ClearAllPreviews();
+
+            // hide panel -> đóng guide nếu đang mở (KHÔNG mark)
+            if (_activeGuideView != null && _activeGuideView.gameObject.activeSelf)
+            {
+                _activeGuideView.CloseOnly();
+                _activeGuideView = null;
+            }
+
             if (root) root.SetActive(false);
             _currentArea = null;
         }
@@ -90,7 +125,13 @@ namespace IronIvy.UI
             ClearPlotHighlight();
             ClearAllPreviews();
 
-            // đóng popup, trả UI về main
+            // cancel -> đóng guide nếu đang mở (KHÔNG mark)
+            if (_activeGuideView != null && _activeGuideView.gameObject.activeSelf)
+            {
+                _activeGuideView.CloseOnly();
+                _activeGuideView = null;
+            }
+
             if (UIManager.HasInstance)
                 UIManager.Instance.CloseAllPopups();
             else
@@ -116,24 +157,17 @@ namespace IronIvy.UI
                 int index = i;
                 Button btn = Instantiate(plotSlotPrefab, plotSlotContainer);
 
-                // Vì UI đang rebuild liên tục (Destroy/Instantiate),
-                // ta set màu trực tiếp và tắt Transition để Unity không override.
                 btn.transition = Selectable.Transition.None;
 
-                // Text
                 var txt = btn.GetComponentInChildren<TextMeshProUGUI>();
                 if (txt)
                 {
-                    string plantName = _selectedPlants[index] != null ?
-                        _selectedPlants[index].displayName : "Trống";
-
+                    string plantName = _selectedPlants[index] != null ? _selectedPlants[index].displayName : "Trống";
                     txt.text = $"Ô đất {index + 1}\n<size=80%>{plantName}</size>";
                 }
 
-                // Color
                 ApplySlotVisual(btn, index);
 
-                // Click
                 btn.onClick.AddListener(() =>
                 {
                     _currentSelectedSlotIndex = index;
@@ -146,19 +180,15 @@ namespace IronIvy.UI
         private void ApplySlotVisual(Button btn, int index)
         {
             if (btn == null) return;
-
             var g = btn.targetGraphic;
             if (g == null) return;
 
             bool isSelected = (index == _currentSelectedSlotIndex);
             bool isFilled = (_selectedPlants != null && index >= 0 && index < _selectedPlants.Count && _selectedPlants[index] != null);
 
-            if (isSelected)
-                g.color = slotSelectedColor;
-            else if (isFilled)
-                g.color = slotFilledColor;
-            else
-                g.color = slotNormalColor;
+            if (isSelected) g.color = slotSelectedColor;
+            else if (isFilled) g.color = slotFilledColor;
+            else g.color = slotNormalColor;
         }
 
         private void RenderSeedList()
@@ -188,8 +218,7 @@ namespace IronIvy.UI
                 Button btn = Instantiate(seedButtonPrefab, seedListContainer);
 
                 var txt = btn.GetComponentInChildren<TextMeshProUGUI>();
-                if (txt != null)
-                    txt.text = plant.displayName;
+                if (txt != null) txt.text = plant.displayName;
 
                 var p = plant;
                 btn.onClick.AddListener(() => SelectPlantForCurrentSlot(p));
@@ -200,10 +229,8 @@ namespace IronIvy.UI
         {
             if (_currentSelectedSlotIndex < 0 || _currentSelectedSlotIndex >= _selectedPlants.Count) return;
 
-            // gắn plant vào slot hiện tại
             _selectedPlants[_currentSelectedSlotIndex] = plant;
 
-            // preview "cây mờ" tại plot tương ứng
             if (_currentArea != null && _currentArea.plots != null
                 && _currentSelectedSlotIndex >= 0 && _currentSelectedSlotIndex < _currentArea.plots.Count)
             {
@@ -211,7 +238,6 @@ namespace IronIvy.UI
                 if (plot != null) plot.SetPreviewPlant(plant);
             }
 
-            // auto advance slot (giữ behavior cũ)
             if (_currentSelectedSlotIndex < _selectedPlants.Count - 1)
                 _currentSelectedSlotIndex++;
 
@@ -242,6 +268,9 @@ namespace IronIvy.UI
 
             if (plantCount == 0) return;
 
+            // Cơ chế auto: qua bước tiếp theo (Start minigame) -> complete + close guide
+            CompleteAndCloseGuideIfOpen();
+
             int cost = plantCount * energyPerPlant;
 
             if (!UIManager.HasInstance)
@@ -250,7 +279,6 @@ namespace IronIvy.UI
                 return;
             }
 
-            // trước khi start, clear highlight + preview để tránh kẹt hình
             ClearPlotHighlight();
             ClearAllPreviews();
 
@@ -258,8 +286,38 @@ namespace IronIvy.UI
         }
 
         // =========================
-        // World Highlight Hooks
+        // Guide helpers
         // =========================
+        private void TryShowGuide_OnFirstOpen()
+        {
+            if (guidePanelOnFirstOpen == null) return;
+            if (!GuidePanelManager.HasInstance) return;
+
+            // đang mở rồi thì thôi
+            if (_activeGuideView != null && _activeGuideView.gameObject.activeSelf)
+                return;
+
+            // show nhưng CHƯA mark. mark khi CompleteAndClose()
+            _activeGuideView = GuidePanelManager.Instance.ShowPanelIfNotComplete(
+                guideStepId_FirstOpen,
+                guidePanelOnFirstOpen,
+                pauseGameWhenGuideShown,
+                forceGuideOnTop,
+                guideSortingOrderOverride,
+                ignorePrefsInEditor,
+                disableMarkInEditor
+            );
+        }
+
+        private void CompleteAndCloseGuideIfOpen()
+        {
+            if (_activeGuideView == null) return;
+            if (!_activeGuideView.gameObject.activeSelf) return;
+
+            _activeGuideView.CompleteAndClose();
+            _activeGuideView = null;
+        }
+
         private void HighlightCurrentPlot()
         {
             if (_currentArea == null) return;

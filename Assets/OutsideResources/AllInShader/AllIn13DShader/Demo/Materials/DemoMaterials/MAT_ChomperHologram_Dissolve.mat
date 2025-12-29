@@ -24,7 +24,7 @@ Material:
   - _HEIGHTGRADIENTPOSITIONSPACE_LOCAL
   - _HIGHLIGHTS_ON
   - _HOLOGRAM_ON
-  - _LIGHTMODEL_FAKEGI
+  - _LIGHTMODEL_FASTLIGHTING
   - _MATCAPBLENDMODE_MULTIPLY
   - _NORMAL_MAP_ON
   - _OUTLINETYPE_NONE
@@ -33,7 +33,7 @@ Material:
   - _REFLECTIONS_CLASSIC
   - _RIMLIGHTINGSTAGE_BEFORELIGHTING
   - _RIM_LIGHTING_ON
-  - _SHADINGMODEL_PBR
+  - _SHADINGMODEL_BASIC
   - _SPECULARMODEL_CLASSIC
   - _TEXTUREBLENDINGMODE_RGB
   - _TEXTUREBLENDINGSOURCE_VERTEXCOLOR
@@ -116,7 +116,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: e222ed97453a52444b91dafa104900d6, type: 3}
+        m_Texture: {fileID: 2800000, guid: 577327ab4a1498444ac71e1e685404f5, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MatcapTex:
@@ -285,7 +285,7 @@ Material:
     - _IntersectionFadeFactor: 1
     - _IntersectionFadeOn: 0
     - _IntersectionGlowOn: 0
-    - _LightModel: 5
+    - _LightModel: 6
     - _LightmapColorCorrection: 0
     - _Matcap: 0
     - _MatcapBlend: 0.25
@@ -337,7 +337,7 @@ Material:
     - _ScrollTextureOn: 0
     - _ScrollTextureX: 1
     - _ScrollTextureY: 1
-    - _ShadingModel: 1
+    - _ShadingModel: 0
     - _ShadowCutoff: 0.2
     - _ShakeBlend: 1
     - _ShakeSpeedMult: 1

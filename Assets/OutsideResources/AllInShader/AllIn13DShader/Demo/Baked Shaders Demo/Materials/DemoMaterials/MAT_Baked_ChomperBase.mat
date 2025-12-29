@@ -8,18 +8,19 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: MAT_Baked_ChomperBase
-  m_Shader: {fileID: 4800000, guid: 35d7855f8a6fde8469ba0e17e9756c79, type: 3}
-  m_ValidKeywords: []
-  m_InvalidKeywords:
+  m_Shader: {fileID: 4800000, guid: 0dde7f0097aeb2541aea684ca0ad0e3c, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords:
   - _ALBEDOVERTEXCOLORMODE_REPLACE
   - _ALPHA_CUTOFF_ON
   - _AOMAP_ON
   - _CAST_SHADOWS_ON
   - _COLORRAMPLIGHTINGSTAGE_BEFORELIGHTING
   - _EMISSION_ON
+  - _FADEUVSET_UV1
   - _FADE_BURN_ON
   - _FADE_ON
-  - _GLITCHWORLDSPACE_ON
   - _GREYSCALESTAGE_BEFORELIGHTING
   - _HEIGHTGRADIENTPOSITIONSPACE_LOCAL
   - _HIGHLIGHTS_ON
@@ -40,12 +41,15 @@ Material:
   - _TEXTUREBLENDINGSOURCE_VERTEXCOLOR
   - _TRIPLANARNORMALSPACE_WORLD
   - _USE_WIND_VERTICAL_MASK
+  m_InvalidKeywords:
+  - _GLITCHWORLDSPACE_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
+  m_CustomRenderQueue: 2000
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -231,6 +235,7 @@ Material:
     - _FadeOn: 1
     - _FadePower: 1
     - _FadeTransition: 0.046
+    - _FadeUVSet: 0
     - _FogOn: 0
     - _GeneralAlpha: 1
     - _Glitch: 0
@@ -412,3 +417,4 @@ Material:
     - _ShakeSpeed: {r: 41, g: 49, b: 45, a: 0}
     - _VertexDistortionNoiseSpeed: {r: 4, g: 4, b: 0, a: 0}
   m_BuildTextureStacks: []
+  m_AllowLocking: 1

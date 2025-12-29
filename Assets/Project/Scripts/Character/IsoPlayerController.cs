@@ -40,6 +40,13 @@ namespace IronIvy.Gameplay
         [Tooltip("Ngưỡng input nhỏ coi như đứng yên.")]
         public float movingThreshold = 0.05f;
 
+        [Header("Anti Jitter (Stop Head Shake)")]
+        [Tooltip("Ngưỡng deadzone riêng cho Side để tránh lắc đầu khi vừa dừng.")]
+        public float sideDeadZone = 0.08f;
+
+        [Tooltip("Ngưỡng vận tốc thực tế để coi như đứng yên, chặn rotation tick ở frame cuối.")]
+        public float idleVelocityThreshold = 0.05f;
+
         private CharacterController _cc;
         private bool _useNewInput;
 
@@ -82,6 +89,11 @@ namespace IronIvy.Gameplay
             if (_useNewInput && moveAction != null) moveAction.action.Enable();
             if (_useNewInput && runAction != null) runAction.action.Enable();
 #endif
+            // Khi bật lại controller, reset param để tránh "giật" do state cũ còn lưu
+            ForceIdleAnimatorState();
+            _smoothedVelocity = Vector3.zero;
+            _velRef = Vector3.zero;
+            _moveInput = Vector2.zero;
         }
 
         private void OnDisable()
@@ -141,7 +153,10 @@ namespace IronIvy.Gameplay
             _cc.SimpleMove(_smoothedVelocity);
 
             // 5) Rotate snappy (theo hướng input/camera)
-            if (moveDirWorld.sqrMagnitude > 0.0001f && rotationMaxDegree > 0f)
+            // Patch: chặn rotation tick ở frame cuối bằng ngưỡng vận tốc thực tế
+            if (rotationMaxDegree > 0f &&
+                moveDirWorld.sqrMagnitude > 0.0001f &&
+                _smoothedVelocity.magnitude > idleVelocityThreshold)
             {
                 Quaternion toRot = Quaternion.LookRotation(moveDirWorld, Vector3.up);
                 transform.rotation = Quaternion.RotateTowards(
@@ -160,13 +175,23 @@ namespace IronIvy.Gameplay
             if (!animator) return;
 
             float inputMag01 = Mathf.Clamp01(_moveInput.magnitude);
-            bool isMoving = inputMag01 > movingThreshold;
+            bool isMovingByInput = inputMag01 > movingThreshold;
 
-            // Side: trái/phải theo input X (đúng isometric)
-            float side = isMoving ? _moveInput.x : 0f;
-
-            // Speed: world speed (m/s) để match BlendTree nếu nó đặt Pos theo giá trị lớn (2..5..6)
             float speed = _smoothedVelocity.magnitude;
+            bool isIdleByVelocity = speed < idleVelocityThreshold;
+
+            // Patch: nếu đã idle theo velocity thì hard reset về 0 để chặn "lắc đầu"
+            if (!isMovingByInput || isIdleByVelocity)
+            {
+                ForceIdleAnimatorState();
+                SetRunSafe(false);
+                SetFloatSafe(hSpeedMul, 1f, 0f);
+                return;
+            }
+
+            // Side: deadzone riêng để tránh axis noise (đặc biệt lúc vừa nhả phím)
+            float side = 0f;
+            if (Mathf.Abs(_moveInput.x) > sideDeadZone) side = _moveInput.x;
 
             SetFloatSafe(hSide, side, animatorDamp);
             SetFloatSafe(hSpeed, speed, animatorDamp);
@@ -174,6 +199,27 @@ namespace IronIvy.Gameplay
             // run + speedMultiplier (optional)
             SetRunSafe(isRunHeld);
             SetFloatSafe(hSpeedMul, isRunHeld ? runMultiplier : 1f, animatorDamp);
+        }
+
+        private void ForceIdleAnimatorState()
+        {
+            if (!animator) return;
+
+            // Hard set, không dùng damp, để dập tắt jitter ngay lập tức
+            if (HasFloatParam(hSide)) animator.SetFloat(hSide, 0f);
+            if (HasFloatParam(hSpeed)) animator.SetFloat(hSpeed, 0f);
+        }
+
+        private bool HasFloatParam(int hash)
+        {
+            if (!animator) return false;
+            for (int i = 0; i < animator.parameterCount; i++)
+            {
+                var p = animator.parameters[i];
+                if (p.nameHash != hash) continue;
+                return p.type == AnimatorControllerParameterType.Float;
+            }
+            return false;
         }
 
         private void SetFloatSafe(int hash, float value, float damp)
