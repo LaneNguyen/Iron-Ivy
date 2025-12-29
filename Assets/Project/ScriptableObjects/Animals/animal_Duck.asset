@@ -19,12 +19,21 @@ MonoBehaviour:
   cameraOrbitHeight: 8
   cameraLookAtHeight: 0.8
   cameraOrbitRotateSpeed: 0
+  animalOrbitDistance: 2.8
+  animalOrbitPitch: 25
+  animalOrbitYaw: 30
+  animalOrbitHeight: 1.2
+  cameraBlendSeconds: 0.35
   favoriteFood: {fileID: 11400000, guid: e5b41e7a0209d4e41aef6fe16925bb48, type: 2}
+  buffTrustMultiplier: 3
+  hasFavoriteBuff: 1
   buffSafetyNet: 3
-  buffTrustMultiplier: 1.5
   dropItem: {fileID: 0}
   dropCount: 1
   doubleLootOnBuff: 1
+  rewardItem: {fileID: 0}
+  rewardMinCount: 1
+  rewardMaxCount: 1
   prefab: {fileID: 1600231042716339702, guid: f69e75671ffd4c143ac67920d4afdfc6, type: 3}
   maxCountGlobal: 10
   spawnWeight: 1
@@ -36,11 +45,6 @@ MonoBehaviour:
   minIdleTime: 2
   maxIdleTime: 4
   isNocturnal: 0
-  ambientClips:
-  - {fileID: 8300000, guid: 556877e71eaef1c429ccc04a9ece3c2a, type: 3}
-  ambientMinInterval: 5
-  ambientMaxInterval: 15
-  ambientSoundRadius: 15
   curiousRadius: 10
   curiousChancePerCheck: 0.2
   curiousMinDuration: 2
@@ -59,10 +63,26 @@ MonoBehaviour:
   maxRandomBeats: 20
   minRandomFragments: 2
   maxRandomFragments: 6
+  playlist: []
   goodAnim: Good
   badAnim: Bad
   iv17Reactions: []
+  reactionVisuals:
+    neutral: {fileID: 0}
+    sad: {fileID: 0}
+    angry: {fileID: 0}
+    happy: {fileID: 0}
+    happyStreakThreshold: 0
+    missReactionSeconds: 0
+    happyHoldSeconds: 0
+    streakDecaySeconds: 0
+    alternateSadAngry: 0
   archiveReward: 4
   minigameMusicLoop: {fileID: 8300000, guid: 5095e63fe74681a4ea42e0b182803b58, type: 3}
   loopSfx: {fileID: 0}
   successVFX: {fileID: 100004, guid: 3af6f68141914ca43ba39b2403757bd0, type: 3}
+  ambientClips:
+  - {fileID: 8300000, guid: 556877e71eaef1c429ccc04a9ece3c2a, type: 3}
+  ambientMinInterval: 5
+  ambientMaxInterval: 15
+  ambientSoundRadius: 15

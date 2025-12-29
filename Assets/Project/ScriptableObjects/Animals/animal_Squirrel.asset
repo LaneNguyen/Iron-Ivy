@@ -25,8 +25,8 @@ MonoBehaviour:
   animalOrbitHeight: 1.2
   cameraBlendSeconds: 0.35
   favoriteFood: {fileID: 11400000, guid: 00e9e275c37774f4abe494bf5a3f27d9, type: 2}
-  buffTrustMultiplier: 1.5
-  hasFavoriteBuff: 0
+  buffTrustMultiplier: 2
+  hasFavoriteBuff: 1
   buffSafetyNet: 3
   dropItem: {fileID: 11400000, guid: e5b41e7a0209d4e41aef6fe16925bb48, type: 2}
   dropCount: 1

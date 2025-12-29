@@ -97,7 +97,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 2.7, y: 2.7, z: 2.7}
+  m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 1207085142439183692}
@@ -278,6 +278,8 @@ MonoBehaviour:
   disableTriggerColliderWhileInteracting: 1
   interactionTriggerCollider: {fileID: 0}
   interactCooldown: 0.25
+  autoResetSeconds: 3
+  reEnableDelaySeconds: 0.25
   debugLog: 0
 --- !u!65 &-7000890541931812786
 BoxCollider:

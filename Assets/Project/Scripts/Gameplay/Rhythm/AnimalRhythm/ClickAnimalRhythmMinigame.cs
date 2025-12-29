@@ -388,8 +388,19 @@ namespace IronIvy.Gameplay.Rhythm
         {
             if (_currentAnimal == null || !ArchiveManager.HasInstance) return 0f;
             var def = _currentAnimal.Definition;
+
+            // Logic cũ: Tính điểm gốc dựa trên phong độ (thắng tuyệt đối hay thắng thường)
             float finalReward = (successRatio >= 0.99f) ? def.archiveReward : (successRatio >= 0.5f ? def.archiveReward * 0.5f : 0f);
-            if (finalReward > 0f) ArchiveManager.Instance.AddProgress(finalReward); // Khôi phục AddProgress
+
+            // --- THÊM ĐOẠN NÀY ---
+            // Nếu có Buff thức ăn -> Nhân đôi điểm Archive nhận được
+            if (_hasFavoriteBuff)
+            {
+                finalReward *= 2f;
+            }
+            // ---------------------
+
+            if (finalReward > 0f) ArchiveManager.Instance.AddProgress(finalReward);
             return finalReward;
         }
 
@@ -397,11 +408,28 @@ namespace IronIvy.Gameplay.Rhythm
         {
             item = null; count = 0;
             if (_currentAnimal == null || !InventoryManager.HasInstance || successRatio < 0.5f) return;
+
             var def = _currentAnimal.Definition;
-            if (def.dropItem == null) return; // Khôi phục dropItem
-            item = def.dropItem;
-            count = (_hasFavoriteBuff && def.doubleLootOnBuff) ? def.dropCount * 2 : def.dropCount;
-            InventoryManager.Instance.AddFood(item, count); // Khôi phục AddFood
+
+            // --- SỬA TỪ ĐÂY ---
+            // Đổi sang dùng biến MỚI: rewardItem
+            if (def.rewardItem == null) return;
+
+            item = def.rewardItem;
+
+            // Logic tính số lượng (random trong khoảng min-max)
+            int baseCount = Random.Range(def.rewardMinCount, def.rewardMaxCount + 1);
+
+            // Logic Buff x2 (giữ nguyên logic muốn)
+            if (_hasFavoriteBuff && def.doubleLootOnBuff)
+            {
+                baseCount *= 2;
+            }
+
+            count = baseCount;
+            // --- KẾT THÚC SỬA ---
+
+            InventoryManager.Instance.AddFood(item, count);
         }
 
         private bool BuildRandomPlaylistForAnimal(AnimalDefinition def, List<RhythmPattern> outList)

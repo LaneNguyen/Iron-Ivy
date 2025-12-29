@@ -89,7 +89,6 @@ namespace IronIvy.Data
         public float wanderRadius = 6f;
         public float minIdleTime = 1f;
         public float maxIdleTime = 3f;
-        public bool isNocturnal = false;
 
         [Header("Curious behaviour")]
         public float curiousRadius = 10f;
@@ -115,11 +114,6 @@ namespace IronIvy.Data
         [Header("Rhythm (New Playlist)")]
         public List<RhythmPattern> playlist = new List<RhythmPattern>();
 
-        // ===== Visuals & Reactions =====
-        [Header("Animation (Legacy)")]
-        public string goodAnim = "Good";
-        public string badAnim = "Bad";
-        public string[] iv17Reactions;
 
         [Header("Rhythm Reaction (New Visual Set)")]
         public AnimalReactionVisualSet reactionVisuals;
