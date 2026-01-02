@@ -7,6 +7,8 @@ namespace IronIvy.Core
     // - 4 icon hướng di chuyển: mỗi cái tắt riêng khi bấm đúng hướng
     // - icon RMB: tắt khi nhấn/giữ RMB (rotate camera)
     // - khi tất cả icon đã tắt -> auto CompleteAndClose()
+    // - NEW: có âm thanh khi hoàn thành từng bước / hoàn thành tất cả
+    // - NEW: hỗ trợ UI Button (OnClick) gọi trực tiếp các hàm OnPress...
     public class GuideBootTrigger : MonoBehaviour
     {
         [Header("Guide Step")]
@@ -47,6 +49,16 @@ namespace IronIvy.Core
         [Tooltip("Nếu true: đủ 4 hướng + RMB thì tự complete & close.")]
         public bool autoCompleteWhenAllDone = true;
 
+        [Header("Audio SE (Resources/Audio/SE)")]
+        [Tooltip("Tên SE phát khi hoàn thành 1 bước (ẩn 1 icon).")]
+        public string seOnStepDone = "ui_tick";
+
+        [Tooltip("Tên SE phát khi hoàn thành toàn bộ tutorial (auto close).")]
+        public string seOnAllDone = "ui_complete";
+
+        [Tooltip("Chặn spam SE nếu user click liên tục (giây).")]
+        public float seCooldown = 0.08f;
+
         private GuidePanelView _activeView;
 
         // trạng thái đã làm xong từng input
@@ -55,6 +67,8 @@ namespace IronIvy.Core
         private bool _doneDown;
         private bool _doneRight;
         private bool _doneRmb;
+
+        private float _nextAllowedSETime = 0f;
 
         private void Start()
         {
@@ -69,44 +83,38 @@ namespace IronIvy.Core
             // 1) Detect movement input (WASD + Arrow)
             if (!_doneUp && (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow)))
             {
-                _doneUp = true;
-                HideIcon(iconUp);
+                AudioManager.Instance?.PlayInterfaceSE();
+                MarkDoneUp();
             }
 
             if (!_doneLeft && (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow)))
             {
-                _doneLeft = true;
-                HideIcon(iconLeft);
+                AudioManager.Instance?.PlayInterfaceSE();
+                MarkDoneLeft();
             }
 
             if (!_doneDown && (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow)))
             {
-                _doneDown = true;
-                HideIcon(iconDown);
+                AudioManager.Instance?.PlayInterfaceSE();
+                MarkDoneDown();
             }
 
             if (!_doneRight && (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow)))
             {
-                _doneRight = true;
-                HideIcon(iconRight);
+                AudioManager.Instance?.PlayInterfaceSE();
+                MarkDoneRight();
             }
 
             // 2) Detect RMB rotate camera
-            // TPS rotate đang dùng GetMouseButton(1) trong PlayerThirdPersonController. :contentReference[oaicite:1]{index=1}
-            // Tutorial chỉ cần biết user đã "dùng RMB".
             if (!_doneRmb && (Input.GetMouseButtonDown(1) || Input.GetMouseButton(1)))
             {
-                _doneRmb = true;
-                HideIcon(iconRightMouse);
+                AudioManager.Instance?.PlayInterfaceSE();
+                MarkDoneRmb();
             }
 
+
             // 3) Auto complete when all required actions done
-            if (autoCompleteWhenAllDone && IsAllDone())
-            {
-                _activeView.CompleteAndClose();
-                _activeView = null;
-                gameObject.SetActive(false);
-            }
+            TryAutoComplete();
         }
 
         public void TryShow()
@@ -131,6 +139,71 @@ namespace IronIvy.Core
             // Nếu player thật đã xem rồi -> manager trả null -> tắt trigger khỏi tốn công
             if (_activeView == null)
                 gameObject.SetActive(false);
+        }
+
+        // =========================
+        // UI BUTTON HOOKS
+        // =========================
+        // Gán các hàm này vào OnClick của các nút/ icon trong Guide Panel.
+        public void OnPressUp() { if (_activeView != null && _activeView.gameObject.activeSelf) { MarkDoneUp(); TryAutoComplete(); } }
+        public void OnPressLeft() { if (_activeView != null && _activeView.gameObject.activeSelf) { MarkDoneLeft(); TryAutoComplete(); } }
+        public void OnPressDown() { if (_activeView != null && _activeView.gameObject.activeSelf) { MarkDoneDown(); TryAutoComplete(); } }
+        public void OnPressRight() { if (_activeView != null && _activeView.gameObject.activeSelf) { MarkDoneRight(); TryAutoComplete(); } }
+        public void OnPressRmb() { if (_activeView != null && _activeView.gameObject.activeSelf) { MarkDoneRmb(); TryAutoComplete(); } }
+
+        // =========================
+        // MARK DONE (shared by keyboard + UI)
+        // =========================
+        private void MarkDoneUp()
+        {
+            if (_doneUp) return;
+            _doneUp = true;
+            HideIcon(iconUp);
+            PlayStepSE();
+        }
+
+        private void MarkDoneLeft()
+        {
+            if (_doneLeft) return;
+            _doneLeft = true;
+            HideIcon(iconLeft);
+            PlayStepSE();
+        }
+
+        private void MarkDoneDown()
+        {
+            if (_doneDown) return;
+            _doneDown = true;
+            HideIcon(iconDown);
+            PlayStepSE();
+        }
+
+        private void MarkDoneRight()
+        {
+            if (_doneRight) return;
+            _doneRight = true;
+            HideIcon(iconRight);
+            PlayStepSE();
+        }
+
+        private void MarkDoneRmb()
+        {
+            if (_doneRmb) return;
+            _doneRmb = true;
+            HideIcon(iconRightMouse);
+            PlayStepSE();
+        }
+
+        private void TryAutoComplete()
+        {
+            if (!autoCompleteWhenAllDone) return;
+            if (!IsAllDone()) return;
+
+            PlayCompleteSE();
+
+            _activeView.CompleteAndClose();
+            _activeView = null;
+            gameObject.SetActive(false);
         }
 
         private void ResetRuntimeState()
@@ -165,8 +238,26 @@ namespace IronIvy.Core
 
         private bool IsAllDone()
         {
-            // Nếu Lane muốn “không bắt buộc RMB” thì chỉ cần bỏ _doneRmb ra khỏi đây.
             return _doneUp && _doneLeft && _doneDown && _doneRight && _doneRmb;
+        }
+
+        private void PlayStepSE()
+        {
+            if (Time.unscaledTime < _nextAllowedSETime) return;
+            _nextAllowedSETime = Time.unscaledTime + Mathf.Max(0.02f, seCooldown);
+
+            if (string.IsNullOrEmpty(seOnStepDone)) return;
+            if (AudioManager.Instance == null) return;
+
+            AudioManager.Instance.PlaySE(seOnStepDone);
+        }
+
+        private void PlayCompleteSE()
+        {
+            if (string.IsNullOrEmpty(seOnAllDone)) return;
+            if (AudioManager.Instance == null) return;
+
+            AudioManager.Instance.PlaySE(seOnAllDone);
         }
     }
 }

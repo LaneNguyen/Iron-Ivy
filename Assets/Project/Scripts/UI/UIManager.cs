@@ -206,6 +206,10 @@ namespace IronIvy.Core
 
             // 2) Switch UI (Trong lúc màn hình đang đen)
             CloseAllPopups();
+
+            if (AudioManager.Instance != null)
+                AudioManager.Instance.PlayOpenPanelSE();
+
             if (archivePanel != null) archivePanel.Show();
 
             yield return new WaitForSecondsRealtime(holdBlack);

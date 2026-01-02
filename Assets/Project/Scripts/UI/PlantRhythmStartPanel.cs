@@ -65,9 +65,10 @@ namespace IronIvy.UI
         // GIỮ NGUYÊN để code cũ không gãy (MainGameUIPanel đang gọi)
         public void Show()
         {
+            AudioManager.Instance?.PlayOpenPanelSE();
             if (root) root.SetActive(true);
 
-            // Nếu ai đó vẫn gọi Show() cũ thì mình cũng cố show guide (an toàn)
+            // Nếu chỗ nao vẫn gọi Show() cũ thì mình cũng cố show guide (an toàn)
             TryShowGuide_OnFirstOpen();
 
             Debug.LogWarning("Old Show() called. Please update caller to use ShowForArea(PlantArea).");
@@ -94,9 +95,9 @@ namespace IronIvy.UI
                     _selectedPlants.Add(null);
             }
 
+            AudioManager.Instance?.PlayOpenPanelSE();
             if (root) root.SetActive(true);
 
-            // ✅ ĐÚNG Ý MỚI: guide hiện ngay khi panel mở (lần đầu)
             TryShowGuide_OnFirstOpen();
 
             _currentSelectedSlotIndex = (_selectedPlants.Count > 0) ? 0 : -1;
@@ -170,6 +171,7 @@ namespace IronIvy.UI
 
                 btn.onClick.AddListener(() =>
                 {
+                    AudioManager.Instance.PlayInterfaceSE();
                     _currentSelectedSlotIndex = index;
                     RefreshUI();
                     HighlightCurrentPlot();
@@ -227,6 +229,7 @@ namespace IronIvy.UI
 
         private void SelectPlantForCurrentSlot(PlantDefinition plant)
         {
+            AudioManager.Instance.PlayInterfaceSE();
             if (_currentSelectedSlotIndex < 0 || _currentSelectedSlotIndex >= _selectedPlants.Count) return;
 
             _selectedPlants[_currentSelectedSlotIndex] = plant;
@@ -262,6 +265,7 @@ namespace IronIvy.UI
 
         private void OnStartClicked()
         {
+            AudioManager.Instance?.PlayInterfaceSE();
             int plantCount = 0;
             foreach (var p in _selectedPlants)
                 if (p != null) plantCount++;

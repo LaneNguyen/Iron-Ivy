@@ -1,12 +1,12 @@
-using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
 using System.Collections.Generic;
-using IronIvy.Gameplay.Animals;
 using IronIvy.Core;
 using IronIvy.Data;
 using IronIvy.Gameplay;
+using IronIvy.Gameplay.Animals;
 using IronIvy.Gameplay.Interaction;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
 
 namespace IronIvy.UI
 {
@@ -37,7 +37,7 @@ namespace IronIvy.UI
         [Header("Config")]
         [SerializeField] private int animalEnergyCost = 1;
 
-                [Header("Feedback (Favorite Food)")]
+        [Header("Feedback (Favorite Food)")]
         [TextArea] public string correctFeedbackText = "Trúng gu trúng gu! (Buff Active)";
         [TextArea] public string wrongFeedbackText = "Không phải món khoái khẩu, nhưng vẫn chơi được nè.";
 
@@ -68,7 +68,8 @@ namespace IronIvy.UI
             if (panelRoot != null) panelRoot.SetActive(false);
             if (buffInfoText) buffInfoText.text = "";
 
-            // optional: auto hook buttons nếu em muốn
+
+
             if (playButton != null)
             {
                 playButton.onClick.RemoveListener(OnPlayButton);
@@ -95,7 +96,6 @@ namespace IronIvy.UI
             }
         }
 
-        // NEW overload: nhận trigger nguồn
         public void ShowForAnimal(AnimalController animal, InteractionTrigger sourceTrigger)
         {
             _sourceTrigger = sourceTrigger;
@@ -132,7 +132,11 @@ namespace IronIvy.UI
 
         private void ShowPanel(string title, string question)
         {
-            if (panelRoot != null) panelRoot.SetActive(true);
+            if (panelRoot != null)
+            {
+                panelRoot.SetActive(true);
+                AudioManager.Instance?.PlayOpenPanelSE();
+            }
             if (titleText != null) titleText.text = title;
             if (questionText != null) questionText.text = question;
         }
@@ -230,7 +234,7 @@ namespace IronIvy.UI
             }
         }
 
-               private void OnFoodSelected(FoodItem food)
+        private void OnFoodSelected(FoodItem food)
         {
             if (_selectedFood == food)
             {
@@ -265,7 +269,7 @@ namespace IronIvy.UI
         }
 
 
-                private void UpdateSlotHighlights()
+        private void UpdateSlotHighlights()
         {
             bool hasAnimalDef = (_currentAnimal != null && _currentAnimal.Definition != null);
 
@@ -310,7 +314,7 @@ namespace IronIvy.UI
 
             if (debugLog)
                 Debug.Log("[MinigameInteractionPanel] OnPlayButton -> RequestStartAnimalRhythm");
-
+            AudioManager.Instance?.PlayInterfaceSE();
             UIManager.Instance.RequestStartAnimalRhythm(_currentAnimal, _selectedFood, animalEnergyCost);
         }
 
@@ -318,7 +322,7 @@ namespace IronIvy.UI
         {
             Hide();
 
-            // optional: bật main UI lại nếu em muốn
+            // optional: bật main UI lại nếu muốn sau này
             if (UIManager.HasInstance)
                 UIManager.Instance.CloseAllPopups();
         }

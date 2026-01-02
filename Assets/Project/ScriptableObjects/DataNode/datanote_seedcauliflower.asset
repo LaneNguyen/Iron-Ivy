@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1e5ba809730b064091d6171efa7a34a, type: 3}
+  m_Name: datanote_seedcauliflower
+  m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Data.ArchiveNodeDefinition
+  id: datanote_cauliflower
+  title: "C\u1EE6 C\u1EA2I TR\u1EAENG"
+  description: "M\u1EDF kh\xF3a k\u1EF9 thu\u1EADt tr\u1ED3ng C\u1EE7 C\u1EA3i Tr\u1EAFng."
+  icon: {fileID: 585579266, guid: fc6992a7165ef034e9d786067e38c4b9, type: 3}
+  costToUnlock: 60
+  requiredParent: {fileID: 11400000, guid: 18057ab6cab1ed24f8c15516fd8567fb, type: 2}
+  rewardType: 2
+  rewardValue: 1
+  rewardObject: {fileID: 11400000, guid: cf27867c8e02ea74687a564db0a2ca18, type: 2}

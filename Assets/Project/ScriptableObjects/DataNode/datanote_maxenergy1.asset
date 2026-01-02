@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: datanote_maxenergy1
   m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Data.ArchiveNodeDefinition
   id: datanote_maxenergy1
-  title: MAX ENERGY +1
-  description: "T\u0103ng m\u1EE9c n\u0103ng l\u01B0\u1EE3ng t\u1ED1i \u0111a."
+  title: MAX ENERGY I
+  description: "T\u0103ng gi\u1EDBi h\u1EA1n PIN N\u0102NG L\u01AF\u1EE2NG +1."
   icon: {fileID: 554289780, guid: 94fb19094aba2bb499997d32e9bc7f18, type: 3}
-  costToUnlock: 0
+  costToUnlock: 5
   requiredParent: {fileID: 0}
   rewardType: 1
   rewardValue: 1

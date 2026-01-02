@@ -1,4 +1,6 @@
 using UnityEngine;
+using IronIvy.UI;
+using IronIvy.Data;
 
 namespace IronIvy.UI
 {

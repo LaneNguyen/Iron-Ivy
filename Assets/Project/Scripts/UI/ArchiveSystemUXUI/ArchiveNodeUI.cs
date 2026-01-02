@@ -25,6 +25,14 @@ namespace IronIvy.UI
         [Header("Parent Gating Visual")]
         [Range(0.1f, 1f)] public float blockedAlpha = 0.5f;
 
+        [Header("Unaffordable Visual (not enough progress/energy)")]
+        [Range(0.1f, 1f)] public float unaffordableAlpha = 0.65f;
+
+        [Header("Inspect Border Rotation (when reading description)")]
+        public bool useInspectRotation = true;
+        [Tooltip("Độ/giây. 6-12 là chậm, nhẹ, không chóng mặt.")]
+        public float inspectRotateSpeed = 10f;
+
         [Header("Colors (Config)")]
         public Color lockedColor = Color.gray;
         public Color unlockedColor = new Color(0f, 1f, 1f, 1f);
@@ -35,13 +43,16 @@ namespace IronIvy.UI
         private ArchivePanel _parentPanel;
         private CanvasGroup _cg;
 
+        private bool _isInspecting;
+        private Quaternion _borderBaseRot;
+
+        private static ArchiveNodeUI _currentInspectNode;
+
         // Panel sẽ dùng property này thay vì truy cập field tên "definition" (tránh nhầm).
         public ArchiveNodeDefinition Data => _data != null ? _data : definition;
 
-
         private void Awake()
         {
-
             if (_parentPanel == null)
                 _parentPanel = GetComponentInParent<ArchivePanel>(true);
 
@@ -57,7 +68,9 @@ namespace IronIvy.UI
             if (_cg == null) _cg = GetComponent<CanvasGroup>();
             if (_cg == null) _cg = gameObject.AddComponent<CanvasGroup>();
 
-            // optional: refresh visual luôn (nếu manager sẵn)
+            if (borderImage != null)
+                _borderBaseRot = borderImage.rectTransform.localRotation;
+
             if (ArchiveManager.HasInstance)
                 RefreshVisual();
         }
@@ -67,13 +80,21 @@ namespace IronIvy.UI
             if (ArchiveManager.HasInstance)
                 ArchiveManager.Instance.OnNodeUnlocked += HandleNodeUnlocked;
         }
+
         private void OnDisable()
         {
             if (ArchiveManager.HasInstance)
                 ArchiveManager.Instance.OnNodeUnlocked -= HandleNodeUnlocked;
+
+            // nếu node này đang inspect mà bị disable thì clear + reset rot
+            if (_currentInspectNode == this)
+            {
+                _currentInspectNode = null;
+                StopInspect();
+            }
         }
 
-
+        // ✅ GIỮ LẠI SETUP như logic cũ (để callsite không vỡ)
         public void Setup(ArchiveNodeDefinition data, ArchivePanel parent)
         {
             // Ưu tiên data truyền vào; nếu null thì dùng definition set trong Inspector.
@@ -95,7 +116,21 @@ namespace IronIvy.UI
                 btnSelect.onClick.AddListener(OnNodeClicked);
             }
 
+            if (borderImage != null)
+                _borderBaseRot = borderImage.rectTransform.localRotation;
+
+            // setup xong refresh UI theo logic cũ
             RefreshVisual();
+        }
+
+        private void Update()
+        {
+            if (!useInspectRotation) return;
+            if (!_isInspecting) return;
+            if (borderImage == null) return;
+
+            float z = Time.unscaledTime * inspectRotateSpeed;
+            borderImage.rectTransform.localRotation = _borderBaseRot * Quaternion.Euler(0f, 0f, z);
         }
 
         public void RefreshVisual()
@@ -104,7 +139,7 @@ namespace IronIvy.UI
 
             bool isUnlocked = ArchiveManager.Instance.IsNodeUnlocked(Data.id);
 
-            // ✅ NEW RULE: costToUnlock là Required Progress Percent (%)
+            // costToUnlock được dùng như Required Progress Percent (%)
             float requiredPercent = Mathf.Clamp(Data.costToUnlock, 0f, 100f);
             float currentPercent = ArchiveManager.Instance.CurrentPercent100;
 
@@ -144,7 +179,7 @@ namespace IronIvy.UI
 
                 if (lockOverlay) lockOverlay.SetActive(true);
 
-                // vẫn cho click để xem mô tả (unlock bị chặn ở panel + manager)
+                // vẫn cho click để xem mô tả
                 if (btnSelect != null) btnSelect.interactable = true;
                 return;
             }
@@ -159,6 +194,9 @@ namespace IronIvy.UI
                 if (btnSelect != null) btnSelect.interactable = true;
                 return;
             }
+
+            // NOT enough progress/energy: làm mờ cả node
+            SetWholeNodeAlpha(unaffordableAlpha);
 
             if (borderImage) borderImage.color = lockedColor;
             if (iconImage && iconImage.enabled) iconImage.color = new Color(0.3f, 0.3f, 0.3f, 1f);
@@ -188,7 +226,37 @@ namespace IronIvy.UI
         private void OnNodeClicked()
         {
             if (_parentPanel != null && Data != null)
+            {
+                AudioManager.Instance?.PlayInterfaceSE();
+
+                // giữ logic select cũ
                 _parentPanel.SelectNode(Data);
+
+                // chỉ thêm “inspect rotate”
+                SetAsInspectNode();
+            }
+        }
+
+        private void SetAsInspectNode()
+        {
+            if (_currentInspectNode != null && _currentInspectNode != this)
+                _currentInspectNode.StopInspect();
+
+            _currentInspectNode = this;
+            StartInspect();
+        }
+
+        private void StartInspect()
+        {
+            _isInspecting = true;
+        }
+
+        private void StopInspect()
+        {
+            _isInspecting = false;
+
+            if (borderImage != null)
+                borderImage.rectTransform.localRotation = _borderBaseRot;
         }
 
         private void HandleNodeUnlocked(string id)

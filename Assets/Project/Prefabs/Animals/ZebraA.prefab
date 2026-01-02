@@ -1069,6 +1069,8 @@ MonoBehaviour:
   disableTriggerColliderWhileInteracting: 1
   interactionTriggerCollider: {fileID: 0}
   interactCooldown: 0.25
+  autoResetSeconds: 3
+  reEnableDelaySeconds: 0.25
   debugLog: 0
 --- !u!65 &-4931803059700262855
 BoxCollider:
@@ -1293,6 +1295,7 @@ GameObject:
   m_Component:
   - component: {fileID: 299826717206986286}
   - component: {fileID: 6799837579896221277}
+  - component: {fileID: 4434411074823295389}
   m_Layer: 0
   m_Name: Zebra
   m_TagString: Untagged
@@ -1339,6 +1342,27 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!65 &4434411074823295389
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5247646626966580920}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.16, y: 0.15, z: 0.25}
+  m_Center: {x: 0, y: 0.09, z: 0.05}
 --- !u!1 &5773841486360764194
 GameObject:
   m_ObjectHideFlags: 0

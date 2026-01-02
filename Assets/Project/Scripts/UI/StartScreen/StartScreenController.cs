@@ -12,6 +12,9 @@ namespace IronIvy.Core
 
         public void OnClickStart()
         {
+            if (AudioManager.HasInstance)
+                AudioManager.Instance.PlayInterfaceSE();
+
             if (startScreenPanel != null)
                 startScreenPanel.SetActive(false);
 
@@ -24,11 +27,17 @@ namespace IronIvy.Core
 
         public void OnClickOptions()
         {
-            Debug.Log("Options clicked (chưa làm menu options).");
+            if (AudioManager.HasInstance)
+                AudioManager.Instance.PlayInterfaceSE();
+
+            Debug.Log("Options clicked.");
         }
 
         public void OnClickQuit()
         {
+            if (AudioManager.HasInstance)
+                AudioManager.Instance.PlayInterfaceSE();
+
             Debug.Log("Quit clicked.");
             Application.Quit();
         }

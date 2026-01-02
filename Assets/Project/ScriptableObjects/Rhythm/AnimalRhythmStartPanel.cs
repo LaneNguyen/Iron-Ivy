@@ -17,9 +17,15 @@ namespace IronIvy.UI
         public void Show()
         {
             if (panelRoot != null)
+            {
                 panelRoot.SetActive(true);
+                AudioManager.Instance?.PlayOpenPanelSE();
+            }
             else
+            {
                 gameObject.SetActive(true);
+                AudioManager.Instance?.PlayOpenPanelSE();
+            }
         }
 
         public void Hide()

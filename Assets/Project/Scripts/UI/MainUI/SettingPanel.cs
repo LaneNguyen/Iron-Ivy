@@ -1,6 +1,6 @@
+using IronIvy.Core;
 using UnityEngine;
 using UnityEngine.UI;
-using IronIvy.Core;
 
 public class SettingPanel : MonoBehaviour
 {
@@ -122,7 +122,7 @@ public class SettingPanel : MonoBehaviour
     {
         isBGMMute = v;
         if (!AudioManager.HasInstance) return;
-
+        AudioManager.Instance.PlayInterfaceSE();
         AudioManager.Instance.MuteBGM(isBGMMute);
     }
 
@@ -130,30 +130,31 @@ public class SettingPanel : MonoBehaviour
     {
         isSEMute = v;
         if (!AudioManager.HasInstance) return;
-
+        AudioManager.Instance.PlayInterfaceSE();
         AudioManager.Instance.MuteSE(isSEMute);
     }
 
     // giữ lại cho UI cũ nếu panel của bạn vẫn có nút "Apply"
     // nhưng thực tế đã apply realtime rồi
-   public void OnSubmitButtonClick()
-{
-    if (AudioManager.HasInstance)
+    public void OnSubmitButtonClick()
     {
-        AudioManager.Instance.ChangeBGMVolume(bgmValue);
-        AudioManager.Instance.ChangeSEVolume(seValue);
-        AudioManager.Instance.MuteBGM(isBGMMute);
-        AudioManager.Instance.MuteSE(isSEMute);
+        if (AudioManager.HasInstance)
+        {
+            AudioManager.Instance.PlayInterfaceSE();
+            AudioManager.Instance.ChangeBGMVolume(bgmValue);
+            AudioManager.Instance.ChangeSEVolume(seValue);
+            AudioManager.Instance.MuteBGM(isBGMMute);
+            AudioManager.Instance.MuteSE(isSEMute);
+        }
+
+        if (UIManager.HasInstance) UIManager.Instance.CloseSettings();
+        else gameObject.SetActive(false);
     }
 
-    if (UIManager.HasInstance) UIManager.Instance.CloseSettings();
-    else gameObject.SetActive(false);
-}
-
-public void OnCloseButtonClick()
-{
-    if (UIManager.HasInstance) UIManager.Instance.CloseSettings();
-    else gameObject.SetActive(false);
-}
+    public void OnCloseButtonClick()
+    {
+        if (UIManager.HasInstance) UIManager.Instance.CloseSettings();
+        else gameObject.SetActive(false);
+    }
 
 }

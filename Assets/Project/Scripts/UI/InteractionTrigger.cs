@@ -119,6 +119,10 @@ namespace IronIvy.Gameplay.Interaction
                 _nextAllowedTime = Time.time + interactCooldown;
                 _isInteracting = true;
 
+                // ===== UI/UX Interface SE (NEW) =====
+                if (AudioManager.HasInstance)
+                    AudioManager.Instance.PlayInterfaceSE();
+
                 if (interactPrompt)
                     interactPrompt.SetActive(false);
 

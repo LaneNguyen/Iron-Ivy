@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -32,6 +32,16 @@ public class AudioManager : BaseManager<AudioManager>
 
     [Header("Default BGM Settings")]
     public string defaultBGMName;
+
+    [Header("UI SE Settings")]
+    [Tooltip("Optional override UI interface SE name. If empty, fallback to default (InterfaceSound).")]
+    public string interfaceSEName = "InterfaceSound";
+    private const string DEFAULT_UI_SE_NAME = "InterfaceSound";
+
+    [Header("UI Panel SE Settings")]
+    [Tooltip("SE phát khi mở bất kỳ panel UI nào.")]
+    public string openPanelSEName = "PanelOpen";
+    private const string DEFAULT_OPEN_PANEL_SE_NAME = "PanelOpen";
 
     private Dictionary<string, AudioClip> bgmDic;
     private Dictionary<string, AudioClip> seDic;
@@ -243,6 +253,19 @@ public class AudioManager : BaseManager<AudioManager>
         float baseVolume = (AttachSESource != null) ? AttachSESource.volume : 1f;
         float finalVolume = Mathf.Clamp01(baseVolume * volumeScale);
         AudioSource.PlayClipAtPoint(clip, position, finalVolume);
+    }
+
+    public void PlayInterfaceSE(float delay = 0.0f)
+    {
+        string seName = string.IsNullOrEmpty(interfaceSEName) ? DEFAULT_UI_SE_NAME : interfaceSEName;
+        PlaySE(seName, delay);
+    }
+
+    // NEW: play SE when opening any UI panel
+    public void PlayOpenPanelSE(float delay = 0.0f)
+    {
+        string seName = string.IsNullOrEmpty(openPanelSEName) ? DEFAULT_OPEN_PANEL_SE_NAME : openPanelSEName;
+        PlaySE(seName, delay);
     }
 
     public void ChangeBGMVolume(float volume)

@@ -12,11 +12,9 @@ namespace IronIvy.Core
         [SerializeField] private int sortingOrderOverride = 5000;
 
         [Header("Marking")]
-        [Tooltip("Nếu false: CompleteAndClose sẽ KHÔNG MarkShown (dùng cho guide repeatable).")]
         [SerializeField] private bool allowMarking = true;
 
         [Header("Testing")]
-        [Tooltip("Trong UNITY_EDITOR: nếu true thì CompleteAndClose sẽ KHÔNG MarkShown.")]
         [SerializeField] private bool disableMarkInEditor = true;
 
         [Header("UI Behavior")]
@@ -24,13 +22,16 @@ namespace IronIvy.Core
         public bool overrideCanvasSorting = true;
         public bool enforceCanvasGroupBlockRaycast = true;
 
+        [Header("IMPORTANT: Guide animation should NOT freeze when game is paused")]
+        [Tooltip("Nếu true: tự chuyển Animator/Particle trong guide sang UnscaledTime để vẫn chạy khi Time.timeScale = 0.")]
+        public bool useUnscaledTimeForGuide = true;
+
         [Header("Hooks (optional)")]
         public UnityEvent onOpened;
         public UnityEvent onClosed;
 
         private bool _didPause = false;
 
-        // Setup cũ (giữ tương thích)
         public void Setup(string id, bool pause, bool forceTop, int orderOverride, bool disableMarkInEditorFlag)
         {
             stepId = id;
@@ -39,10 +40,9 @@ namespace IronIvy.Core
             sortingOrderOverride = orderOverride;
             disableMarkInEditor = disableMarkInEditorFlag;
 
-            allowMarking = true; // setup kiểu "once" mặc định cho phép mark
+            allowMarking = true;
         }
 
-        // NEW: dùng cho Repeatable trigger (không mark)
         public void SetupRepeatable(string id, bool pause, bool forceTop, int orderOverride)
         {
             stepId = id;
@@ -50,12 +50,12 @@ namespace IronIvy.Core
             forceShowOnTop = forceTop;
             sortingOrderOverride = orderOverride;
 
-            allowMarking = false; // quan trọng
-            // Editor flag không cần thiết nữa vì đã chặn bằng allowMarking
+            allowMarking = false;
         }
 
         private void OnEnable()
         {
+            // 1) Đảm bảo guide luôn on top
             if (forceShowOnTop && bringToFrontOnEnable)
                 transform.SetAsLastSibling();
 
@@ -79,6 +79,11 @@ namespace IronIvy.Core
                 }
             }
 
+            // 2) NEW: Guide UI vẫn chạy dù pause game
+            if (useUnscaledTimeForGuide)
+                ApplyUnscaledTimeToGuide();
+
+            // 3) Pause world/gameplay (Time.timeScale = 0)
             if (pauseGameWhenShow && GuidePanelManager.HasInstance)
             {
                 GuidePanelManager.Instance.PauseGame();
@@ -118,6 +123,25 @@ namespace IronIvy.Core
             }
 
             gameObject.SetActive(false);
+        }
+
+        private void ApplyUnscaledTimeToGuide()
+        {
+            // Animator: UnscaledTime để animation UI không bị đứng hình khi timeScale=0
+            var animators = GetComponentsInChildren<Animator>(true);
+            for (int i = 0; i < animators.Length; i++)
+            {
+                // Chỉ đổi nếu animator đang bật
+                animators[i].updateMode = AnimatorUpdateMode.UnscaledTime;
+            }
+
+            // ParticleSystem: dùng unscaled time nếu có VFX
+            var particles = GetComponentsInChildren<ParticleSystem>(true);
+            for (int i = 0; i < particles.Length; i++)
+            {
+                var main = particles[i].main;
+                main.useUnscaledTime = true;
+            }
         }
     }
 }

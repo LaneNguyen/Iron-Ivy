@@ -1,18 +1,18 @@
-using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
 using System.Collections;
 using System.Collections.Generic;
 using IronIvy.Core;
 using IronIvy.Data;
+using TMPro;
+using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace IronIvy.UI
 {
     public class ArchivePanel : MonoBehaviour, IPointerClickHandler
     {
         [Header("Container (Manual Placement)")]
-        public RectTransform nodesContainer; // chứa các ArchiveNodeUI mà Lane tự đặt tay
+        public RectTransform nodesContainer; // chứa các ArchiveNodeUI
         public RectTransform zoomContent;    // Content để zoom/pan (background + nodes). Nếu null sẽ dùng nodesContainer
 
         [Header("Detail Section")]
@@ -72,7 +72,7 @@ namespace IronIvy.UI
 
             // Node sẽ tự có definition sẵn, nhưng panel cần gắn lại ref & callback
             if (node.Data != null)
-    node.Setup(node.Data, this);
+                node.Setup(node.Data, this);
 
             PrepareNodeHidden(node);
         }
@@ -85,6 +85,7 @@ namespace IronIvy.UI
 
         public void Show()
         {
+            AudioManager.Instance?.PlayOpenPanelSE();
             gameObject.SetActive(true);
 
             StopNodeReveal();
@@ -107,6 +108,7 @@ namespace IronIvy.UI
 
         private void OnCloseClicked()
         {
+            AudioManager.Instance?.PlayInterfaceSE();
             if (UIManager.HasInstance)
             {
                 UIManager.Instance.CloseArchiveUI();
@@ -189,14 +191,15 @@ namespace IronIvy.UI
         {
             if (_currentSelection == null) return;
             if (nodesContainer != null)
-{
-    // chỉ refresh các node UI đang active trong tree (nhẹ hơn refresh toàn scene)
-    var nodes = nodesContainer.GetComponentsInChildren<ArchiveNodeUI>(true);
-    for (int i = 0; i < nodes.Length; i++)
-        nodes[i].RefreshVisual();
-}
+            {
+                // chỉ refresh các node UI đang active trong tree (nhẹ hơn refresh toàn scene)
+                var nodes = nodesContainer.GetComponentsInChildren<ArchiveNodeUI>(true);
+                for (int i = 0; i < nodes.Length; i++)
+                    nodes[i].RefreshVisual();
+            }
             if (!ArchiveManager.HasInstance) return;
 
+            AudioManager.Instance?.PlaySE("NodeUnlock", 0);
             ArchiveManager.Instance.UnlockNode(_currentSelection);
 
             UpdateTotalPoints();

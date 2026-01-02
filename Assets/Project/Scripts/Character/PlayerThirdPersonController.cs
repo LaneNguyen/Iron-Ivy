@@ -235,10 +235,10 @@ namespace IronIvy.Gameplay
             _cc.Move(finalMove * Time.deltaTime);
 
             // 7) Animator: dùng logic "tắt cứng" giống Iso
-            UpdateAnimatorTPS(hasMoveInput, raw, targetSpeed);
+            UpdateAnimatorTPS(hasMoveInput, raw, targetSpeed, isRun);
         }
 
-        private void UpdateAnimatorTPS(bool hasMoveInput, Vector2 rawInput, float targetSpeed)
+        private void UpdateAnimatorTPS(bool hasMoveInput, Vector2 rawInput, float targetSpeed, bool isRun)
         {
             if (!_anim) return;
 
@@ -262,6 +262,9 @@ namespace IronIvy.Gameplay
             float side = rawInput.x;
             if (Mathf.Abs(side) < sideDeadZone) side = 0f;
             _anim.SetFloat("Side", side);
+
+            // run: Animator param là Float (0/1)
+            _anim.SetFloat("run", isRun ? 1f : 0f);
         }
 
         private void ForceIdleAnimatorState()
@@ -269,6 +272,7 @@ namespace IronIvy.Gameplay
             if (!_anim) return;
             _anim.SetFloat("Speed", 0f);
             _anim.SetFloat("Side", 0f);
+            _anim.SetFloat("run", 0f);
         }
 
         private void ApplyGravityOnly()

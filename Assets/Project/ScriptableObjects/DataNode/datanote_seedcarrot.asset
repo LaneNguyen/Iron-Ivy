@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: datanote_seedcarrot
   m_EditorClassIdentifier: Assembly-CSharp::IronIvy.Data.ArchiveNodeDefinition
   id: datanote_seedcarrot
-  title: PLANT_CARROT
-  description: "M\u1EDF kh\xF3a k\u1EF9 thu\u1EADt tr\u1ED3ng Carrot"
+  title: "C\u1EE6 C\xC0 R\u1ED0T"
+  description: "M\u1EDF kh\xF3a k\u1EF9 thu\u1EADt tr\u1ED3ng C\xE0 R\u1ED1t."
   icon: {fileID: -2008668290, guid: d08a9b320659e7146beebbd0628da973, type: 3}
-  costToUnlock: 0
+  costToUnlock: 15
   requiredParent: {fileID: 0}
   rewardType: 2
   rewardValue: 1
