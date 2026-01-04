@@ -10,6 +10,7 @@ TagManager:
   - Animal
   - Synty Tree
   - FxTemporaire
+  - Pushable
   layers:
   - Default
   - TransparentFX

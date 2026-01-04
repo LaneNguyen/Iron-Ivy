@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Events;
+using IronIvy.Core;
 
 namespace IronIvy.Core
 {
@@ -105,12 +106,12 @@ namespace IronIvy.Core
         }
 
         public void CloseOnly()
-        {
+        {AudioManager.Instance?.PlayInterfaceSE();
             gameObject.SetActive(false);
         }
 
         public void CompleteAndClose()
-        {
+        { AudioManager.Instance?.PlayInterfaceSE();
             bool allowMark = allowMarking;
 
 #if UNITY_EDITOR

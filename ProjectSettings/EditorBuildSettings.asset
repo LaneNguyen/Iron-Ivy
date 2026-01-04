@@ -7,13 +7,13 @@ EditorBuildSettings:
   m_Scenes:
   - enabled: 1
     path: Assets/Scenes/StartScene.unity
-    guid: 7d963d8f2a0793144a47f267155e2601
+    guid: 54aa34d1f83f5fa478b43285296a18a2
   - enabled: 1
-    path: Assets/Scenes/IvyIsland.unity
+    path: Assets/Scenes/LoadingScene.unity
+    guid: 84c06cf84f4a34f429dc3ac30e811909
+  - enabled: 1
+    path: Assets/Scenes/IvyIslandScene.unity
     guid: 69de494a3ea22c745936f019f1f5f3ae
-  - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
-    guid: 9fc0d4010bbf28b4594072e72b8655ab
   m_configObjects:
     com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}

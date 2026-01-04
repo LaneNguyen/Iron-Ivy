@@ -10,13 +10,19 @@ namespace IronIvy.Core
         const string KEY_ARCHIVE_NODES  = "ironivy.archive.nodes";
         const string KEY_ENERGY_CUR     = "ironivy.energy.cur";
         const string KEY_ENERGY_MAX     = "ironivy.energy.max";
+        
+        // Key cho vị trí Player
+        const string KEY_PLAYER_X       = "ironivy.player.pos.x";
+        const string KEY_PLAYER_Y       = "ironivy.player.pos.y";
+        const string KEY_PLAYER_Z       = "ironivy.player.pos.z";
 
         public bool HasSaveData()
         {
             return PlayerPrefs.HasKey(KEY_ARCHIVE_POINTS)
                 || PlayerPrefs.HasKey(KEY_ARCHIVE_NODES)
                 || PlayerPrefs.HasKey(KEY_ENERGY_MAX)
-                || PlayerPrefs.HasKey(KEY_ENERGY_CUR);
+                || PlayerPrefs.HasKey(KEY_ENERGY_CUR)
+                || PlayerPrefs.HasKey(KEY_PLAYER_X); // Kiểm tra thêm vị trí
         }
 
         public void DeleteSaveData()
@@ -25,9 +31,33 @@ namespace IronIvy.Core
             PlayerPrefs.DeleteKey(KEY_ARCHIVE_NODES);
             PlayerPrefs.DeleteKey(KEY_ENERGY_CUR);
             PlayerPrefs.DeleteKey(KEY_ENERGY_MAX);
+            PlayerPrefs.DeleteKey(KEY_PLAYER_X); // Xóa tọa độ
+            PlayerPrefs.DeleteKey(KEY_PLAYER_Y);
+            PlayerPrefs.DeleteKey(KEY_PLAYER_Z);
             PlayerPrefs.Save();
 
-            Debug.Log("[SaveLoad] Deleted save data (Archive/Energy).");
+            Debug.Log("[SaveLoad] Deleted all save data including position.");
+        }
+
+        // Hàm mới để lưu vị trí Vector3
+        public void SavePlayerPosition(Vector3 position)
+        {
+            PlayerPrefs.SetFloat(KEY_PLAYER_X, position.x);
+            PlayerPrefs.SetFloat(KEY_PLAYER_Y, position.y);
+            PlayerPrefs.SetFloat(KEY_PLAYER_Z, position.z);
+            PlayerPrefs.Save();
+        }
+
+        // Hàm mới để lấy vị trí đã lưu
+        public Vector3 GetSavedPlayerPosition(Vector3 defaultPos)
+        {
+            if (!PlayerPrefs.HasKey(KEY_PLAYER_X)) return defaultPos;
+
+            return new Vector3(
+                PlayerPrefs.GetFloat(KEY_PLAYER_X),
+                PlayerPrefs.GetFloat(KEY_PLAYER_Y),
+                PlayerPrefs.GetFloat(KEY_PLAYER_Z)
+            );
         }
 
         public void SaveGame()
@@ -54,18 +84,14 @@ namespace IronIvy.Core
             PlayerPrefs.Save();
         }
 
-        // treatMissingAsNewGame: nếu chưa có save -> energy full, archive empty
         public void LoadAll(bool treatMissingAsNewGame = true)
         {
             bool hasSave = HasSaveData();
 
-            // 1) Load Archive trước
+            // 1) Load Archive
             if (ArchiveManager.HasInstance)
             {
-                float points = (hasSave)
-                    ? PlayerPrefs.GetFloat(KEY_ARCHIVE_POINTS, 0f)
-                    : 0f;
-
+                float points = (hasSave) ? PlayerPrefs.GetFloat(KEY_ARCHIVE_POINTS, 0f) : 0f;
                 List<string> loadedNodes = new List<string>();
                 string nodesString = (hasSave) ? PlayerPrefs.GetString(KEY_ARCHIVE_NODES, "") : "";
                 if (!string.IsNullOrEmpty(nodesString))
@@ -79,22 +105,12 @@ namespace IronIvy.Core
             {
                 int defaultMax = 6;
                 int savedMax = PlayerPrefs.GetInt(KEY_ENERGY_MAX, defaultMax);
-
                 int savedCur;
+
                 if (!hasSave && treatMissingAsNewGame)
-                {
-                    // New profile / no save: full energy
                     savedCur = savedMax;
-                }
                 else
-                {
-                    // Có save: lấy đúng value (kể cả 0 nếu người chơi thật sự hết energy)
-                    // Nếu key cur không tồn tại thì default = max
-                    if (PlayerPrefs.HasKey(KEY_ENERGY_CUR))
-                        savedCur = PlayerPrefs.GetInt(KEY_ENERGY_CUR, savedMax);
-                    else
-                        savedCur = savedMax;
-                }
+                    savedCur = PlayerPrefs.GetInt(KEY_ENERGY_CUR, savedMax);
 
                 EnergyManager.Instance.SetLoadedData(savedCur, savedMax);
             }

@@ -49,6 +49,29 @@ namespace IronIvy.UI
         public Color correctSelectedColor = new Color(0.2f, 0.9f, 0.35f, 1f);
         public Color wrongSelectedColor = new Color(1f, 0.55f, 0.2f, 1f);
 
+        // =========================================================
+        // NEW: Guide panel show once when open this minigame interaction
+        // =========================================================
+        [Header("Guide - Show Once On First Open")]
+        [Tooltip("Panel guide overlay (có GuidePanelView) sẽ hiện lần đầu mở MinigameInteractionPanel.")]
+        [SerializeField] private GameObject firstOpenGuidePanel;
+
+        [Tooltip("Key lưu PlayerPrefs để biết đã xem guide chưa.")]
+        [SerializeField] private string firstOpenGuideStepId = "guide.minigame.interaction.first_open";
+
+        [Tooltip("Nếu true: pause gameplay khi guide hiện (timeScale=0). Guide UI nên dùng UnscaledTime.")]
+        [SerializeField] private bool pauseGameWhenGuideShown = false;
+
+        [Tooltip("Trong Unity Editor: nếu true thì bỏ qua PlayerPrefs để test (guide luôn hiện).")]
+        [SerializeField] private bool ignorePrefsInEditor = true;
+
+        [Tooltip("Trong Unity Editor: nếu true thì không ghi PlayerPrefs khi complete (để test khỏi mất guide).")]
+        [SerializeField] private bool disableMarkInEditor = true;
+
+        [Tooltip("Sorting order để guide nổi trên mọi thứ.")]
+        [SerializeField] private int guideSortingOrderOverride = 15000;
+
+        private GuidePanelView _activeGuideView;
 
         [Header("Debug")]
         public bool debugLog = true;
@@ -67,8 +90,6 @@ namespace IronIvy.UI
         {
             if (panelRoot != null) panelRoot.SetActive(false);
             if (buffInfoText) buffInfoText.text = "";
-
-
 
             if (playButton != null)
             {
@@ -120,11 +141,18 @@ namespace IronIvy.UI
             if (feedingSectionRoot) feedingSectionRoot.SetActive(true);
             RenderFoodList();
 
-            // NEW: đảm bảo nút Start không bị disabled vĩnh viễn
+            //  đảm bảo nút Start không bị disabled vĩnh viễn
             if (playButton != null)
                 playButton.interactable = true;
 
             _isOpen = true;
+if (cancelButton != null)
+{
+    bool isFirstTime = IsFirstTimeExperience();
+    cancelButton.interactable = !isFirstTime;
+}
+            
+            TryShowFirstOpenGuide();
 
             if (debugLog)
                 Debug.Log("[MinigameInteractionPanel] ShowForAnimal OK");
@@ -168,6 +196,9 @@ namespace IronIvy.UI
             _currentAnimal = null;
             _selectedFood = null;
 
+            // guide view reference clear (đừng auto close ở đây, vì guide có thể muốn tồn tại riêng)
+            _activeGuideView = null;
+
             if (debugLog)
                 Debug.Log("[MinigameInteractionPanel] Hide -> complete sticky");
         }
@@ -194,6 +225,8 @@ namespace IronIvy.UI
 
             _currentAnimal = null;
             _selectedFood = null;
+
+            _activeGuideView = null;
         }
 
         private void RenderFoodList()
@@ -268,7 +301,6 @@ namespace IronIvy.UI
             }
         }
 
-
         private void UpdateSlotHighlights()
         {
             bool hasAnimalDef = (_currentAnimal != null && _currentAnimal.Definition != null);
@@ -312,6 +344,12 @@ namespace IronIvy.UI
                 return;
             }
 
+            //  "qua bước tiếp theo là xong" -> bấm Play thì complete guide luôn
+            CompleteFirstOpenGuideIfOpen();
+            // bật lại cancel cho các lần sau
+if (cancelButton != null)
+    cancelButton.interactable = true;
+
             if (debugLog)
                 Debug.Log("[MinigameInteractionPanel] OnPlayButton -> RequestStartAnimalRhythm");
             AudioManager.Instance?.PlayInterfaceSE();
@@ -326,5 +364,44 @@ namespace IronIvy.UI
             if (UIManager.HasInstance)
                 UIManager.Instance.CloseAllPopups();
         }
+
+        // =========================================================
+        // Guide helpers
+        // =========================================================
+        private void TryShowFirstOpenGuide()
+        {
+            if (firstOpenGuidePanel == null) return;
+            if (!GuidePanelManager.HasInstance) return;
+
+            // đang mở rồi thì thôi
+            if (_activeGuideView != null && _activeGuideView.gameObject.activeSelf)
+                return;
+
+            _activeGuideView = GuidePanelManager.Instance.ShowPanelIfNotComplete(
+                firstOpenGuideStepId,
+                firstOpenGuidePanel,
+                pauseGameWhenGuideShown,
+                true,
+                guideSortingOrderOverride,
+                ignorePrefsInEditor,
+                disableMarkInEditor
+            );
+        }
+
+        private void CompleteFirstOpenGuideIfOpen()
+        {
+            if (_activeGuideView == null) return;
+            if (!_activeGuideView.gameObject.activeSelf) return;
+
+            _activeGuideView.CompleteAndClose();
+            _activeGuideView = null;
+        }
+
+        private bool IsFirstTimeExperience()
+{
+    if (!GuidePanelManager.HasInstance) return false;
+    return !GuidePanelManager.Instance.HasShown(firstOpenGuideStepId);
+}
+
     }
 }
