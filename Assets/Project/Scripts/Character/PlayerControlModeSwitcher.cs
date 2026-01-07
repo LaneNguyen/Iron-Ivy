@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using Unity.Cinemachine;
 using IronIvy.Systems.Camera;
-using IronIvy.Gameplay;
 
 namespace IronIvy.Gameplay
 {
@@ -9,10 +8,9 @@ namespace IronIvy.Gameplay
     // - iso controller: topdown / isometric
     // - tps controller: third person + pivot orbit
     //
-    // lưu ý:
-    // - TPS luôn enable component => LateUpdate chạy để pivot follow player
-    // - bật/tắt input TPS thì để CameraManager + PlayerThirdPersonController lo
-    //   (qua autoEnableByCamera + OnCameraChanged)
+    // cinematic-safe:
+    // - KHÔNG auto switch camera trong Start() nếu đang intro lock
+    // - chỉ bắt đầu setup mode khi InputLock(false) (Enter Gameplay)
     public class PlayerControlModeSwitcher : MonoBehaviour
     {
         [Header("Controllers")]
@@ -42,6 +40,12 @@ namespace IronIvy.Gameplay
         // state hiện tại
         private bool isIsoMode = true;
 
+        // opening intro lock (event-driven)
+        private bool _inputLocked = false;
+
+        // để đảm bảo init chỉ chạy 1 lần khi unlock
+        private bool _didInitialApply = false;
+
         private void Awake()
         {
             // đảm bảo TPS controller luôn bật component
@@ -50,16 +54,33 @@ namespace IronIvy.Gameplay
                 tpsController.enabled = true;
         }
 
+        private void OnEnable()
+        {
+            if (IronIvy.Core.ListenManager.HasInstance)
+                IronIvy.Core.ListenManager.Instance.OnInputLockRequested += HandleInputLockRequested;
+        }
+
+        private void OnDisable()
+        {
+            if (IronIvy.Core.ListenManager.HasInstance)
+                IronIvy.Core.ListenManager.Instance.OnInputLockRequested -= HandleInputLockRequested;
+        }
+
         private void Start()
         {
-            if (startWithIso)
-                SwitchToIso();
-            else
-                SwitchToTps();
+            // BEFORE: auto SwitchToIso/Tps ngay ở Start -> gây flash camera
+            // NOW: chỉ apply ngay nếu không locked, còn locked thì đợi unlock.
+            if (!_inputLocked)
+            {
+                ApplyInitialModeOnce();
+            }
         }
 
         private void Update()
         {
+            // cinematic lock: không cho đổi mode khi đang intro
+            if (_inputLocked) return;
+
             // demo: nhấn Tab để test nhanh
             if (Input.GetKeyDown(KeyCode.Tab))
             {
@@ -68,6 +89,31 @@ namespace IronIvy.Gameplay
                 else
                     SwitchToIso();
             }
+        }
+
+        private void HandleInputLockRequested(bool locked)
+        {
+            _inputLocked = locked;
+
+            // Khi unlock lần đầu -> apply mode startup
+            if (!locked)
+            {
+                ApplyInitialModeOnce();
+            }
+        }
+
+        private void ApplyInitialModeOnce()
+        {
+            if (_didInitialApply) return;
+            _didInitialApply = true;
+
+            if (startWithIso)
+                SwitchToIso();
+            else
+                SwitchToTps();
+
+            if (logDebug)
+                Debug.Log("[PlayerControlModeSwitcher] initial mode applied after unlock");
         }
 
         public void SwitchToIso()

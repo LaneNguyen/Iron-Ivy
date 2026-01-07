@@ -70,8 +70,30 @@ namespace IronIvy.Core
 
         private float _nextAllowedSETime = 0f;
 
-        private void Start()
+        private void OnEnable()
         {
+            if (!ListenManager.HasInstance) return;
+
+            // IMPORTANT: Cinematic flow gate
+            // Chỉ được show guide khi intro kết thúc và gameplay unlock input.
+            // IntroFlow sẽ RaiseInputLockRequested(false) ở bước Enter Gameplay.
+            ListenManager.Instance.OnInputLockRequested += HandleInputLockRequested;
+        }
+
+        private void OnDisable()
+        {
+            if (!ListenManager.HasInstance) return;
+
+            // FIX BUG: OnDisable phải unsubscribe, không được +=
+            ListenManager.Instance.OnInputLockRequested -= HandleInputLockRequested;
+        }
+
+        private void HandleInputLockRequested(bool locked)
+        {
+            // locked == true: đang intro / đang khoá input => KHÔNG show
+            if (locked) return;
+
+            // locked == false: Enter Gameplay => giờ mới được show guide
             TryShow();
         }
 
@@ -112,7 +134,6 @@ namespace IronIvy.Core
                 MarkDoneRmb();
             }
 
-
             // 3) Auto complete when all required actions done
             TryAutoComplete();
         }
@@ -121,6 +142,9 @@ namespace IronIvy.Core
         {
             if (guidePanel == null) return;
             if (!GuidePanelManager.HasInstance) return;
+
+            // Nếu panel đang mở rồi thì thôi (tránh event gọi lại 2 lần)
+            if (_activeView != null && _activeView.gameObject.activeSelf) return;
 
             ResetRuntimeState();
             ShowAllIcons();

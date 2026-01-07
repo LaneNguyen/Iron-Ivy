@@ -75,6 +75,10 @@ namespace IronIvy.Core
                 ListenManager.Instance.OnRhythmPlantResult += HandlePlantRhythmResult;
                 ListenManager.Instance.OnRhythmAnimalResult += HandleAnimalRhythmResult;
                 ListenManager.Instance.OnArchiveOpenRequested += HandleArchiveOpenRequested;
+
+                // Opening intro event-driven
+                ListenManager.Instance.OnGameplayHUDVisibleRequested += HandleGameplayHUDVisibleRequested;
+                ListenManager.Instance.OnMinimapVisibleRequested += HandleMinimapVisibleRequested;
             }
         }
 
@@ -85,6 +89,9 @@ namespace IronIvy.Core
                 ListenManager.Instance.OnRhythmPlantResult -= HandlePlantRhythmResult;
                 ListenManager.Instance.OnRhythmAnimalResult -= HandleAnimalRhythmResult;
                 ListenManager.Instance.OnArchiveOpenRequested -= HandleArchiveOpenRequested;
+
+                ListenManager.Instance.OnGameplayHUDVisibleRequested -= HandleGameplayHUDVisibleRequested;
+                ListenManager.Instance.OnMinimapVisibleRequested -= HandleMinimapVisibleRequested;
             }
         }
 
@@ -114,6 +121,17 @@ namespace IronIvy.Core
         {
             // Khi nhận event từ ListenManager, cũng thực hiện mở kèm hiệu ứng fade
             OpenArchiveUI();
+        }
+
+        private void HandleGameplayHUDVisibleRequested(bool visible)
+        {
+            if (visible) ShowMainHUD();
+            else HideMainHUD();
+        }
+
+        private void HandleMinimapVisibleRequested(bool visible)
+        {
+            SetMinimapVisible(visible);
         }
 
         private void EnsureMinigameRefs()
@@ -261,7 +279,6 @@ namespace IronIvy.Core
             if (notify.plantRewardPanel != null) notify.plantRewardPanel.Hide();
             if (notify.animalRewardPanel != null) notify.animalRewardPanel.gameObject.SetActive(false);
 
-            // Nếu có ArchivePanel đang mở thì ẩn luôn (tùy thuộc vào cấu trúc ArchivePanel.Show/Hide của bạn)
             if (archivePanel != null) archivePanel.gameObject.SetActive(false);
 
             ShowMainHUD();

@@ -19,7 +19,7 @@ MonoBehaviour:
   cameraOrbitHeight: 8
   cameraLookAtHeight: 0.8
   cameraOrbitRotateSpeed: 0
-  animalOrbitDistance: 2.8
+  animalOrbitDistance: 3.5
   animalOrbitPitch: 25
   animalOrbitYaw: 30
   animalOrbitHeight: 1.2
@@ -28,7 +28,7 @@ MonoBehaviour:
   buffTrustMultiplier: 3
   hasFavoriteBuff: 1
   buffSafetyNet: 3
-  dropItem: {fileID: 0}
+  dropItem: {fileID: 11400000, guid: 7dd2cd018801fe04faf983f4df6dc903, type: 2}
   dropCount: 1
   doubleLootOnBuff: 1
   rewardItem: {fileID: 0}
@@ -44,7 +44,6 @@ MonoBehaviour:
   wanderRadius: 6
   minIdleTime: 2
   maxIdleTime: 4
-  isNocturnal: 0
   curiousRadius: 10
   curiousChancePerCheck: 0.2
   curiousMinDuration: 2
@@ -64,9 +63,6 @@ MonoBehaviour:
   minRandomFragments: 2
   maxRandomFragments: 6
   playlist: []
-  goodAnim: Good
-  badAnim: Bad
-  iv17Reactions: []
   reactionVisuals:
     neutral: {fileID: 0}
     sad: {fileID: 0}

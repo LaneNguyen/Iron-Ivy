@@ -9,6 +9,30 @@ namespace IronIvy.Core
     public class ListenManager : BaseManager<ListenManager>
     {
         // =========================
+        // OPENING INTRO (EVENT-DRIVEN)
+        // =========================
+        public event Action OnGameSceneEntered;
+
+        public event Action OnTimelineCanvasShowRequested;
+        public event Action OnTimelineCanvasHideRequested;
+
+        public event Action<bool> OnInputLockRequested;
+        public event Action<bool> OnGameplayHUDVisibleRequested;
+        public event Action<bool> OnMinimapVisibleRequested;
+
+        public event Action<CameraSwitchRequestPayload> OnCameraSwitchRequested;
+
+        public event Action OnIntroSkipRequested;
+
+        // ===== NEW: signal để Bootstrapper biết timeline đã thật sự Play() =====
+        // Dùng để giữ screen đen cho tới khi cutscene bắt đầu, tránh flash camera.
+        public event Action OnIntroTimelineStarted;
+
+        // ===== Master signal khi đã Enter Gameplay =====
+        // Không thay thế InputLock(false), chỉ là signal "tui confirm đã vào gameplay".
+        public event Action OnGameplayBegin;
+
+        // =========================
         // SYSTEM / CORE EVENTS
         // =========================
         public event Action<int> OnEnergyChanged;
@@ -16,6 +40,16 @@ namespace IronIvy.Core
 
         public event Action OnMinigameStarted;
         public event Action OnMinigameStopped;
+
+        // ===== NEW: Minigame context (để UI biết đang Plant hay Animal, tránh lẫn icon) =====
+        public enum MinigameContext
+        {
+            None = 0,
+            Plant = 1,
+            Animal = 2
+        }
+
+        public event Action<MinigameContext> OnMinigameContextChanged;
 
         public event Action OnDayEnded;
         public event Action OnTrustSuccess;
@@ -30,9 +64,43 @@ namespace IronIvy.Core
         public void RaiseArchiveChanged(float value) => OnArchiveChanged?.Invoke(value);
         public void RaiseMinigameStarted() => OnMinigameStarted?.Invoke();
         public void RaiseMinigameStopped() => OnMinigameStopped?.Invoke();
+
+        public void RaiseMinigameContextChanged(MinigameContext context)
+        {
+            OnMinigameContextChanged?.Invoke(context);
+        }
+
         public void RaiseDayEnded() => OnDayEnded?.Invoke();
         public void RaiseTrustSuccess() => OnTrustSuccess?.Invoke();
         public void RaiseInventoryChanged() => OnInventoryChanged?.Invoke();
+
+        // =========================
+        // OPENING INTRO - RAISE HELPERS
+        // =========================
+        public void RaiseGameSceneEntered() => OnGameSceneEntered?.Invoke();
+
+        public void RaiseTimelineCanvasShowRequested() => OnTimelineCanvasShowRequested?.Invoke();
+        public void RaiseTimelineCanvasHideRequested() => OnTimelineCanvasHideRequested?.Invoke();
+
+        public void RaiseInputLockRequested(bool locked) => OnInputLockRequested?.Invoke(locked);
+        public void RaiseGameplayHUDVisibleRequested(bool visible) => OnGameplayHUDVisibleRequested?.Invoke(visible);
+        public void RaiseMinimapVisibleRequested(bool visible) => OnMinimapVisibleRequested?.Invoke(visible);
+
+        public void RaiseCameraSwitchRequested(CameraSwitchRequestPayload payload) => OnCameraSwitchRequested?.Invoke(payload);
+
+        public void RaiseIntroSkipRequested() => OnIntroSkipRequested?.Invoke();
+
+        // ===== NEW: intro timeline started =====
+        public void RaiseIntroTimelineStarted()
+        {
+            OnIntroTimelineStarted?.Invoke();
+        }
+
+        // ===== gameplay begin =====
+        public void RaiseGameplayBegin()
+        {
+            OnGameplayBegin?.Invoke();
+        }
 
         public void RaiseSystemsReady()
         {
@@ -74,6 +142,19 @@ namespace IronIvy.Core
         // =========================
         // PAYLOAD TYPES
         // =========================
+
+        [Serializable]
+        public class CameraSwitchRequestPayload
+        {
+            public string cameraId;
+            public bool pushHistory;
+
+            public CameraSwitchRequestPayload(string cameraId, bool pushHistory)
+            {
+                this.cameraId = cameraId;
+                this.pushHistory = pushHistory;
+            }
+        }
 
         [Serializable]
         public class RhythmHUDShowPayload

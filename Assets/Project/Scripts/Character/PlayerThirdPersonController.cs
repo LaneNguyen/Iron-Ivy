@@ -1,4 +1,5 @@
-﻿using IronIvy.Systems.Camera;
+﻿using IronIvy.Core;
+using IronIvy.Systems.Camera;
 using Unity.Cinemachine;
 using UnityEngine;
 
@@ -67,11 +68,14 @@ namespace IronIvy.Gameplay
         private Vector3 _smoothDampVelocity;    // ref cho SmoothDamp
 
         [SerializeField, Tooltip("Debug: Check xem controller có đang active không")]
-        private bool isTPSActive = true;
+        private bool isTPSActive = false; // IMPORTANT: default false để không “đè” intro establish
 
         private IsoPlayerController _isoController;
 
         private float _activationTimer = 0f;
+
+        // Opening intro lock (event-driven)
+        private bool _inputLocked;
 
         private void Awake()
         {
@@ -94,6 +98,12 @@ namespace IronIvy.Gameplay
                 CameraManager.Instance.OnCameraChanged += OnCameraChanged;
             }
 
+            if (ListenManager.HasInstance)
+            {
+                ListenManager.Instance.OnInputLockRequested += HandleInputLockRequested;
+                ListenManager.Instance.OnGameplayBegin += HandleGameplayBegin;
+            }
+
             if (_isoController != null)
             {
                 _isoController.enabled = !isTPSActive;
@@ -104,6 +114,9 @@ namespace IronIvy.Gameplay
                 _activationTimer = activationGraceTime;
                 ForceIdleAnimatorState();
             }
+
+            // Sync ngay lần đầu (nếu gameplay start thẳng không qua intro)
+            SyncTPSFromCurrentCamera(allowWhileLocked: false);
         }
 
         private void OnDestroy()
@@ -112,10 +125,24 @@ namespace IronIvy.Gameplay
             {
                 CameraManager.Instance.OnCameraChanged -= OnCameraChanged;
             }
+
+            if (ListenManager.HasInstance)
+            {
+                ListenManager.Instance.OnInputLockRequested -= HandleInputLockRequested;
+                ListenManager.Instance.OnGameplayBegin -= HandleGameplayBegin;
+            }
         }
 
         private void Update()
         {
+            // Nếu đang bị lock input (opening timeline), đứng yên + vẫn rơi do gravity.
+            if (_inputLocked)
+            {
+                ForceIdleAnimatorState();
+                ApplyGravityOnly();
+                return;
+            }
+
             if (isTPSActive)
             {
                 if (_activationTimer > 0f)
@@ -136,6 +163,43 @@ namespace IronIvy.Gameplay
                     ApplyGravityOnly();
                 }
             }
+        }
+
+        private void HandleInputLockRequested(bool locked)
+        {
+            _inputLocked = locked;
+
+            if (locked)
+            {
+                _currentVelocity = Vector3.zero;
+                _smoothDampVelocity = Vector3.zero;
+                ForceIdleAnimatorState();
+                return;
+            }
+
+            // IMPORTANT: vừa unlock xong, sync TPS theo camera hiện tại
+            // Vì camera có thể đã switch sang GameCam trong lúc còn lock.
+            SyncTPSFromCurrentCamera(allowWhileLocked: false);
+        }
+
+        private void HandleGameplayBegin()
+        {
+            // Gameplay bắt đầu: sync lần nữa cho chắc.
+            SyncTPSFromCurrentCamera(allowWhileLocked: false);
+        }
+
+        private void SyncTPSFromCurrentCamera(bool allowWhileLocked)
+        {
+            if (!autoEnableByCamera) return;
+            if (thirdPersonCamRef == null) return;
+
+            if (!allowWhileLocked && _inputLocked) return;
+
+            if (!CameraManager.HasInstance) return;
+
+            var cur = CameraManager.Instance.CurrentCamera;
+            bool shouldBeTPS = (cur == thirdPersonCamRef);
+            SetTPSActive(shouldBeTPS);
         }
 
         private void HandleCameraInput()
@@ -242,28 +306,23 @@ namespace IronIvy.Gameplay
         {
             if (!_anim) return;
 
-            // Dùng velocity do mình điều khiển, KHÔNG dùng _cc.velocity (hay dư chấn)
             float speedFlat = new Vector3(_currentVelocity.x, 0f, _currentVelocity.z).magnitude;
 
             bool isIdleByTarget = targetSpeed <= 0.01f || !hasMoveInput;
             bool isIdleByVelocity = speedFlat < idleVelocityThreshold;
 
-            // HARD IDLE: giống Iso
             if (isIdleByTarget || isIdleByVelocity)
             {
                 ForceIdleAnimatorState();
                 return;
             }
 
-            // Speed: set theo speedFlat
             _anim.SetFloat("Speed", speedFlat);
 
-            // Side: lấy từ input X, có deadzone riêng
             float side = rawInput.x;
             if (Mathf.Abs(side) < sideDeadZone) side = 0f;
             _anim.SetFloat("Side", side);
 
-            // run: Animator param là Float (0/1)
             _anim.SetFloat("run", isRun ? 1f : 0f);
         }
 
@@ -289,6 +348,10 @@ namespace IronIvy.Gameplay
         {
             if (!autoEnableByCamera) return;
             if (thirdPersonCamRef == null) return;
+
+            // Trong intro lock, camera có thể switch nhưng player không được phép bật TPS.
+            // Việc sync sẽ xảy ra khi unlock / GameplayBegin.
+            if (_inputLocked) return;
 
             bool isMyCamera = (newCam == thirdPersonCamRef);
             SetTPSActive(isMyCamera);
