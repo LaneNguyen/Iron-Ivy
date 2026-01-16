@@ -11,7 +11,7 @@ public class AudioManager : BaseManager<AudioManager>
     private const string BGM_VOLUME_KEY = "BGM_VOLUME_KEY";
     private const string SE_VOLUME_KEY = "SE_VOLUME_KEY";
     private const float BGM_VOLUME_DEFAULT = 0.5f;
-    private const float SE_VOLUME_DEFAULT = 0.5f;
+    private const float SE_VOLUME_DEFAULT = 0.3f;
 
     private const string BGM_MUTE_KEY = "BGM_MUTE_KEY";
     private const string SE_MUTE_KEY = "SE_MUTE_KEY";

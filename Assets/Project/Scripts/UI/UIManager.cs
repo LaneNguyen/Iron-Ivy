@@ -7,6 +7,8 @@ using IronIvy.Gameplay.Interaction;
 using IronIvy.Gameplay.Rhythm;
 using IronIvy.UI;
 using UnityEngine;
+using UnityEngine.Playables;
+using UnityEngine.SceneManagement;
 
 namespace IronIvy.Core
 {
@@ -29,8 +31,6 @@ namespace IronIvy.Core
             public PlantRhythmRewardPanel plantRewardPanel;
             public AnimalRhythmRewardPanel animalRewardPanel;
 
-            // NEW: Minimap nằm trong Notify group
-            // Gợi ý: drag "MinimapRoot" (GameObject) vào đây trong Inspector
             public GameObject minimapRoot;
         }
 
@@ -46,26 +46,63 @@ namespace IronIvy.Core
         [SerializeField] private float fadeInTime = 0.18f;
         [SerializeField] private float holdBlack = 0.05f;
 
+        [Header("Ending Timeline (ScreenFader -> Hide UI -> Play Timeline)")]
+        [SerializeField] private float holdBlackBeforePlayTimeline = 0.10f;
+
+        [Header("After Ending Timeline")]
+        [SerializeField] private bool loadFirstSceneAfterTimeline = true;
+        [SerializeField] private int firstSceneBuildIndex = 0;
+        [SerializeField] private bool fadeInBeforeLoadFirstScene = false;
+
+        [Header("Timeline AutoPlay Guard")]
+        [Tooltip("Kéo các PlayableDirector bạn KHÔNG muốn nó tự chạy vào đây (vd: EndingTimeline Director). UIManager sẽ disable component lúc Start.")]
+        [SerializeField] private List<PlayableDirector> directorsToDisableOnStart = new List<PlayableDirector>();
+
+        [Tooltip("Nếu true: UIManager sẽ disable toàn bộ directorsToDisableOnStart ngay khi Start.")]
+        [SerializeField] private bool disableDirectorsOnStart = true;
+
+        [Tooltip("Nếu true: khi PlayEndingTimeline sẽ gọi Evaluate() trước Play để update bindings ngay.")]
+        [SerializeField] private bool evaluateBeforePlayTimeline = true;
+
         private ClickPlantRhythmMinigame _plantRhythmMinigame;
         private ClickAnimalRhythmMinigame _animalRhythmMinigame;
         private Coroutine _fadeRoutine;
 
-        // =========================
-        // LIFECYCLE & EVENT REGISTRATION
-        // =========================
+        private PlayableDirector _currentEndingDirector;
+
         private void Start()
         {
             EnsureMinigameRefs();
 
-            // Khởi tạo trạng thái overlay ban đầu
             if (fadeOverlay != null)
             {
                 fadeOverlay.alpha = 0f;
                 fadeOverlay.gameObject.SetActive(false);
             }
 
-            // Minimap: default là hiện (nếu có assign)
             SetMinimapVisible(true);
+
+            ApplyAutoPlayGuard();
+        }
+
+        private void ApplyAutoPlayGuard()
+        {
+            if (!disableDirectorsOnStart) return;
+            if (directorsToDisableOnStart == null || directorsToDisableOnStart.Count == 0) return;
+
+            for (int i = 0; i < directorsToDisableOnStart.Count; i++)
+            {
+                var d = directorsToDisableOnStart[i];
+                if (d == null) continue;
+
+                // Disable component để không ai Play được (kể cả script khác lỡ gọi)
+                d.enabled = false;
+
+                // Reset về 0 cho sạch sẽ, tránh case InitialTime bị set khác
+                d.time = 0;
+
+                // Evaluate chỉ khi component enabled, nên ở đây mình không gọi
+            }
         }
 
         private void OnEnable()
@@ -76,7 +113,6 @@ namespace IronIvy.Core
                 ListenManager.Instance.OnRhythmAnimalResult += HandleAnimalRhythmResult;
                 ListenManager.Instance.OnArchiveOpenRequested += HandleArchiveOpenRequested;
 
-                // Opening intro event-driven
                 ListenManager.Instance.OnGameplayHUDVisibleRequested += HandleGameplayHUDVisibleRequested;
                 ListenManager.Instance.OnMinimapVisibleRequested += HandleMinimapVisibleRequested;
             }
@@ -93,11 +129,10 @@ namespace IronIvy.Core
                 ListenManager.Instance.OnGameplayHUDVisibleRequested -= HandleGameplayHUDVisibleRequested;
                 ListenManager.Instance.OnMinimapVisibleRequested -= HandleMinimapVisibleRequested;
             }
+
+            UnhookEndingDirector();
         }
 
-        // =========================
-        // EVENT HANDLERS
-        // =========================
         private void HandlePlantRhythmResult(ListenManager.RhythmPlantResultPayload payload)
         {
             if (notify.plantRewardPanel != null)
@@ -119,7 +154,6 @@ namespace IronIvy.Core
 
         private void HandleArchiveOpenRequested()
         {
-            // Khi nhận event từ ListenManager, cũng thực hiện mở kèm hiệu ứng fade
             OpenArchiveUI();
         }
 
@@ -143,9 +177,6 @@ namespace IronIvy.Core
                 _animalRhythmMinigame = FindObjectOfType<ClickAnimalRhythmMinigame>(true);
         }
 
-        // =========================
-        // MINIMAP VISIBILITY (Notify Group)
-        // =========================
         public void ShowMinimap() => SetMinimapVisible(true);
         public void HideMinimap() => SetMinimapVisible(false);
 
@@ -155,9 +186,23 @@ namespace IronIvy.Core
                 notify.minimapRoot.SetActive(visible);
         }
 
-        // =========================
-        // START MINIGAME REQUESTS
-        // =========================
+        private void ClearRhythmHUDAvatarCache()
+        {
+            if (notify == null) return;
+            if (notify.rhythmHUD == null) return;
+
+            var hud = notify.rhythmHUD;
+
+            hud.SendMessage("ClearAvatarIcon", SendMessageOptions.DontRequireReceiver);
+            hud.SendMessage("ClearAvatar", SendMessageOptions.DontRequireReceiver);
+            hud.SendMessage("ClearIcon", SendMessageOptions.DontRequireReceiver);
+            hud.SendMessage("ResetAvatar", SendMessageOptions.DontRequireReceiver);
+
+            hud.SendMessage("SetAvatarIcon", null, SendMessageOptions.DontRequireReceiver);
+            hud.SendMessage("SetIcon", null, SendMessageOptions.DontRequireReceiver);
+            hud.SendMessage("SetAnimalIcon", null, SendMessageOptions.DontRequireReceiver);
+        }
+
         public bool RequestStartPlantRhythm(PlantArea area, List<PlantDefinition> selectedPlants, int energyCost)
         {
             EnsureMinigameRefs();
@@ -165,10 +210,16 @@ namespace IronIvy.Core
 
             if (EnergyManager.HasInstance && !EnergyManager.Instance.TrySpend(energyCost)) return false;
 
+            ClearRhythmHUDAvatarCache();
+
+            if (notify != null && notify.rhythmHUD != null)
+            {
+                notify.rhythmHUD.ClearReactionPresenterAnimal();
+            }
+
             _plantRhythmMinigame.StartSequence(area.plots, selectedPlants, area);
             CloseAllPopups();
 
-            // Minigame start: hide minimap
             HideMinimap();
 
             if (ListenManager.HasInstance) ListenManager.Instance.RaiseMinigameStarted();
@@ -189,40 +240,43 @@ namespace IronIvy.Core
                 {
                     if (animal.Definition != null && animal.Definition.favoriteFood == selectedFood)
                         isFavorite = true;
+                        
+                    if (isFavorite)
+{
+    animal.GrantFavoriteFoodBuffToken();
+}
+
 
                     animal.TryFeed(selectedFood);
                     if (ListenManager.HasInstance) ListenManager.Instance.RaiseInventoryChanged();
                 }
             }
 
+            ClearRhythmHUDAvatarCache();
+
             _animalRhythmMinigame.RequestPlay(animal, isFavorite);
             CloseAllPopups();
 
-            // Minigame start: hide minimap
             HideMinimap();
 
             if (ListenManager.HasInstance) ListenManager.Instance.RaiseMinigameStarted();
             return true;
         }
 
-        // =========================
-        // UI CONTROL & FADE LOGIC
-        // =========================
-
         public void OpenArchiveUI()
         {
             if (archivePanel == null) return;
+
             HideMinimap();
+
             if (_fadeRoutine != null) StopCoroutine(_fadeRoutine);
             _fadeRoutine = StartCoroutine(OpenArchiveWithFade());
         }
 
         private IEnumerator OpenArchiveWithFade()
         {
-            // 1) Fade to black
             yield return FadeOverlay(1f, fadeOutTime, blockRaycasts: true);
 
-            // 2) Switch UI (Trong lúc màn hình đang đen)
             CloseAllPopups();
 
             if (AudioManager.Instance != null)
@@ -232,7 +286,6 @@ namespace IronIvy.Core
 
             yield return new WaitForSecondsRealtime(holdBlack);
 
-            // 3) Fade back
             yield return FadeOverlay(0f, fadeInTime, blockRaycasts: false);
 
             _fadeRoutine = null;
@@ -253,7 +306,7 @@ namespace IronIvy.Core
 
             while (t < duration)
             {
-                t += Time.unscaledDeltaTime; // Dùng unscaled để fade mượt cả khi pause game
+                t += Time.unscaledDeltaTime;
                 float p = Mathf.Clamp01(t / duration);
                 fadeOverlay.alpha = Mathf.Lerp(start, target, p);
                 yield return null;
@@ -267,7 +320,6 @@ namespace IronIvy.Core
 
         public void CloseArchiveUI()
         {
-            // Hiện tại đóng Archive quay về Main HUD
             CloseAllPopups();
             ShowMinimap();
         }
@@ -297,9 +349,119 @@ namespace IronIvy.Core
         private void HideMainHUD() => mainGameUIPanel?.gameObject.SetActive(false);
         private void ShowMainHUD() => mainGameUIPanel?.gameObject.SetActive(true);
 
-        // =========================
-        // COMPATIBILITY OVERLOADS
-        // =========================
+        public void PlayEndingTimeline(PlayableDirector director)
+        {
+            if (director == null)
+            {
+                Debug.LogWarning("<color=yellow>[UIManager]</color> PlayEndingTimeline() director is null.");
+                return;
+            }
+
+            if (_fadeRoutine != null) StopCoroutine(_fadeRoutine);
+
+            UnhookEndingDirector();
+
+            _fadeRoutine = StartCoroutine(PlayEndingTimelineRoutine(director));
+        }
+
+        private IEnumerator PlayEndingTimelineRoutine(PlayableDirector director)
+        {
+            yield return FadeOverlay(1f, fadeOutTime, blockRaycasts: true);
+
+            HideAllGameUIForCutscene();
+
+            if (holdBlackBeforePlayTimeline > 0f)
+                yield return new WaitForSecondsRealtime(holdBlackBeforePlayTimeline);
+
+            _currentEndingDirector = director;
+            _currentEndingDirector.stopped += HandleEndingTimelineStopped;
+
+            // Quan trọng: nếu director bị disable ở Start để chống autoplay, thì giờ phải bật lại trước khi Play
+            if (!_currentEndingDirector.enabled)
+                _currentEndingDirector.enabled = true;
+
+            _currentEndingDirector.time = 0;
+
+            if (evaluateBeforePlayTimeline)
+                _currentEndingDirector.Evaluate();
+
+            // Fade từ đen về sáng để thấy cutscene
+            yield return FadeOverlay(0f, fadeInTime, blockRaycasts: false);
+            // Tắt BGM hiện tại để nhường chỗ cho BGM của timeline
+            if (AudioManager.HasInstance)
+            {
+                AudioManager.Instance.PauseBGMRuntime();
+            }
+            // Rồi mới play để cutscene chạy
+            _currentEndingDirector.Play();
+
+            _fadeRoutine = null;
+        }
+
+        private void HideAllGameUIForCutscene()
+        {
+            if (popup != null)
+            {
+                if (popup.plantRhythmStartPanel != null) popup.plantRhythmStartPanel.Hide();
+                if (popup.animalInteractionPanel != null) popup.animalInteractionPanel.Hide();
+
+                if (popup.pauseMenu != null) popup.pauseMenu.SetActive(false);
+                if (popup.settingsMenu != null) popup.settingsMenu.SetActive(false);
+            }
+
+            if (notify != null)
+            {
+                if (notify.plantRewardPanel != null) notify.plantRewardPanel.Hide();
+                if (notify.animalRewardPanel != null) notify.animalRewardPanel.gameObject.SetActive(false);
+
+                if (notify.rhythmHUD != null) notify.rhythmHUD.gameObject.SetActive(false);
+                if (notify.minimapRoot != null) notify.minimapRoot.SetActive(false);
+            }
+
+            if (archivePanel != null) archivePanel.gameObject.SetActive(false);
+            if (mainGameUIPanel != null) mainGameUIPanel.gameObject.SetActive(false);
+        }
+
+        private void HandleEndingTimelineStopped(PlayableDirector d)
+        {
+            UnhookEndingDirector();
+            // Nếu không load scene thì resume để game không bị im luôn
+            if (!loadFirstSceneAfterTimeline)
+            {
+                if (AudioManager.HasInstance)
+                    AudioManager.Instance.ResumeBGMRuntime();
+            }
+            if (loadFirstSceneAfterTimeline)
+            {
+                if (_fadeRoutine != null) StopCoroutine(_fadeRoutine);
+                _fadeRoutine = StartCoroutine(LoadFirstSceneRoutine());
+            }
+        }
+
+        private IEnumerator LoadFirstSceneRoutine()
+        {
+            if (fadeInBeforeLoadFirstScene)
+            {
+                yield return FadeOverlay(0f, fadeInTime, blockRaycasts: false);
+            }
+
+            yield return null;
+
+            int idx = Mathf.Max(0, firstSceneBuildIndex);
+            SceneManager.LoadScene(idx);
+
+            _fadeRoutine = null;
+        }
+
+        private void UnhookEndingDirector()
+        {
+            if (_currentEndingDirector != null)
+            {
+                _currentEndingDirector.stopped -= HandleEndingTimelineStopped;
+                _currentEndingDirector = null;
+            }
+        }
+
         public bool RequestStartPlantRhythm(object plots, List<PlantDefinition> selectedPlants, PlantArea area) => RequestStartPlantRhythm(area, selectedPlants);
         public bool RequestStartPlantRhythm(PlantArea area) => RequestStartPlantRhythm(area, new List<PlantDefinition>());
         public bool RequestStartAnimalRhythm(AnimalController animal, int energyCost) => RequestStartAnimalRhythm(animal, null, energyCost);

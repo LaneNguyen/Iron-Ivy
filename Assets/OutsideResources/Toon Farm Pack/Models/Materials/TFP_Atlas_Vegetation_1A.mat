@@ -113,7 +113,7 @@ Material:
     - _SrcBlend: 1
     - _UVSec: 0
     - _WindJitter: 0
-    - _WindScroll: 0.37
+    - _WindScroll: 0.09
     - _ZWrite: 1
     - __dirty: 0
     m_Colors:

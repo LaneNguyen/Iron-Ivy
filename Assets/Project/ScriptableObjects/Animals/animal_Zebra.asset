@@ -19,12 +19,21 @@ MonoBehaviour:
   cameraOrbitHeight: 5
   cameraLookAtHeight: 0.7
   cameraOrbitRotateSpeed: 0
+  animalOrbitDistance: 2.8
+  animalOrbitPitch: 25
+  animalOrbitYaw: 30
+  animalOrbitHeight: 1.2
+  cameraBlendSeconds: 0.35
   favoriteFood: {fileID: 11400000, guid: 00e9e275c37774f4abe494bf5a3f27d9, type: 2}
-  buffSafetyNet: 3
   buffTrustMultiplier: 1.5
+  hasFavoriteBuff: 0
+  buffSafetyNet: 3
   dropItem: {fileID: 0}
   dropCount: 1
   doubleLootOnBuff: 1
+  rewardItem: {fileID: 0}
+  rewardMinCount: 1
+  rewardMaxCount: 1
   prefab: {fileID: 4072681092632716123, guid: 0fe14e8fc7c68fa4ab6aa72b5935bc79, type: 3}
   maxCountGlobal: 10
   spawnWeight: 1
@@ -35,12 +44,6 @@ MonoBehaviour:
   wanderRadius: 20
   minIdleTime: 3
   maxIdleTime: 7
-  isNocturnal: 0
-  ambientClips:
-  - {fileID: 8300000, guid: 7cca9119fc67bf14581acdc85c843e73, type: 3}
-  ambientMinInterval: 5
-  ambientMaxInterval: 15
-  ambientSoundRadius: 15
   curiousRadius: 10
   curiousChancePerCheck: 0.2
   curiousMinDuration: 2
@@ -57,10 +60,23 @@ MonoBehaviour:
   maxRandomBeats: 30
   minRandomFragments: 2
   maxRandomFragments: 6
-  goodAnim: Good
-  badAnim: Bad
-  iv17Reactions: []
+  playlist: []
+  reactionVisuals:
+    neutral: {fileID: -209757891, guid: 49c4bbe67396ae143bd5a7383b9cf498, type: 3}
+    sad: {fileID: -2067933280, guid: 49c4bbe67396ae143bd5a7383b9cf498, type: 3}
+    angry: {fileID: -2067933280, guid: 49c4bbe67396ae143bd5a7383b9cf498, type: 3}
+    happy: {fileID: 1354082161, guid: 49c4bbe67396ae143bd5a7383b9cf498, type: 3}
+    happyStreakThreshold: 3
+    missReactionSeconds: 0
+    happyHoldSeconds: 0
+    streakDecaySeconds: 0
+    alternateSadAngry: 0
   archiveReward: 10
   minigameMusicLoop: {fileID: 8300000, guid: e347fd514bf207d42bbfdbc598876712, type: 3}
   loopSfx: {fileID: 0}
   successVFX: {fileID: 100004, guid: 3af6f68141914ca43ba39b2403757bd0, type: 3}
+  ambientClips:
+  - {fileID: 8300000, guid: 7cca9119fc67bf14581acdc85c843e73, type: 3}
+  ambientMinInterval: 5
+  ambientMaxInterval: 15
+  ambientSoundRadius: 15

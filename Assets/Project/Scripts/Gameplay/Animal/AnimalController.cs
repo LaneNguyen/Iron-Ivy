@@ -84,6 +84,10 @@ namespace IronIvy.Gameplay.Animals
         private bool _agentWasStopped;
         private float _agentSpeed;
 
+        // runtime-only buff token (không save)
+private bool _favoriteFoodBuffToken = false;
+
+
         private Coroutine _faceRoutine;
 
         private void Reset()
@@ -504,6 +508,22 @@ namespace IronIvy.Gameplay.Animals
             if (clip && AudioManager.HasInstance)
                 AudioManager.Instance.PlaySEAtPosition(clip, transform.position);
         }
+
+public void GrantFavoriteFoodBuffToken()
+{
+    _favoriteFoodBuffToken = true;
+}
+
+// được gọi khi bắt đầu minigame
+// dùng xong là mất buff
+public bool ConsumeFavoriteFoodBuffToken()
+{
+    if (!_favoriteFoodBuffToken)
+        return false;
+
+    _favoriteFoodBuffToken = false;
+    return true;
+}
 
         private void SetupCuriousState()
         {

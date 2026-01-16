@@ -146,12 +146,13 @@ namespace IronIvy.UI
                 playButton.interactable = true;
 
             _isOpen = true;
-if (cancelButton != null)
-{
-    bool isFirstTime = IsFirstTimeExperience();
-    cancelButton.interactable = !isFirstTime;
-}
-            
+            if (cancelButton != null)
+            {
+                bool isFirstTime = IsFirstTimeExperience();
+                cancelButton.interactable = !isFirstTime;
+            }
+
+
             TryShowFirstOpenGuide();
 
             if (debugLog)
@@ -347,8 +348,8 @@ if (cancelButton != null)
             //  "qua bước tiếp theo là xong" -> bấm Play thì complete guide luôn
             CompleteFirstOpenGuideIfOpen();
             // bật lại cancel cho các lần sau
-if (cancelButton != null)
-    cancelButton.interactable = true;
+            if (cancelButton != null)
+                cancelButton.interactable = true;
 
             if (debugLog)
                 Debug.Log("[MinigameInteractionPanel] OnPlayButton -> RequestStartAnimalRhythm");
@@ -373,20 +374,19 @@ if (cancelButton != null)
             if (firstOpenGuidePanel == null) return;
             if (!GuidePanelManager.HasInstance) return;
 
-            // đang mở rồi thì thôi
-            if (_activeGuideView != null && _activeGuideView.gameObject.activeSelf)
-                return;
-
-            _activeGuideView = GuidePanelManager.Instance.ShowPanelIfNotComplete(
+            bool shown = GuidePanelManager.Instance.ShowPanelOnce(
                 firstOpenGuideStepId,
                 firstOpenGuidePanel,
                 pauseGameWhenGuideShown,
                 true,
-                guideSortingOrderOverride,
-                ignorePrefsInEditor,
-                disableMarkInEditor
+                guideSortingOrderOverride
             );
+
+            // safety: nếu guide đã shown trước đó thì đảm bảo nó không bật ké theo panelRoot
+            if (!shown && firstOpenGuidePanel.activeSelf)
+                firstOpenGuidePanel.SetActive(false);
         }
+
 
         private void CompleteFirstOpenGuideIfOpen()
         {
@@ -398,10 +398,10 @@ if (cancelButton != null)
         }
 
         private bool IsFirstTimeExperience()
-{
-    if (!GuidePanelManager.HasInstance) return false;
-    return !GuidePanelManager.Instance.HasShown(firstOpenGuideStepId);
-}
+        {
+            if (!GuidePanelManager.HasInstance) return false;
+            return !GuidePanelManager.Instance.HasShown(firstOpenGuideStepId);
+        }
 
     }
 }

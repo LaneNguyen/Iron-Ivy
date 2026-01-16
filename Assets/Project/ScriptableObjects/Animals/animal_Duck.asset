@@ -64,11 +64,11 @@ MonoBehaviour:
   maxRandomFragments: 6
   playlist: []
   reactionVisuals:
-    neutral: {fileID: 0}
-    sad: {fileID: 0}
-    angry: {fileID: 0}
-    happy: {fileID: 0}
-    happyStreakThreshold: 0
+    neutral: {fileID: -2119013152, guid: c7466141e66fae54a8e7b6089dae8544, type: 3}
+    sad: {fileID: 1938876443, guid: c7466141e66fae54a8e7b6089dae8544, type: 3}
+    angry: {fileID: 1938876443, guid: c7466141e66fae54a8e7b6089dae8544, type: 3}
+    happy: {fileID: -1225847153, guid: c7466141e66fae54a8e7b6089dae8544, type: 3}
+    happyStreakThreshold: 3
     missReactionSeconds: 0
     happyHoldSeconds: 0
     streakDecaySeconds: 0

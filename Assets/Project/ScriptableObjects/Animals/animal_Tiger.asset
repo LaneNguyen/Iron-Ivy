@@ -26,7 +26,7 @@ MonoBehaviour:
   cameraBlendSeconds: 0.35
   favoriteFood: {fileID: 0}
   buffTrustMultiplier: 1.5
-  hasFavoriteBuff: 1
+  hasFavoriteBuff: 0
   buffSafetyNet: 3
   dropItem: {fileID: 0}
   dropCount: 1
@@ -62,11 +62,11 @@ MonoBehaviour:
   maxRandomFragments: 6
   playlist: []
   reactionVisuals:
-    neutral: {fileID: 0}
-    sad: {fileID: 0}
-    angry: {fileID: 0}
-    happy: {fileID: 0}
-    happyStreakThreshold: 0
+    neutral: {fileID: -1365671756, guid: ba345775ab9ce6846af2d011d01e47e6, type: 3}
+    sad: {fileID: 588890058, guid: ba345775ab9ce6846af2d011d01e47e6, type: 3}
+    angry: {fileID: 2141143100, guid: ba345775ab9ce6846af2d011d01e47e6, type: 3}
+    happy: {fileID: -724880204, guid: ba345775ab9ce6846af2d011d01e47e6, type: 3}
+    happyStreakThreshold: 3
     missReactionSeconds: 0
     happyHoldSeconds: 0
     streakDecaySeconds: 0

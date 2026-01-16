@@ -2,6 +2,7 @@ using IronIvy.Core;
 using IronIvy.Data;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Playables;
 using UnityEngine.UI;
 
 namespace IronIvy.UI
@@ -9,7 +10,6 @@ namespace IronIvy.UI
     public class ArchiveNodeUI : MonoBehaviour
     {
         [Header("Node Data (Manual Placement)")]
-        [Tooltip("Lane tự kéo ArchiveNodeDefinition vào đây cho từng node trên cây.")]
         public ArchiveNodeDefinition definition;
 
         [Header("UI Components")]
@@ -19,8 +19,8 @@ namespace IronIvy.UI
         public GameObject lockOverlay;
 
         [Header("Optional Texts (auto hide when unlocked)")]
-        public TextMeshProUGUI dataCostText;     // hiển thị required %
-        public TextMeshProUGUI currentDataText;  // hiển thị current %
+        public TextMeshProUGUI dataCostText;
+        public TextMeshProUGUI currentDataText;
 
         [Header("Parent Gating Visual")]
         [Range(0.1f, 1f)] public float blockedAlpha = 0.5f;
@@ -30,7 +30,6 @@ namespace IronIvy.UI
 
         [Header("Inspect Border Rotation (when reading description)")]
         public bool useInspectRotation = true;
-        [Tooltip("Độ/giây. 6-12 là chậm, nhẹ, không chóng mặt.")]
         public float inspectRotateSpeed = 10f;
 
         [Header("Colors (Config)")]
@@ -38,6 +37,10 @@ namespace IronIvy.UI
         public Color unlockedColor = new Color(0f, 1f, 1f, 1f);
         public Color affordableColor = new Color(1f, 0.9f, 0.4f, 1f);
         public Color blockedByParentColor = new Color(0.2f, 0.2f, 0.2f, 1f);
+
+        [Header("Ending Timeline (Scene Reference)")]
+        [Tooltip("PlayableDirector của ending timeline. Kéo object có PlayableDirector vào đây.")]
+        public PlayableDirector endingTimelineDirector;
 
         private ArchiveNodeDefinition _data;
         private ArchivePanel _parentPanel;
@@ -48,7 +51,8 @@ namespace IronIvy.UI
 
         private static ArchiveNodeUI _currentInspectNode;
 
-        // Panel sẽ dùng property này thay vì truy cập field tên "definition" (tránh nhầm).
+        private bool hasTriggeredEndingTimeline = false;
+
         public ArchiveNodeDefinition Data => _data != null ? _data : definition;
 
         private void Awake()
@@ -86,7 +90,6 @@ namespace IronIvy.UI
             if (ArchiveManager.HasInstance)
                 ArchiveManager.Instance.OnNodeUnlocked -= HandleNodeUnlocked;
 
-            // nếu node này đang inspect mà bị disable thì clear + reset rot
             if (_currentInspectNode == this)
             {
                 _currentInspectNode = null;
@@ -94,10 +97,8 @@ namespace IronIvy.UI
             }
         }
 
-        // ✅ GIỮ LẠI SETUP như logic cũ (để callsite không vỡ)
         public void Setup(ArchiveNodeDefinition data, ArchivePanel parent)
         {
-            // Ưu tiên data truyền vào; nếu null thì dùng definition set trong Inspector.
             _data = data != null ? data : definition;
             _parentPanel = parent;
 
@@ -119,7 +120,6 @@ namespace IronIvy.UI
             if (borderImage != null)
                 _borderBaseRot = borderImage.rectTransform.localRotation;
 
-            // setup xong refresh UI theo logic cũ
             RefreshVisual();
         }
 
@@ -139,24 +139,20 @@ namespace IronIvy.UI
 
             bool isUnlocked = ArchiveManager.Instance.IsNodeUnlocked(Data.id);
 
-            // costToUnlock được dùng như Required Progress Percent (%)
             float requiredPercent = Mathf.Clamp(Data.costToUnlock, 0f, 100f);
             float currentPercent = ArchiveManager.Instance.CurrentPercent100;
 
             bool canUnlockByProgress = currentPercent + 0.0001f >= requiredPercent;
             bool parentUnlocked = IsParentUnlocked();
 
-            // node đã mở -> hide 2 text refs
             SetCostTextsVisible(!isUnlocked);
 
-            // update optional texts
             if (!isUnlocked)
             {
                 if (dataCostText != null) dataCostText.text = $"{requiredPercent:0.#}%";
                 if (currentDataText != null) currentDataText.text = $"{currentPercent:0.#}%";
             }
 
-            // reset alpha default
             SetWholeNodeAlpha(1f);
 
             if (isUnlocked)
@@ -169,7 +165,6 @@ namespace IronIvy.UI
                 return;
             }
 
-            // blocked bởi parent: mờ toàn bộ node + màu riêng
             if (!parentUnlocked)
             {
                 SetWholeNodeAlpha(blockedAlpha);
@@ -179,12 +174,10 @@ namespace IronIvy.UI
 
                 if (lockOverlay) lockOverlay.SetActive(true);
 
-                // vẫn cho click để xem mô tả
                 if (btnSelect != null) btnSelect.interactable = true;
                 return;
             }
 
-            // unlockable bình thường
             if (canUnlockByProgress)
             {
                 if (borderImage) borderImage.color = affordableColor;
@@ -195,7 +188,6 @@ namespace IronIvy.UI
                 return;
             }
 
-            // NOT enough progress/energy: làm mờ cả node
             SetWholeNodeAlpha(unaffordableAlpha);
 
             if (borderImage) borderImage.color = lockedColor;
@@ -225,16 +217,42 @@ namespace IronIvy.UI
 
         private void OnNodeClicked()
         {
-            if (_parentPanel != null && Data != null)
+            if (_parentPanel == null || Data == null) return;
+
+            AudioManager.Instance?.PlayInterfaceSE();
+
+            _parentPanel.SelectNode(Data);
+            SetAsInspectNode();
+
+            // Không chạy timeline ở đây nữa.
+            // Timeline sẽ chạy khi node được unlock (HandleNodeUnlocked).
+        }
+
+        private void HandleNodeUnlocked(string id)
+        {
+            if (Data == null) return;
+            if (Data.id != id) return;
+
+            RefreshVisual();
+
+            if (hasTriggeredEndingTimeline) return;
+            if (!Data.triggerEndingTimelineOnUnlock) return;
+
+            hasTriggeredEndingTimeline = true;
+            TryStartEndingTimeline();
+        }
+
+        private void TryStartEndingTimeline()
+        {
+            if (!UIManager.HasInstance) return;
+
+            if (endingTimelineDirector == null)
             {
-                AudioManager.Instance?.PlayInterfaceSE();
-
-                // giữ logic select cũ
-                _parentPanel.SelectNode(Data);
-
-                // chỉ thêm “inspect rotate”
-                SetAsInspectNode();
+                Debug.LogWarning("<color=yellow>[ArchiveNodeUI]</color> triggerEndingTimelineOnUnlock=true nhưng node chưa assign endingTimelineDirector.");
+                return;
             }
+
+            UIManager.Instance.PlayEndingTimeline(endingTimelineDirector);
         }
 
         private void SetAsInspectNode()
@@ -257,14 +275,6 @@ namespace IronIvy.UI
 
             if (borderImage != null)
                 borderImage.rectTransform.localRotation = _borderBaseRot;
-        }
-
-        private void HandleNodeUnlocked(string id)
-        {
-            if (Data == null) return;
-            if (Data.id != id) return;
-
-            RefreshVisual();
         }
     }
 }

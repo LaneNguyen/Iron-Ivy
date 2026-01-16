@@ -213,6 +213,9 @@ namespace IronIvy.UI
             SetTrust01(0);
             SetProgress(0);
 
+            // NOTE:
+            // ResetSoft để nếu đang có animal reaction thì nó quay về neutral thay vì giữ Sad/Happy
+            // Nhưng nếu HUD này dùng chung cho Plant, thì phần "clear definition" sẽ làm ở Hide (xem HandleHidePayload)
             ReactionPresenter_ResetSoft();
         }
 
@@ -234,6 +237,13 @@ namespace IronIvy.UI
         private void HandleHidePayload()
         {
             Hide();
+
+            // FIX QUAN TRỌNG:
+            // Khi thoát minigame (đặc biệt Animal -> Plant) phải xóa definition của animal
+            // Nếu không, lần Show tiếp theo (Plant HUD) sẽ "hồi sinh" icon neutral của animal.
+            ClearReactionPresenterAnimal();
+
+            // ResetHard để tắt UI + reset state machine
             ReactionPresenter_ResetHard();
         }
 
@@ -338,6 +348,8 @@ namespace IronIvy.UI
             SetStatus(string.Empty, true);
             SetHitMiss(0, 0);
 
+            // Reset HUD thì cũng clear luôn reaction animal cho chắc
+            ClearReactionPresenterAnimal();
             ReactionPresenter_ResetHard();
         }
 
@@ -442,7 +454,15 @@ namespace IronIvy.UI
 
         public void ClearReactionPresenterAnimal()
         {
+            // FIX: clear definition để Plant HUD không lôi reaction sprite của animal lên nữa
             _reactionActiveDefinition = null;
+
+            // clear cache sprite để chắc chắn không còn neutral/sad... từ animal
+            _sprNeutral = null;
+            _sprSad = null;
+            _sprAngry = null;
+            _sprHappy = null;
+
             ReactionPresenter_ResetHard();
         }
 
@@ -544,10 +564,7 @@ namespace IronIvy.UI
 
             if (dm > 0) ReactionPresenter_OnMiss();
             else if (dh > 0) ReactionPresenter_OnHit();
-            else
-            {
-                // Shield / Rest / tick không scorable -> ignore
-            }
+            else { }
         }
 
         private void ReactionPresenter_OnHit()
@@ -568,7 +585,6 @@ namespace IronIvy.UI
             }
             else
             {
-                // Chưa đủ streak thì giữ neutral để khỏi nhấp nháy
                 if (_reactionState != _HUDReactionState.Happy)
                 {
                     _reactionState = _HUDReactionState.Neutral;
@@ -599,7 +615,6 @@ namespace IronIvy.UI
                 }
             }
 
-            // Fallback nếu thiếu sprite
             if (missSprite == null)
             {
                 missSprite = _sprSad != null ? _sprSad : (_sprNeutral != null ? _sprNeutral : null);
@@ -625,14 +640,12 @@ namespace IronIvy.UI
 
             if (reactionAutoReturnToNeutral)
             {
-                // Decay streak nếu nguội
                 if (_reactionStreak > 0 && _reactionDecaySeconds > 0f)
                 {
                     if (Time.time - _reactionLastHitTime > _reactionDecaySeconds)
                         _reactionStreak = 0;
                 }
 
-                // Hết timer state -> về neutral
                 if (_reactionState != _HUDReactionState.Neutral && _reactionStateUntil > 0f && Time.time >= _reactionStateUntil)
                 {
                     _reactionState = _HUDReactionState.Neutral;

@@ -12,8 +12,8 @@ namespace IronIvy.UI
     public class ArchivePanel : MonoBehaviour, IPointerClickHandler
     {
         [Header("Container (Manual Placement)")]
-        public RectTransform nodesContainer; // chứa các ArchiveNodeUI
-        public RectTransform zoomContent;    // Content để zoom/pan (background + nodes). Nếu null sẽ dùng nodesContainer
+        public RectTransform nodesContainer;
+        public RectTransform zoomContent;
 
         [Header("Detail Section")]
         public GameObject detailPanel;
@@ -41,7 +41,25 @@ namespace IronIvy.UI
         public GameObject costLabelObject;
         public GameObject totalLabelObject;
 
-        // Danh sách này giờ được node tự register vào, KHÔNG scan toàn bộ.
+        [Header("First Open Guide (Show once)")]
+        public GuidePanelView firstOpenGuidePanel;
+        public string firstOpenGuideStepId = "GUIDE_ARCHIVE_FIRST_OPEN";
+        public bool ignorePrefsInEditorForTesting = true;
+        [Min(0f)] public float firstOpenGuideDelaySeconds = 1.2f;
+        public bool markShownWhenGuideCloses = true;
+
+        [Header("Debug / Cheat (while panel is open)")]
+        [Tooltip("Optional button: click để set Archive progress 100%.")]
+        public Button debugFill100Button;
+
+        [Tooltip("Phím tắt để set 100% khi panel đang mở.")]
+        public KeyCode debugFillKey = KeyCode.F9;
+
+        [Tooltip("Nếu true: set xong sẽ auto refresh node visuals + unlock button state.")]
+        public bool refreshAfterDebugFill = true;
+
+        private Coroutine _firstOpenGuideRoutine;
+
         private readonly List<ArchiveNodeUI> _spawnedNodes = new List<ArchiveNodeUI>();
 
         private ArchiveNodeDefinition _currentSelection;
@@ -50,6 +68,8 @@ namespace IronIvy.UI
         private bool _isTypingDesc;
 
         private Coroutine _revealRoutine;
+
+        private bool _guideShownThisSession = false;
 
         private void Awake()
         {
@@ -60,9 +80,57 @@ namespace IronIvy.UI
 
             if (zoomContent == null && nodesContainer != null)
                 zoomContent = nodesContainer;
+
+            if (firstOpenGuidePanel != null && markShownWhenGuideCloses)
+            {
+                firstOpenGuidePanel.onClosed.AddListener(OnFirstOpenGuideClosed);
+            }
+
+            if (debugFill100Button != null)
+            {
+                debugFill100Button.onClick.RemoveAllListeners();
+                debugFill100Button.onClick.AddListener(OnDebugFill100Clicked);
+            }
         }
 
-        // ===== Public API cho node tự đăng ký =====
+        private void OnDestroy()
+        {
+            if (firstOpenGuidePanel != null && markShownWhenGuideCloses)
+            {
+                firstOpenGuidePanel.onClosed.RemoveListener(OnFirstOpenGuideClosed);
+            }
+
+            if (debugFill100Button != null)
+            {
+                debugFill100Button.onClick.RemoveListener(OnDebugFill100Clicked);
+            }
+        }
+
+        private void Update()
+        {
+            if (!gameObject.activeInHierarchy) return;
+
+            if (Input.GetKeyDown(debugFillKey))
+            {
+                if (IsTypingInInputField()) return;
+                ApplyDebugFill100();
+            }
+        }
+
+        private bool IsTypingInInputField()
+        {
+            if (EventSystem.current == null) return false;
+
+            var go = EventSystem.current.currentSelectedGameObject;
+            if (go == null) return false;
+
+            if (go.GetComponent<TMP_InputField>() != null) return true;
+            if (go.GetComponent<InputField>() != null) return true;
+
+            return false;
+        }
+
+        // Public API cho node tự đăng ký
         public void RegisterNode(ArchiveNodeUI node)
         {
             if (node == null) return;
@@ -70,7 +138,6 @@ namespace IronIvy.UI
 
             _spawnedNodes.Add(node);
 
-            // Node sẽ tự có definition sẵn, nhưng panel cần gắn lại ref & callback
             if (node.Data != null)
                 node.Setup(node.Data, this);
 
@@ -97,10 +164,15 @@ namespace IronIvy.UI
             RefreshAllNodes();
 
             _revealRoutine = StartCoroutine(RevealNodesSequence());
+
+            _guideShownThisSession = false;
+            StartFirstOpenGuideDelayed();
         }
 
         public void Hide()
         {
+            StopFirstOpenGuideDelayed();
+
             StopNodeReveal();
             StopDescTyping(resetVisible: true);
             gameObject.SetActive(false);
@@ -116,6 +188,93 @@ namespace IronIvy.UI
             }
 
             Hide();
+        }
+
+        private void OnDebugFill100Clicked()
+        {
+            AudioManager.Instance?.PlayInterfaceSE();
+            ApplyDebugFill100();
+        }
+
+        private void ApplyDebugFill100()
+        {
+            if (!ArchiveManager.HasInstance) return;
+
+            ArchiveManager.Instance.SetProgressPercent100(save: true);
+
+            if (!refreshAfterDebugFill) return;
+
+            UpdateTotalPoints();
+            RefreshAllNodes();
+
+            if (_currentSelection != null)
+                UpdateUnlockButtonState();
+        }
+
+        private void StartFirstOpenGuideDelayed()
+        {
+            StopFirstOpenGuideDelayed();
+
+            if (firstOpenGuidePanel == null) return;
+            if (!GuidePanelManager.HasInstance) return;
+
+            bool ignorePrefs = GuidePanelManager.Instance.ShouldIgnorePrefsForTesting(ignorePrefsInEditorForTesting);
+            if (!ignorePrefs && GuidePanelManager.Instance.HasShown(firstOpenGuideStepId))
+                return;
+
+            _firstOpenGuideRoutine = StartCoroutine(FirstOpenGuideDelayRoutine());
+        }
+
+        private void StopFirstOpenGuideDelayed()
+        {
+            if (_firstOpenGuideRoutine != null)
+            {
+                StopCoroutine(_firstOpenGuideRoutine);
+                _firstOpenGuideRoutine = null;
+            }
+        }
+
+        private IEnumerator FirstOpenGuideDelayRoutine()
+        {
+            float delay = Mathf.Max(0f, firstOpenGuideDelaySeconds);
+            if (delay > 0f)
+                yield return new WaitForSecondsRealtime(delay);
+
+            _firstOpenGuideRoutine = null;
+
+            if (!gameObject.activeInHierarchy) yield break;
+            if (_guideShownThisSession) yield break;
+
+            TryShowFirstOpenGuide();
+        }
+
+        private void TryShowFirstOpenGuide()
+        {
+            if (!gameObject.activeInHierarchy) return;
+            if (firstOpenGuidePanel == null) return;
+            if (!GuidePanelManager.HasInstance) return;
+
+            if (_guideShownThisSession) return;
+
+            var view = GuidePanelManager.Instance.ShowPanelIfNotComplete(
+                firstOpenGuideStepId,
+                firstOpenGuidePanel.gameObject,
+                pauseGameWhenShow: true,
+                forceShowOnTop: true,
+                sortingOrderOverride: 6000,
+                ignorePrefsInEditor: ignorePrefsInEditorForTesting,
+                disableMarkInEditor: true
+            );
+
+            if (view == null) return;
+
+            _guideShownThisSession = true;
+        }
+
+        private void OnFirstOpenGuideClosed()
+        {
+            if (!GuidePanelManager.HasInstance) return;
+            GuidePanelManager.Instance.MarkShown(firstOpenGuideStepId);
         }
 
         private void RefreshAllNodes()
@@ -190,13 +349,14 @@ namespace IronIvy.UI
         private void OnUnlockClicked()
         {
             if (_currentSelection == null) return;
+
             if (nodesContainer != null)
             {
-                // chỉ refresh các node UI đang active trong tree (nhẹ hơn refresh toàn scene)
                 var nodes = nodesContainer.GetComponentsInChildren<ArchiveNodeUI>(true);
                 for (int i = 0; i < nodes.Length; i++)
                     nodes[i].RefreshVisual();
             }
+
             if (!ArchiveManager.HasInstance) return;
 
             AudioManager.Instance?.PlaySE("NodeUnlock", 0);
@@ -216,7 +376,6 @@ namespace IronIvy.UI
             }
         }
 
-        // ===== typewriter giữ nguyên =====
         private void PlayDescTypewriter(string content)
         {
             StopDescTyping(resetVisible: true);
@@ -297,7 +456,6 @@ namespace IronIvy.UI
             if (inside) SkipDescTyping();
         }
 
-        // ===== reveal giữ nguyên (nhưng chạy trên list đã register) =====
         private void PrepareNodeHidden(ArchiveNodeUI node)
         {
             if (node == null) return;

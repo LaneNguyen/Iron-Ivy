@@ -17,7 +17,8 @@ MonoBehaviour:
   description: "H\xE3y\u2589s\u1ED1ng\u2589\u2589 ch\xEDnh l\xE0 \u2589\u2589\u2589\u2589\u2589\u2589"
   icon: {fileID: 1710308067, guid: 15d11212e2a9f88418565a86e06d99f7, type: 3}
   costToUnlock: 100
-  requiredParent: {fileID: 11400000, guid: ca2259309860920419f0f298ecda7143, type: 2}
+  requiredParent: {fileID: 0}
   rewardType: 1
   rewardValue: 1
   rewardObject: {fileID: 11400000, guid: 13a9dbf17330c7241ad67538a84a36dd, type: 2}
+  triggerEndingTimelineOnUnlock: 1

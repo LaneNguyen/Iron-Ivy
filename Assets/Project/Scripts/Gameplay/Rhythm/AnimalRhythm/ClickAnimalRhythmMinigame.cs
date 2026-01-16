@@ -109,7 +109,8 @@ namespace IronIvy.Gameplay.Rhythm
         {
             _currentAnimal = animal;
             _currentFocus = (animal != null) ? animal.transform : (defaultRoot != null ? defaultRoot : transform);
-            _hasFavoriteBuff = isFavoriteBuff;
+            // FIX: không tin param nữa, buff chỉ tới từ token (one-shot)
+_hasFavoriteBuff = (animal != null) && animal.ConsumeFavoriteFoodBuffToken();
 
             int baseSafety = 3;
             var animalDef = (animal != null) ? animal.Definition : null;

@@ -73,7 +73,30 @@ namespace IronIvy.Gameplay.Rhythm
             IsRunning = true;
             _isStopping = false;
 
+            // FIX: trước khi show HUD của Plant, clear avatar/icon cũ (đặc biệt sau Animal)
+            TryClearRhythmHUDAvatarCache();
+
             _sequenceCoroutine = StartCoroutine(SequenceRoutine());
+        }
+
+        private void TryClearRhythmHUDAvatarCache()
+        {
+            // Mình không biết chính xác RhythmHUD đang dùng hàm nào để set icon
+            // nên mình gọi thử vài tên phổ biến bằng SendMessage
+            if (!UIManager.HasInstance) return;
+            if (UIManager.Instance.notify == null) return;
+            if (UIManager.Instance.notify.rhythmHUD == null) return;
+
+            var hud = UIManager.Instance.notify.rhythmHUD;
+
+            hud.SendMessage("ClearAvatarIcon", SendMessageOptions.DontRequireReceiver);
+            hud.SendMessage("ClearAvatar", SendMessageOptions.DontRequireReceiver);
+            hud.SendMessage("ClearIcon", SendMessageOptions.DontRequireReceiver);
+            hud.SendMessage("ResetAvatar", SendMessageOptions.DontRequireReceiver);
+
+            hud.SendMessage("SetAvatarIcon", null, SendMessageOptions.DontRequireReceiver);
+            hud.SendMessage("SetIcon", null, SendMessageOptions.DontRequireReceiver);
+            hud.SendMessage("SetAnimalIcon", null, SendMessageOptions.DontRequireReceiver);
         }
 
         private IEnumerator SequenceRoutine()
@@ -125,13 +148,14 @@ namespace IronIvy.Gameplay.Rhythm
                 ListenManager.Instance.RaiseRhythmHUDUpdate(new ListenManager.RhythmHUDUpdatePayload(
                     _seqTotalHits, _seqTotalMisses, _trust01, 0f, "", true, 0f));
             }
+
             // SỬA LỖI NHẠC: Kiểm tra kỹ hơn ScriptableObject
             if (plant.musicLoop != null && AudioManager.HasInstance)
             {
                 Debug.Log($"[PlantMinigame] Playing music: {plant.musicLoop.name}");
                 //AudioManager.Instance.PlayBGM(plant.musicLoop.name);
                 //LOGIC mới lưu nhạc: 
-                 AudioManager.Instance.PushBGM(plant.musicLoop.name);
+                AudioManager.Instance.PushBGM(plant.musicLoop.name);
             }
 
             // 4. Chạy qua stages/patterns/sequence
@@ -182,6 +206,7 @@ namespace IronIvy.Gameplay.Rhythm
                 _totalRewards[plant.yieldItem] += yieldCount;
             }
         }
+
         private void SpawnTarget(bool isHold, float beatDuration)
         {
             if (spawnArea == null || targetPrefab == null) return;
@@ -205,7 +230,6 @@ namespace IronIvy.Gameplay.Rhythm
                 (hit) => { _waitHit = hit; _waitResolved = true; }
             );
         }
-
 
         private IEnumerator WaitPlayerInputRoutine(bool isHoldStep)
         {
@@ -255,6 +279,7 @@ namespace IronIvy.Gameplay.Rhythm
             // --- BỔ SUNG: Dừng nhạc minigame ---
             if (AudioManager.HasInstance)
                 AudioManager.Instance.FadeOutBGM();
+
             // Khôi phục camera/HUD giống Animal
             if (CameraManager.HasInstance)
                 CameraManager.Instance.RestoreMinigameCamera();
@@ -278,12 +303,15 @@ namespace IronIvy.Gameplay.Rhythm
                 // --- BỔ SUNG: Dừng nhạc minigame ---
                 if (AudioManager.HasInstance)
                     AudioManager.Instance.FadeOutBGM();
+
                 if (CameraManager.HasInstance)
                     CameraManager.Instance.RestoreMinigameCamera();
+
                 if (AudioManager.HasInstance)
                 {
                     AudioManager.Instance.PopBGM();
                 }
+
                 if (ListenManager.HasInstance)
                     ListenManager.Instance.RaiseRhythmHUDHide();
             }
@@ -353,8 +381,6 @@ namespace IronIvy.Gameplay.Rhythm
 
             return Mathf.Max(1, total);
         }
-
-
 
         private IEnumerator CleanupPlotsRoutine()
         {
