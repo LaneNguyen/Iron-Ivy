@@ -140,6 +140,8 @@ namespace IronIvy.Core
                 Debug.Log("<color=cyan>[UIManager]</color> Nhận tín hiệu kết quả Plant Rhythm. Đang mở bảng thưởng...");
                 notify.plantRewardPanel.ShowPlantRhythmResult(payload);
             }
+
+             ShowMinimap();
         }
 
         private void HandleAnimalRhythmResult(ListenManager.RhythmAnimalResultPayload payload)
@@ -150,6 +152,7 @@ namespace IronIvy.Core
                 notify.animalRewardPanel.gameObject.SetActive(true);
                 notify.animalRewardPanel.ShowAnimalRhythmResult(payload);
             }
+            ShowMinimap();
         }
 
         private void HandleArchiveOpenRequested()
